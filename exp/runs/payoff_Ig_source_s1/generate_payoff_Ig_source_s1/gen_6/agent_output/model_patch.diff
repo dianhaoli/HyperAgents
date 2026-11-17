@@ -1,0 +1,73 @@
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+index e69de29..4a9c153 100644
+Binary files a/__pycache__/task_agent.cpython-313.pyc and b/__pycache__/task_agent.cpython-313.pyc differ
+diff --git a/task_agent.py b/task_agent.py
+index 6f74849..4301240 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,17 +50,29 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs, previous_candidate=None):
++def build_prompt(inputs, previous_candidate=None, verification=False):
++    audit = (
++        "Infer one concrete sequence of grid operations and verify it against every training pair before "
++        "solving the test. The check must be positional and exact, not based on color counts or a plausible "
++        "summary. For any crop, reorder, or repetition, explicitly track the source rows and columns (or "
++        "tile boundaries) that produce the output, and check the resulting height and width. If rows are "
++        "sorted, state the key and the resulting source-row order for each example; do not assume how ties "
++        "are ordered without evidence. If any training cell or dimension disagrees, reject the rule and try "
++        "another one. Keep the final answer in the requested format."
++    )
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
+-        "Before answering, state the rule to yourself as concrete grid operations (including any crop, "
+-        "reordering, or repetition), and check by applying it to every training input that it reproduces "
+-        "the corresponding output exactly. Pay careful attention to row/column positions and output "
+-        "dimensions; do not infer the test output from color counts alone.",
+-        "",
++        audit,
+     ]
++    if verification:
++        parts.extend([
++            "This is a fresh, independent attempt. Derive the transformation from the demonstrations "
++            "without relying on any earlier proposed answer. In particular, do not accept a row/column "
++            "ordering unless its explicit source-position mapping reproduces every training output.",
++        ])
++    parts.append("")
+     for i, pair in enumerate(inputs["train"], 1):
+         parts.append(f"## Example {i}")
+         h, w = len(pair["input"]), len(pair["input"][0])
+@@ -150,9 +162,11 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs, previous_candidate=None):
+-        """One model response -> one parsed grid (or None); optionally verify a prior candidate."""
+-        prompt = build_prompt(inputs, previous_candidate=previous_candidate)
++    def solve_once(self, inputs, previous_candidate=None, verification=False):
++        """One model response -> one parsed grid (or None), with optional independent audit emphasis."""
++        prompt = build_prompt(
++            inputs, previous_candidate=previous_candidate, verification=verification
++        )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -168,10 +182,10 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                # Spend the existing second call on checking/correcting the first candidate,
+-                # rather than issuing the same unconditioned prompt twice.
+-                prior = answers[0] if attempt == 1 and answers else None
+-                g = self.solve_once(inputs, previous_candidate=prior)
++                # Make the second call an independent solve: exposing the first candidate can
++                # anchor the model to a plausible but positionally incorrect transformation.
++                # The call and answer budgets remain unchanged.
++                g = self.solve_once(inputs, verification=(attempt == 1))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

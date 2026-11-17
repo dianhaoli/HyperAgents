@@ -1,0 +1,41 @@
+diff --git a/task_agent.py b/task_agent.py
+index a486c9a..c90579c 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -140,17 +140,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs, previous_candidate=None):
+-        """Make one model attempt, optionally asking it to check an earlier candidate."""
++    def solve_once(self, inputs):
++        """Make one independent model attempt and parse its candidate grid."""
+         prompt = build_prompt(inputs)
+-        if previous_candidate is not None:
+-            prompt += (
+-                "\n\nA previous attempt proposed this candidate grid: "
+-                f"{json.dumps(previous_candidate)}\n"
+-                "Solve the puzzle independently from the demonstrations before judging that candidate. "
+-                "Check whether it follows the same rule as every example and has the correct dimensions. "
+-                "If it is wrong, correct it; if it is right, return it. Return your final grid using the required tags."
+-            )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -166,9 +158,9 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                # Use the second allowed call to verify/refine the first answer rather than
+-                # spending both calls on identical prompts. Keep distinct candidates only.
+-                g = self.solve_once(inputs, previous_candidate=answers[0] if attempt and answers else None)
++                # Keep each allowed attempt independent: showing the first answer can anchor
++                # the second attempt to the same incorrect hypothesis. Retain distinct answers.
++                g = self.solve_once(inputs)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..9176e39
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

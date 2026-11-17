@@ -1,0 +1,210 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index b35b321..4c2a7b9 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -10,16 +10,14 @@ from agent.llm_withtools import chat_with_agent
+ 
+ 
+ def summarize_evaluation_history(eval_path, max_reports=12):
+-    """Summarize prior generation reports for the meta-agent prompt.
+-
+-    Reports are grouped by generation and evaluation type (for example, arc_eval).
+-    Malformed files and reports without accuracy scores are ignored so an incomplete
+-    history cannot prevent an improvement run.
+-    """
++    """Summarize prior evaluation reports, including task-level regressions."""
+     if not eval_path or not os.path.isdir(eval_path):
+         return "No evaluation reports were found (evaluation directory is unavailable)."
+ 
+     reports = []
++    task_statuses = {}
++    task_observations = {}
++    task_failures = {}
+     for root, dirs, files in os.walk(eval_path):
+         dirs.sort()
+         if "report.json" not in files:
+@@ -27,6 +25,7 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+         relative_parts = os.path.relpath(root, eval_path).split(os.sep)
+         generation = None
+         generation_index = None
++        label = None
+         for index, part in enumerate(relative_parts):
+             match = re.fullmatch(r"gen_(initial|\d+)(?:\..*)?", part)
+             if match:
+@@ -43,28 +42,56 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+             continue
+         if not isinstance(data, dict):
+             continue
+-        score = data.get("overall_accuracy", data.get("accuracy"))
++        raw_score = data.get("overall_accuracy", data.get("accuracy"))
++        if isinstance(raw_score, bool):
++            continue
+         try:
+-            score = float(score)
+-        except (TypeError, ValueError):
++            score = float(raw_score)
++        except (TypeError, ValueError, OverflowError):
+             continue
++        if not math.isfinite(score):
++            continue
++
+         kind_parts = relative_parts[generation_index + 1:]
+         kind = "/".join(kind_parts) if kind_parts else "report"
++        outcomes = {}
+         task_scores = data.get("per_task_score", {})
+-        failed = sorted(
+-            str(task) for task, value in task_scores.items()
+-            if isinstance(value, (int, float)) and value < 1
+-        ) if isinstance(task_scores, dict) else []
+-        reports.append((generation, label, kind, score, data.get("total"), failed))
++        if isinstance(task_scores, dict):
++            for task, value in task_scores.items():
++                if isinstance(value, bool) or not isinstance(value, (int, float)):
++                    continue
++                try:
++                    finite_value = math.isfinite(value)
++                except (TypeError, ValueError, OverflowError):
++                    continue
++                if not finite_value:
++                    continue
++                task = str(task)
++                passed = value >= 1
++                outcomes[task] = passed
++                key = (kind, task)
++                task_observations.setdefault(key, set()).add(generation)
++                if not passed:
++                    task_failures.setdefault(key, set()).add(generation)
++        task_statuses[(kind, generation)] = outcomes
++        failed = sorted(task for task, passed in outcomes.items() if not passed)
++        total = data.get("total")
++        reports.append((generation, label, kind, score, total, failed))
+ 
+     if not reports:
+         return "No usable evaluation reports were found in the supplied history."
+ 
+     reports.sort(key=lambda row: (row[0], row[2]))
++    if max_reports is None:
++        report_limit = len(reports)
++    else:
++        try:
++            report_limit = max(1, int(max_reports))
++        except (TypeError, ValueError, OverflowError):
++            report_limit = 12
+     lines = ["Prior evaluation results (accuracy; lower-scoring generations are useful regression evidence):"]
+-    # Keep the newest records while maintaining chronological order.
+-    for _, generation_label, kind, score, total, failed in reports[-max_reports:]:
+-        count = f", {total} tasks" if isinstance(total, int) else ""
++    for _, generation_label, kind, score, total, failed in reports[-report_limit:]:
++        count = f", {total} tasks" if isinstance(total, int) and not isinstance(total, bool) else ""
+         failures = f"; partial/failed task IDs: {', '.join(failed[:12])}" if failed else "; no partial/failed tasks reported"
+         lines.append(f"- gen_{generation_label} [{kind}]: {score:.3f}{count}{failures}")
+ 
+@@ -82,10 +109,43 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+                 f"below gen_{best[1]} best {best[3]:.3f}; inspect its changes before proposing another."
+             )
+ 
++        generations = sorted({entry[0] for entry in entries})
++        if len(generations) >= 2:
++            previous_generation, latest_generation = generations[-2:]
++            previous = task_statuses.get((kind, previous_generation), {})
++            current = task_statuses.get((kind, latest_generation), {})
++            common_tasks = previous.keys() & current.keys()
++            newly_partial = sorted(task for task in common_tasks if previous[task] and not current[task])
++            recovered = sorted(task for task in common_tasks if not previous[task] and current[task])
++            if newly_partial or recovered:
++                changes = []
++                if newly_partial:
++                    changes.append("newly partial/failed: " + ", ".join(newly_partial[:12]))
++                if recovered:
++                    changes.append("recovered: " + ", ".join(recovered[:12]))
++                lines.append(
++                    f"- Task-level changes from gen_{previous_generation} to gen_{latest_generation} "
++                    f"[{kind}]: " + "; ".join(changes)
++                )
++
++    recurring = []
++    for (kind, task), failed_generations in task_failures.items():
++        if len(failed_generations) >= 2:
++            observed = len(task_observations[(kind, task)])
++            recurring.append((kind, task, len(failed_generations), observed))
++    if recurring:
++        recurring.sort(key=lambda item: (item[0], -item[2], item[1]))
++        details = ", ".join(
++            f"{task} ({failure_count}/{observed_count} generations)"
++            for _, task, failure_count, observed_count in recurring[:12]
++        )
++        lines.append(f"- Recurring partial/failed tasks across runs: {details}")
++
+     lines.append(
+-        "Use these reports and the associated predictions/patches to identify repeatable "
+-        "improvements, investigate recurring failures, and preserve changes that improve "
+-        "overall performance without causing avoidable regressions."
++        "Inspect cited generations' agent_output/model_patch.diff and arc_eval/predictions.json; "
++        "for recurring task IDs, inspect their per-task prediction and available agent chat history. "
++        "Use this evidence to identify repeatable improvements, investigate recurring failures, and "
++        "preserve changes that improve overall performance without causing avoidable regressions."
+     )
+     return "\n".join(lines)
+ 
+diff --git a/tests/test_meta_agent.py b/tests/test_meta_agent.py
+index 22045e8..1cde8ce 100644
+--- a/tests/test_meta_agent.py
++++ b/tests/test_meta_agent.py
+@@ -48,5 +48,57 @@ class EvaluationHistorySummaryTests(unittest.TestCase):
+             self.assertIn("No usable", summarize_evaluation_history(root))
+ 
+ 
++class TaskTransitionSummaryTests(unittest.TestCase):
++    def test_reports_transitions_and_recurring_failures(self):
++        with tempfile.TemporaryDirectory() as root:
++            reports = {
++                "gen_1/arc_eval/report.json": {
++                    "overall_accuracy": 0.5,
++                    "total": 3,
++                    "per_task_score": {"regressed": 1.0, "recovered": 0.0, "repeat": 0.0},
++                },
++                "gen_2/arc_eval/report.json": {
++                    "overall_accuracy": 0.75,
++                    "total": 3,
++                    "per_task_score": {"regressed": 0.0, "recovered": 1.0, "repeat": 0.0},
++                },
++            }
++            for relative, data in reports.items():
++                path = os.path.join(root, relative)
++                os.makedirs(os.path.dirname(path), exist_ok=True)
++                with open(path, "w", encoding="utf-8") as stream:
++                    json.dump(data, stream)
++
++            summary = summarize_evaluation_history(root)
++            self.assertIn("newly partial/failed: regressed", summary)
++            self.assertIn("recovered: recovered", summary)
++            self.assertIn("repeat (2/2 generations)", summary)
++
++    def test_ignores_non_finite_and_oversized_scores(self):
++        with tempfile.TemporaryDirectory() as root:
++            reports = {
++                "gen_1/arc_eval/report.json": {
++                    "overall_accuracy": 0.5,
++                    "total": 1,
++                    "per_task_score": {"huge": 10 ** 1000, "ok": 0.0},
++                },
++                "gen_2/arc_eval/report.json": {
++                    "overall_accuracy": float("inf"),
++                    "total": 1,
++                    "per_task_score": {"ok": 1.0},
++                },
++            }
++            for relative, data in reports.items():
++                path = os.path.join(root, relative)
++                os.makedirs(os.path.dirname(path), exist_ok=True)
++                with open(path, "w", encoding="utf-8") as stream:
++                    json.dump(data, stream)
++
++            summary = summarize_evaluation_history(root, max_reports=None)
++            self.assertIn("gen_1 [arc_eval]: 0.500", summary)
++            self.assertNotIn("huge", summary)
++            self.assertNotIn("gen_2 [arc_eval]", summary)
++
++
+ if __name__ == "__main__":
+     unittest.main()

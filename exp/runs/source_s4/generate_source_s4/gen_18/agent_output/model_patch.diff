@@ -1,0 +1,14 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index ee6b15e..e3d1a98 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -17,6 +17,9 @@ class MetaAgent(AgentSystem):
+         # [experiment adaptation, see DECISIONS.md] gpt-6-luna otherwise asks for clarification and never edits.
+         instruction += (
+             f"\n\nThe repository's README.md describes the goal. Previously generated agents and their evaluation results are at `{eval_path}`. "
++            "Inspect the generation and evaluation code, then review prior evaluation reports and representative task-level failures. "
++            "Use that evidence to identify a concrete weakness in how agents are generated or improved, and make a focused change to address it. "
++            "Preserve existing interfaces and avoid changes unrelated to the goal. Run relevant tests or checks when practical, and report any that you could not run. "
+             "Work autonomously: nobody will answer questions, so do not ask for clarification. "
+             "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
+         )

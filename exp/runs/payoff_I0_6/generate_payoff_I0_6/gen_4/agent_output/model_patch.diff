@@ -1,0 +1,16 @@
+diff --git a/task_agent.py b/task_agent.py
+index c90579c..181b7b0 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -83,7 +83,10 @@ def build_prompt(inputs):
+ 
+ 
+ def _valid(g):
+-    return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
++    # ARC-AGI-2 grids in this domain are at most 30x30. Reject oversized parses
++    # rather than returning an answer that cannot be a valid task output.
++    return (isinstance(g, list) and 0 < len(g) <= 30
++            and all(isinstance(r, list) and 0 < len(r) <= 30 for r in g)
+             and len({len(r) for r in g}) == 1
+             and all(isinstance(v, int) and not isinstance(v, bool) and 0 <= v <= 9 for r in g for v in r))
+ 

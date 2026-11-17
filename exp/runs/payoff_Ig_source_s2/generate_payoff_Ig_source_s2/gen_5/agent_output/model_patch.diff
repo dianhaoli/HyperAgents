@@ -1,0 +1,18 @@
+diff --git a/task_agent.py b/task_agent.py
+index dc8f73c..626d977 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -56,13 +56,6 @@ def build_prompt(inputs):
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
+         "",
+-        "Reason from the examples rather than guessing from the test alone. Compare each training "
+-        "input with its output to locate what changes and what stays invariant. Look for repeated "
+-        "objects, colors, shapes, positions, boundaries, and relations between objects; use only "
+-        "patterns supported by the demonstrations. Check that the same rule explains every training "
+-        "pair, including any changes in grid dimensions, before applying it to the test. Avoid "
+-        "changing cells or regions that the inferred rule does not affect.",
+-        "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+         parts.append(f"## Example {i}")

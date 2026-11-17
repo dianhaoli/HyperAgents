@@ -1,0 +1,108 @@
+diff --git a/task_agent.py b/task_agent.py
+index 75dfeda..c17f91d 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,18 +50,78 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
++def _dihedral_variants(grid):
++    """Return named rotations/reflections of a rectangular grid."""
++    variants = []
++    current = [row[:] for row in grid]
++    for turns in range(4):
++        if turns:
++            current = [list(row) for row in zip(*current[::-1])]
++        variants.append((f"rotate_{90 * turns}", current))
++
++    current = [row[::-1] for row in grid]
++    for turns in range(4):
++        if turns:
++            current = [list(row) for row in zip(*current[::-1])]
++        variants.append((f"reflect_then_rotate_{90 * turns}", current))
++    return variants
++
++
++def infer_simple_transform_candidates(inputs):
++    """Infer exact geometric transforms plus a consistent color substitution.
++
++    This deliberately handles only a narrow family of rules. It is used as a
++    fallback when the model did not produce two distinct answers, and only
++    returned when every training-consistent transform predicts the same test
++    grid, avoiding arbitrary tie-breaking between plausible transforms.
++    """
++    train = inputs.get("train", [])
++    if not train:
++        return []
++
++    candidates = []
++    names = [name for name, _ in _dihedral_variants(train[0]["input"])]
++    for name in names:
++        color_map = {}
++        consistent = True
++        for pair in train:
++            transformed = dict(_dihedral_variants(pair["input"])).get(name)
++            output = pair["output"]
++            if transformed is None or len(transformed) != len(output) or any(
++                len(source_row) != len(target_row)
++                for source_row, target_row in zip(transformed, output)
++            ):
++                consistent = False
++                break
++            for source_row, target_row in zip(transformed, output):
++                for source, target in zip(source_row, target_row):
++                    if source in color_map and color_map[source] != target:
++                        consistent = False
++                        break
++                    color_map[source] = target
++                if not consistent:
++                    break
++            if not consistent:
++                break
++
++        if not consistent:
++            continue
++        transformed_test = dict(_dihedral_variants(inputs["test_input"]))[name]
++        if any(value not in color_map for row in transformed_test for value in row):
++            continue
++        prediction = [[color_map[value] for value in row] for row in transformed_test]
++        if prediction not in candidates:
++            candidates.append(prediction)
++    return candidates
++
++
+ def build_prompt(inputs, previous_candidate=None):
+     """Build a careful ARC prompt, optionally asking for an independent audit."""
+     parts = [
+-        "Solve this ARC-AGI puzzle. The training pairs demonstrate one exact grid transformation. ",
+-        "Infer a rule that explains every pair, then apply it to the test grid. Do not assume the ",
+-        "output has the same dimensions as the input: some rules crop, tile, rearrange, or enlarge grids.",
+-        "\nReason carefully before answering:",
+-        "1. Identify the relevant objects, colors, repeating patterns, borders, and grid structure.",
+-        "2. Compare each input with its output and state what changes and what stays unchanged.",
+-        "3. Check that the proposed rule accounts for every training pair, not just one example.",
+-        "4. Apply the rule to the test input and check the result's dimensions and every row.",
+-        "Do not invent details unsupported by the examples. Return one complete rectangular grid of integers 0-9.",
++        "Solve this ARC-AGI puzzle. Infer a rule that explains every training pair, then apply it "
++        "to the test input. Grids are rectangular arrays of colors 0-9. Outputs may change dimensions.",
++        "Carefully compare object positions, colors, symmetry, and grid structure; verify your rule "
++        "against all examples and check every row and dimension of your proposed answer.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -176,4 +236,15 @@ class TaskAgent:
+                 g = None
+             if g is not None and g not in answers:
+                 answers.append(g)
++        # If model calls failed, repeated the same answer, or yielded only one
++        # usable grid, fill the remaining slot only with a conservative exact
++        # transform that is consistent with every demonstration. Disagreement
++        # between possible transforms means the fallback is too ambiguous.
++        if len(answers) < 2:
++            simple_candidates = infer_simple_transform_candidates(inputs)
++            if simple_candidates and all(
++                candidate == simple_candidates[0] for candidate in simple_candidates
++            ):
++                if simple_candidates[0] not in answers:
++                    answers.append(simple_candidates[0])
+         return answers[:2], []

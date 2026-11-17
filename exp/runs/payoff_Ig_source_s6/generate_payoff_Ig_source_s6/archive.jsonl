@@ -1,2 +1,4 @@
 {"current_genid": "initial", "archive": ["initial"]}
 {"current_genid": 1, "archive": ["initial", 1]}
+{"current_genid": 2, "archive": ["initial", 1, 2]}
+{"current_genid": 3, "archive": ["initial", 1, 2, 3]}

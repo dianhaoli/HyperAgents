@@ -1,0 +1,20 @@
+2026-11-17 22:46:59,375 - MainThread - INFO - Container output: 
+2026-11-17 22:46:59,396 - MainThread - INFO - Container output: 
+2026-11-17 22:46:59,416 - MainThread - INFO - Container output: f9466291a668b58c949a9aeadd3c5b3d664e175f
+
+2026-11-17 22:46:59,652 - MainThread - INFO - Container output: total 28
+-rw-r--r-- 1 arcagent arcagent  263 Nov 17 22:46 archive.jsonl
+drwxr-xr-x 4 arcagent arcagent 4096 Nov 17 22:31 gen_1
+drwxr-xr-x 3 arcagent arcagent 4096 Nov 17 22:31 gen_2
+drwxr-xr-x 4 arcagent arcagent 4096 Nov 17 22:39 gen_3
+drwxr-xr-x 4 arcagent arcagent 4096 Nov 17 22:46 gen_4
+drwxr-xr-x 3 arcagent arcagent 4096 Nov 17 22:46 gen_initial
+-rw-r--r-- 1 arcagent arcagent 1227 Nov 17 22:15 generate_loop.log
+
+2026-11-17 22:46:59,652 - MainThread - INFO - Running meta agent...
+2026-11-17 22:48:06,697 - MainThread - INFO - Container output: reset_paths_to_commit: Checked out ['domains/'] from f9466291a668b58c949a9aeadd3c5b3d664e175f
+reset_paths_to_commit: Cleaned untracked files in ['domains/']
+
+2026-11-17 22:48:06,789 - MainThread - INFO - Container output: 
+2026-11-17 22:48:06,875 - MainThread - INFO - Container output: 
+2026-11-17 22:48:07,109 - ThreadPoolExecutor-7_0 - INFO - [eval] {'phase': 'payoff', 'arm': 'Ig', 'seed': 5, 'iteration': '5'} round 0: 26 test inputs to run (0 cached)

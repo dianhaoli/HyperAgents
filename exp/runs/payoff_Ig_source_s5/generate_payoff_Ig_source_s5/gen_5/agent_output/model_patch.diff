@@ -1,0 +1,37 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..067a2cc 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -137,9 +137,16 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
++    def solve_once(self, inputs, alternative=False):
++        """Make one attempt, optionally asking for an independent second hypothesis."""
+         prompt = build_prompt(inputs)
++        if alternative:
++            prompt += (
++                "\n\nFor this second candidate, independently infer the transformation from the "
++                "training pairs rather than relying on any earlier candidate. Check more than one "
++                "plausible interpretation against every example, then return the output supported "
++                "by the examples. It may match another attempt if that is the best-supported rule."
++            )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,9 +160,11 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # The evaluator accepts either candidate; keep attempt two independent to reduce
++                # anchoring on the first answer while using the full call budget.
++                g = self.solve_once(inputs, alternative=(attempt == 1))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

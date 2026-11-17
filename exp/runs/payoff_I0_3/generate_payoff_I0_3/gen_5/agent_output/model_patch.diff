@@ -1,0 +1,117 @@
+diff --git a/generate_loop.py b/generate_loop.py
+index d8fdcd7..4ceca0b 100644
+--- a/generate_loop.py
++++ b/generate_loop.py
+@@ -2,7 +2,9 @@
+ 
+ import argparse
+ import json
++import math
+ import os
++import tempfile
+ from concurrent.futures import ThreadPoolExecutor
+ from datetime import datetime
+ 
+@@ -360,6 +362,77 @@ def eval_produced_agent(
+         )
+ 
+ 
++def _build_evaluation_summary(eval_path, exclude_genid=None):
++    """Create a compact report index for the self-improving agent."""
++    score_keys = (
++        "overall_accuracy", "accuracy", "exact_match_accuracy",
++        "success_rate", "resolved_rate", "score",
++    )
++    reports = []
++    if not eval_path or not os.path.isdir(eval_path):
++        return ""
++
++    for root, _, filenames in os.walk(eval_path):
++        if "report.json" not in filenames:
++            continue
++        try:
++            with open(os.path.join(root, "report.json"), encoding="utf-8") as f:
++                report = json.load(f)
++        except (OSError, ValueError):
++            continue
++        if not isinstance(report, dict):
++            continue
++        metric = next(
++            ((key, report[key]) for key in score_keys
++             if isinstance(report.get(key), (int, float))
++             and not isinstance(report.get(key), bool)
++             and math.isfinite(report[key])),
++            None,
++        )
++        if metric is None:
++            continue
++
++        relative_parts = os.path.relpath(root, eval_path).split(os.sep)
++        generation = next((part for part in relative_parts if part.startswith("gen_")), "unknown")
++        if exclude_genid is not None and generation == f"gen_{exclude_genid}":
++            continue
++        report_kind = "/".join(part for part in relative_parts if part != generation) or "report"
++        failed = report.get("question_ids_failed")
++        if not isinstance(failed, list):
++            per_task = report.get("per_task_score")
++            failed = ([task for task, value in per_task.items()
++                       if isinstance(value, (int, float)) and value < 1]
++                      if isinstance(per_task, dict) else [])
++        reports.append((report_kind, generation, metric[0], metric[1], failed))
++
++    if not reports:
++        return ""
++
++    def gen_order(generation):
++        if generation == "gen_initial":
++            return -1
++        try:
++            return int(generation.removeprefix("gen_"))
++        except ValueError:
++            return 10**9
++
++    reports.sort(key=lambda row: (row[0], gen_order(row[1])))
++    lines = [
++        "# Prior evaluation summary",
++        "",
++        "Compare scores only within the same report path/domain and split.",
++        "Use these measured results to identify gains and regressions before changing the agent.",
++    ]
++    for report_kind, generation, metric, score, failed in reports:
++        line = f"- {generation} / {report_kind}: {metric}={score:g}"
++        if failed:
++            line += "; failed task IDs: " + ", ".join(str(task) for task in failed[:12])
++            if len(failed) > 12:
++                line += f" (+{len(failed) - 12} more)"
++        lines.append(line)
++    return "\n".join(lines) + "\n"
++
++
+ def copy_prev_eval_to_container(
+     container,
+     prev_eval_path,
+@@ -404,6 +477,24 @@ def copy_prev_eval_to_container(
+     for cmd in prune_cmds:
+         exec_result = container.exec_run(["bash", "-lc", cmd], workdir="/")
+ 
++    # Give the meta-agent a compact, factual index alongside the raw reports.
++    # Keep the archived reports intact; omit the generation currently being produced.
++    summary = _build_evaluation_summary(prev_eval_path, exclude_genid=current_genid)
++    if summary:
++        summary_path = None
++        try:
++            with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", delete=False) as f:
++                f.write(summary)
++                summary_path = f.name
++            copy_to_container(
++                container,
++                source_path=summary_path,
++                dest_path=os.path.join(container_prev_eval_path, "EVALUATION_SUMMARY.md"),
++            )
++        finally:
++            if summary_path and os.path.exists(summary_path):
++                os.remove(summary_path)
++
+     # Confirm files remaining were copied
+     exec_result = container.exec_run(
+         ["ls", "-l", container_prev_eval_path], workdir="/"

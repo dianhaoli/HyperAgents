@@ -1,1 +1,2 @@
 {"iteration": "1", "score": 0.6, "missing": 0, "infra_error_rows": 5, "n_test_inputs": 26, "code_hash": "d6a8732f8265836d", "format_failures": 1, "snapshot_skipped": []}
+{"iteration": "2", "score": 0.66, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "9514c45bf2b61787", "format_failures": 0, "snapshot_skipped": []}

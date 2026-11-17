@@ -1,2 +1,3 @@
 {"iteration": "1", "score": 0.0, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "90b392264242d2c1", "format_failures": 26, "snapshot_skipped": []}
 {"iteration": "2", "score": 0.62, "missing": 0, "infra_error_rows": 2, "n_test_inputs": 26, "code_hash": "3a2bf1516c26b351", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "3", "score": 0.62, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "01690048622ad933", "format_failures": 1, "snapshot_skipped": []}
