@@ -70,5 +70,18 @@
 "source_s6:7": [
 "meta_agent.py",
 "utils/git_utils.py"
+],
+"source_s1:5": [
+"meta_agent.py"
+],
+"source_s1:6": [
+"meta_agent.py"
+],
+"source_s3:4": [],
+"source_s3:5": [],
+"source_s4:4": [],
+"source_s4:6": [
+"meta_agent.py",
+"run_meta_agent.py"
 ]
 }

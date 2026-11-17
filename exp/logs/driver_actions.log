@@ -1,1 +1,13 @@
 22:58:25 launched final exam for payoff_Ig_source_s3
+22:58:27 pick source_s1:g6: source_s1 g6 -> (1, 4, 0.12) | max mean child improvement among changed coaches with >=3 descendants
+   transplant check: True __ARC_SANDBOX_STARTED__
+IMPORT_OK 
+22:58:28 pick source_s2:g6: source_s2 g6 -> (5, 0, None) | no changed coach with >=3 descendants (and scored children): most descendants
+   transplant check: True __ARC_SANDBOX_STARTED__
+IMPORT_OK 
+22:58:30 pick source_s3:g6: source_s3 g6 -> (3, 1, 0.0) | no changed coach with >=3 descendants (and scored children): most descendants
+   transplant check: True __ARC_SANDBOX_STARTED__
+IMPORT_OK 
+22:58:31 pick source_s4:g6: source_s4 g6 -> (6, 0, None) | no changed coach with >=3 descendants (and scored children): most descendants
+   transplant check: True __ARC_SANDBOX_STARTED__
+IMPORT_OK 

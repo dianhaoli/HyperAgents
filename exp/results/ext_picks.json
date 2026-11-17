@@ -1,0 +1,197 @@
+{
+ "source_s1:g6": {
+  "run": "source_s1",
+  "generation": 6,
+  "n_changed_coaches": 4,
+  "candidates": [
+   {
+    "gen": 1,
+    "score": 0.72,
+    "n_descendants": 4,
+    "n_children": 1,
+    "n_scored_children": 1,
+    "mean_child_improvement": 0.12,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 2,
+    "score": 0.84,
+    "n_descendants": 3,
+    "n_children": 3,
+    "n_scored_children": 2,
+    "mean_child_improvement": -0.019999999999999962,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 5,
+    "score": 0.92,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 6,
+    "score": 0.72,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   }
+  ],
+  "pick": {
+   "gen": 1,
+   "score": 0.72,
+   "n_descendants": 4,
+   "n_children": 1,
+   "n_scored_children": 1,
+   "mean_child_improvement": 0.12,
+   "meta_files_changed_vs_I0": [
+    "meta_agent.py"
+   ]
+  },
+  "rule": "max mean child improvement among changed coaches with >=3 descendants",
+  "transplant_check": {
+   "ok": true,
+   "msg": "__ARC_SANDBOX_STARTED__\nIMPORT_OK\n",
+   "files_differing_from_I0": [
+    "meta_agent.py"
+   ]
+  }
+ },
+ "source_s2:g6": {
+  "run": "source_s2",
+  "generation": 6,
+  "n_changed_coaches": 1,
+  "candidates": [
+   {
+    "gen": 5,
+    "score": 0.96,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   }
+  ],
+  "pick": {
+   "gen": 5,
+   "score": 0.96,
+   "n_descendants": 0,
+   "n_children": 0,
+   "n_scored_children": 0,
+   "mean_child_improvement": null,
+   "meta_files_changed_vs_I0": [
+    "meta_agent.py"
+   ]
+  },
+  "rule": "no changed coach with >=3 descendants (and scored children): most descendants",
+  "transplant_check": {
+   "ok": true,
+   "msg": "__ARC_SANDBOX_STARTED__\nIMPORT_OK\n",
+   "files_differing_from_I0": [
+    "meta_agent.py"
+   ]
+  }
+ },
+ "source_s3:g6": {
+  "run": "source_s3",
+  "generation": 6,
+  "n_changed_coaches": 2,
+  "candidates": [
+   {
+    "gen": 3,
+    "score": 0.8,
+    "n_descendants": 1,
+    "n_children": 1,
+    "n_scored_children": 1,
+    "mean_child_improvement": 0.0,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 6,
+    "score": 0.8,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   }
+  ],
+  "pick": {
+   "gen": 3,
+   "score": 0.8,
+   "n_descendants": 1,
+   "n_children": 1,
+   "n_scored_children": 1,
+   "mean_child_improvement": 0.0,
+   "meta_files_changed_vs_I0": [
+    "meta_agent.py"
+   ]
+  },
+  "rule": "no changed coach with >=3 descendants (and scored children): most descendants",
+  "transplant_check": {
+   "ok": true,
+   "msg": "__ARC_SANDBOX_STARTED__\nIMPORT_OK\n",
+   "files_differing_from_I0": [
+    "meta_agent.py"
+   ]
+  }
+ },
+ "source_s4:g6": {
+  "run": "source_s4",
+  "generation": 6,
+  "n_changed_coaches": 1,
+  "candidates": [
+   {
+    "gen": 6,
+    "score": null,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py",
+     "run_meta_agent.py"
+    ]
+   }
+  ],
+  "pick": {
+   "gen": 6,
+   "score": null,
+   "n_descendants": 0,
+   "n_children": 0,
+   "n_scored_children": 0,
+   "mean_child_improvement": null,
+   "meta_files_changed_vs_I0": [
+    "meta_agent.py",
+    "run_meta_agent.py"
+   ]
+  },
+  "rule": "no changed coach with >=3 descendants (and scored children): most descendants",
+  "transplant_check": {
+   "ok": true,
+   "msg": "__ARC_SANDBOX_STARTED__\nIMPORT_OK\n",
+   "files_differing_from_I0": [
+    "meta_agent.py",
+    "run_meta_agent.py"
+   ]
+  }
+ }
+}
