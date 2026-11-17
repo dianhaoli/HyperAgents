@@ -12,3 +12,5 @@ run_payoff_I0_4		python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/
 run_payoff_I0_5		python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/payoff_I0_5/config.json > /home/user/HyperAgents/exp/runs/payoff_I0_5/run.log 2>&1
 run_payoff_I0_6		python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/payoff_I0_6/config.json > /home/user/HyperAgents/exp/runs/payoff_I0_6/run.log 2>&1
 run_source_s3		python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/source_s3/config.json > /home/user/HyperAgents/exp/runs/source_s3/run.log 2>&1
+driver		python3 -m arcexp.driver
+final_payoff_Ig_source_s3	16	python3 -m arcexp.phases final --run payoff_Ig_source_s3
