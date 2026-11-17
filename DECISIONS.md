@@ -183,3 +183,4 @@ The user allowed deviations from the prompt's design where clearly better; each 
     sandboxed import check. Trial iterations (step 7) run before the pay-off runs. The pay-off runs start before
     the pilot exams finish (timing only, like item 22). If the pilot gate fails, they are stopped and reported.
 31b. Transplant check (step 7) passed: all 5 trial coach steps exited 0 with no missing-file errors (s2 and s5 made no edit in their trial; s1, s3, s6 made edits).
+32. Observation: several coach edits break the player (e.g. payoff_I0_5 gen 1, payoff_I0_3 gen 2: the call site passes a new argument to solve_once but its signature was not changed, so every call raises TypeError, which the player swallows; 0 model calls, score 0). These are genuine outcomes of the improvement step, not infrastructure; counted in RESULTS.md.

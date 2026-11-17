@@ -1,0 +1,57 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..21119de 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,13 +50,21 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, attempt=0):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
+         "",
+     ]
++    if attempt == 1:
++        parts.extend([
++            "Solve this as an independent second analysis. Infer a rule that explains every demonstration, "
++            "check that rule against each input-output pair, and only then apply it to the test. "
++            "Reconsider the interpretation if it fails any example; preserve the grid faithfully and "
++            "return one complete valid output grid.",
++            "",
++        ])
+     for i, pair in enumerate(inputs["train"], 1):
+         parts.append(f"## Example {i}")
+         h, w = len(pair["input"]), len(pair["input"][0])
+@@ -137,9 +145,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
++    def solve_once(self, inputs, attempt=0):
+         """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++        prompt = build_prompt(inputs, attempt=attempt)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,9 +161,11 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # The second allowed call uses a distinct verification-oriented prompt so it can
++                # contribute a genuinely different candidate instead of repeating the first setup.
++                g = self.solve_once(inputs, attempt=attempt)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..081e5ed
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

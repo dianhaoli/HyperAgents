@@ -1,0 +1,69 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..6f74849 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,11 +50,15 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, previous_candidate=None):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "Before answering, state the rule to yourself as concrete grid operations (including any crop, "
++        "reordering, or repetition), and check by applying it to every training input that it reproduces "
++        "the corresponding output exactly. Pay careful attention to row/column positions and output "
++        "dimensions; do not infer the test output from color counts alone.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -66,6 +70,15 @@ def build_prompt(inputs):
+         parts.append(f"Output ({h}x{w}):")
+         parts.append(grid_to_text(pair["output"]))
+         parts.append("")
++    if previous_candidate is not None:
++        parts.extend([
++            "## Candidate from the first attempt",
++            json.dumps(previous_candidate),
++            "You are the independent verification attempt. Re-derive the rule from the demonstrations, "
++            "check this candidate against that rule, and correct it if any cell, row order, or dimension "
++            "is inconsistent. Do not repeat the candidate merely because it is provided.",
++            "",
++        ])
+     t = inputs["test_input"]
+     parts.append("## Test")
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+@@ -137,9 +150,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def solve_once(self, inputs, previous_candidate=None):
++        """One model response -> one parsed grid (or None); optionally verify a prior candidate."""
++        prompt = build_prompt(inputs, previous_candidate=previous_candidate)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,9 +166,12 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Spend the existing second call on checking/correcting the first candidate,
++                # rather than issuing the same unconditioned prompt twice.
++                prior = answers[0] if attempt == 1 and answers else None
++                g = self.solve_once(inputs, previous_candidate=prior)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..09393ac
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

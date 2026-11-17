@@ -1,0 +1,128 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..8f6fc92 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,11 +50,14 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, candidate=None):
++    """Build a rule-focused prompt, optionally asking the model to check an earlier answer."""
+     parts = [
+-        "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+-        "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "Solve this ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
++        "(colors). The training pairs share one transformation rule; infer that rule and apply it.",
++        "Compare each input with its output carefully, including dimensions, object positions, "
++        "colors, repetitions, and symmetries. Check that one rule explains every training pair. "
++        "The test output may have different dimensions from its input.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -71,10 +74,18 @@ def build_prompt(inputs):
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+     parts.append(grid_to_text(t))
+     parts.append("")
++    if candidate is not None:
++        parts.extend([
++            "## Candidate from an earlier attempt (it may be wrong)",
++            json.dumps(candidate),
++            "Independently derive the rule from the training pairs. Check this candidate against "
++            "the rule and correct it if needed; do not copy it without verification.",
++            "",
++        ])
+     parts.append(
+-        "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+-        "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+-        "Put nothing else inside the tags."
++        "Return the output grid for the test input. End your response with the grid inside "
++        "<answer></answer> tags as a JSON list of rows, for example:\n"
++        "<answer>[[0, 1, 2], [3, 4, 5]]</answer>\nPut nothing else inside the tags."
+     )
+     return "\n".join(parts)
+ 
+@@ -137,9 +148,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
++    def solve_once(self, inputs, candidate=None):
+         """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++        prompt = build_prompt(inputs, candidate=candidate)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,12 +164,16 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        first = None
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Use the second budgeted call to independently verify/repair the first answer.
++                g = self.solve_once(inputs, candidate=first if attempt == 1 else None)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+             if g is not None:
+                 answers.append(g)
++                if attempt == 0:
++                    first = g
+         return answers, []
+diff --git a/tests/test_task_agent.py b/tests/test_task_agent.py
+new file mode 100644
+index 0000000..56ddc8f
+--- /dev/null
++++ b/tests/test_task_agent.py
+@@ -0,0 +1,46 @@
++import tempfile
++import unittest
++from unittest.mock import patch
++
++import task_agent
++
++
++class TaskAgentTests(unittest.TestCase):
++    def setUp(self):
++        self.inputs = {
++            "domain": "arc",
++            "train": [{"input": [[1, 0]], "output": [[0, 1]]}],
++            "test_input": [[2, 0]],
++        }
++
++    def test_prompt_represents_training_and_test_grids(self):
++        prompt = task_agent.build_prompt(self.inputs)
++        self.assertIn("Input (1x2):", prompt)
++        self.assertIn("Output (1x2):", prompt)
++        self.assertIn("Test", prompt)
++        self.assertIn("test output may have different dimensions", prompt)
++
++    def test_second_attempt_receives_first_candidate(self):
++        prompts = []
++        responses = iter([
++            "<answer>[[0, 2]]</answer>",
++            "<answer>[[2, 0]]</answer>",
++        ])
++
++        def fake_call(prompt):
++            prompts.append(prompt)
++            return next(responses)
++
++        with tempfile.NamedTemporaryFile() as log:
++            agent = task_agent.TaskAgent(chat_history_file=log.name)
++            with patch.object(task_agent, "call_model", side_effect=fake_call):
++                answers, history = agent.forward(self.inputs)
++
++        self.assertEqual(answers, [[[0, 2]], [[2, 0]]])
++        self.assertEqual(history, [])
++        self.assertNotIn("Candidate from an earlier attempt", prompts[0])
++        self.assertIn('[[0, 2]]', prompts[1])
++
++
++if __name__ == "__main__":
++    unittest.main()

@@ -14,3 +14,4 @@ reset_paths_to_commit: Cleaned untracked files in ['domains/']
 2026-11-17 22:15:15,780 - MainThread - INFO - Container output: 
 2026-11-17 22:15:15,854 - MainThread - INFO - Container output: 
 2026-11-17 22:15:15,922 - ThreadPoolExecutor-0_0 - INFO - [eval] {'phase': 'trial', 'arm': 'Ig', 'seed': 1, 'iteration': '1'} round 0: 26 test inputs to run (0 cached)
+2026-11-17 22:21:02,264 - ThreadPoolExecutor-0_0 - INFO - [eval] {'phase': 'trial', 'arm': 'Ig', 'seed': 1, 'iteration': '1'} round 1: 3 test inputs to run (23 cached)
