@@ -1,0 +1,20 @@
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+index e69de29..7d50c27 100644
+Binary files a/__pycache__/task_agent.cpython-313.pyc and b/__pycache__/task_agent.cpython-313.pyc differ
+diff --git a/task_agent.py b/task_agent.py
+index d60c474..6a3fe74 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -70,6 +70,12 @@ def build_prompt(inputs):
+     parts.append(grid_to_text(t))
+     parts.append("")
+     parts.append(
++        "Before applying a rule, audit the demonstrations: identify the relevant objects/colors and "
++        "describe how the changed cells relate to them. Check the proposed rule against every "
++        "input/output pair, including cells that stay unchanged; reject or revise it if even one "
++        "pair disagrees. Do not infer a rule from only the endpoints or one example when the "
++        "other examples constrain which cells change. Then apply the verified rule to the test, "
++        "checking the grid dimensions and changed regions.\n\n"
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+         "Put nothing else inside the tags."

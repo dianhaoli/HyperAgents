@@ -23,5 +23,6 @@
   "rng_seed": 505,
   "workers": 16,
   "name": "trial_Ig_source_s5",
-  "root_commit": "22fedbfd636fb377aa4df3bf47a92483607ec572"
+  "root_commit": "22fedbfd636fb377aa4df3bf47a92483607ec572",
+  "done": true
 }

@@ -95,6 +95,41 @@ def cmd_payoff():
         launch(payoff_i0(i))
 
 
+def cmd_ext(run, gen):
+    """DESIGN_v2 extension test run: transplanted coach of `run` at generation `gen`, frozen pay-off rules."""
+    seed_index = int(run.replace("source_s", "")) - 1
+    tdir = os.path.join(EXP, "transplants_ext", f"{run}_g{gen}")
+    man = json.load(open(os.path.join(tdir, "manifest.json")))
+    name = f"ext_{run}_g{gen}"
+    make(name, phase="ext_payoff", arm=f"g{gen}", seed=seed_index, source_run=run, coach_generation=gen,
+         coach_node=man["gen"], task_set="payoff", max_generation=K,
+         template_dir=os.path.relpath(os.path.join(tdir, "template"), REPO), freeze_paths=man["freeze_paths"],
+         rng_seed=3000 + 100 * gen + seed_index, workers=12)
+    launch(name)
+
+
+def cmd_resume():
+    """Relaunch every unfinished loop run and every registered phase job that has not logged __JOB_DONE__."""
+    for name in sorted(os.listdir(RUNS)):
+        p = os.path.join(RUNS, name, "config.json")
+        if os.path.exists(p) and not json.load(open(p)).get("done") and name != "smoke":
+            launch(name)
+    reg = os.path.join(EXP, "logs", "jobs.tsv")
+    seen = {}
+    if os.path.exists(reg):
+        for line in open(reg):
+            parts = line.rstrip("\n").split("\t")
+            if len(parts) == 3:
+                seen[parts[0]] = parts
+    for name, w, cmd in seen.values():
+        log = os.path.join(EXP, "logs", f"{name}.log")
+        tail = open(log, errors="replace").read()[-3000:] if os.path.exists(log) else ""
+        if "__JOB_DONE__" in tail.splitlines()[-1:] or tail.rstrip().endswith("__JOB_DONE__"):
+            continue
+        env = dict(os.environ, ARC_WORKERS=w or "16")
+        subprocess.run(["bash", os.path.join(REPO, "arcexp", "run_bg.sh"), name] + cmd.split(), env=env)
+
+
 def cmd_status():
     for name in sorted(os.listdir(RUNS)):
         p = os.path.join(RUNS, name, "config.json")
@@ -109,4 +144,8 @@ def cmd_status():
 
 
 if __name__ == "__main__":
-    {"pilot": cmd_pilot, "source": cmd_source, "trial": cmd_trial, "payoff": cmd_payoff, "status": cmd_status}[sys.argv[1]]()
+    if sys.argv[1] == "ext":
+        cmd_ext(sys.argv[2], int(sys.argv[3]))
+    else:
+        {"pilot": cmd_pilot, "source": cmd_source, "trial": cmd_trial, "payoff": cmd_payoff, "status": cmd_status,
+         "resume": cmd_resume}[sys.argv[1]]()

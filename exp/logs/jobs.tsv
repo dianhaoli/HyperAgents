@@ -1,0 +1,4 @@
+b0_rep2	16	python3 -m arcexp.phases b0 --only 2
+xhigh	16	python3 -m arcexp.phases xhigh
+final_payoff_I0_1	16	python3 -m arcexp.phases final --run payoff_I0_1
+final_payoff_I0_2	16	python3 -m arcexp.phases final --run payoff_I0_2
