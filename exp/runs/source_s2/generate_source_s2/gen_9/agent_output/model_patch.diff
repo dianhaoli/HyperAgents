@@ -1,0 +1,12 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index 3ab0656..b35b321 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -1,6 +1,7 @@
+ # Copyright (c) Meta Platforms, Inc. and affiliates.
+ 
+ import json
++import math
+ import os
+ import re
+ 

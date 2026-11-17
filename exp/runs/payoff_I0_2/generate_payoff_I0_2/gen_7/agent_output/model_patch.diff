@@ -1,0 +1,18 @@
+diff --git a/task_agent.py b/task_agent.py
+index 7f4e32a..06defa7 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -76,9 +76,10 @@ def build_prompt(inputs, candidate=None):
+         "positions in every example. Consider whether the rule uses objects or connected components, "
+         "a frame or grid, repetition/tiling, reflection/rotation, cropping/expansion, or movement and "
+         "interaction. Infer the background from the examples rather than assuming color 0 is background. "
+-        "Before answering, apply the proposed rule to each training input and check that the resulting "
+-        "grid matches its demonstrated output exactly, including dimensions and individual cells. "
+-        "Do not add changes that the rule does not explain."
++        "Before answering, state one concise rule and explain how it reproduces each training output; "
++        "if the rule does not account for every example, revise it rather than guessing. Then apply the "
++        "rule to the test input. Check that each training result matches exactly, including dimensions "
++        "and individual cells, and do not add changes the rule does not explain."
+     )
+     if candidate is not None:
+         parts.append(

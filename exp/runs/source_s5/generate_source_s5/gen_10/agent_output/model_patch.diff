@@ -1,0 +1,17 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index 20f8ebc..c203d32 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -88,7 +88,11 @@ def summarize_evaluations(eval_path, max_reports=40, max_task_ids=8):
+     lines = [
+         "Read-only evaluation summary (metrics/task IDs only; predictions are not included):"
+     ]
+-    for genid, relpath, report, parent in entries[:max_reports]:
++    # Keep the newest reports when the history exceeds the prompt budget. Since
++    # entries are chronological, this retains recent candidate outcomes while
++    # preserving their order in the rendered summary.
++    shown_entries = entries[-max_reports:] if max_reports > 0 else []
++    for genid, relpath, report, parent in shown_entries:
+         line = f"gen_{genid}/{relpath}: score={report['score']:.3f}"
+         if isinstance(report["total"], int):
+             line += f", reported total={report['total']}"

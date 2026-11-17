@@ -1,0 +1,36 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index ee6b15e..e8f7319 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -18,7 +18,14 @@ class MetaAgent(AgentSystem):
+         instruction += (
+             f"\n\nThe repository's README.md describes the goal. Previously generated agents and their evaluation results are at `{eval_path}`. "
+             "Work autonomously: nobody will answer questions, so do not ask for clarification. "
+-            "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
++            "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done.\n\n"
++            "Inspect completed evaluation reports, generation metadata, patches, and relevant failure logs before proposing a change. "
++            "Compare each candidate with its parent and the initial agent; the newest generation is not necessarily the best, "
++            "and an unevaluated generation is not evidence of improvement. Preserve behavior from the strongest completed result "
++            "unless there is a specific, evidence-based reason to change it. Treat failed cases as clues for hypotheses, not as "
++            "justification for unsupported task-specific hints. Prefer a small general change that addresses an identifiable failure "
++            "mode while preserving solved cases, and keep agent interfaces and enforced budgets intact. Do not claim improvement "
++            "unless evaluation confirms it."
+         )
+ 
+         new_msg_history = chat_with_agent(instruction, model=self.model, msg_history=[], logging=self.log, tools_available='all')
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..cd2ca6e 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -55,6 +55,11 @@ def build_prompt(inputs):
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "Compare every example carefully: identify which objects, colors, shapes, positions, counts, and "
++        "grid dimensions change or stay fixed. Prefer the simplest rule that explains all examples, and "
++        "check that it also applies to the test. Before answering, verify the output's dimensions, every "
++        "changed cell, and preservation of cells that should remain unchanged. Do not merely copy an "
++        "example or assume a familiar rule without checking it against all demonstrations.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):

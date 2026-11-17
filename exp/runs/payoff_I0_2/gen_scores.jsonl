@@ -3,3 +3,5 @@
 {"iteration": "3", "score": 0.76, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "63115304fd882665", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "4", "score": 0.74, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "58c135a9b0988b74", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "5", "score": 0.62, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "149cd174f12f8110", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "6", "score": 0.6, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "58c135a9b0988b74", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "7", "score": 0.62, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "3ad3bcd161c95d67", "format_failures": 0, "snapshot_skipped": []}
