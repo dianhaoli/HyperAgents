@@ -1,1 +1,3 @@
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3/gen_18', 'current_genid': 18, 'parent_genid': 6, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 18 completed, parent 3
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3/gen_19', 'current_genid': 19, 'parent_genid': 3, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
