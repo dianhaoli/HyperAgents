@@ -9,3 +9,11 @@ generate_loop: generation 7 completed, parent 5
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_8', 'current_genid': 8, 'parent_genid': 5, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
 generate_loop: generation 8 completed, parent 5
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_9', 'current_genid': 9, 'parent_genid': 5, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 9 completed, parent 7
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_10', 'current_genid': 10, 'parent_genid': 7, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 10 completed, parent 9
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_11', 'current_genid': 11, 'parent_genid': 9, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 11 completed, parent 2
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_12', 'current_genid': 12, 'parent_genid': 2, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 12 completed, parent 5
+RUN DONE source_s2

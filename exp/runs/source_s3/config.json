@@ -9,5 +9,6 @@
   "rng_seed": 3,
   "workers": 12,
   "root_commit": "abf2a504f61867c752bed49a51cb19fee444fce1",
-  "name": "source_s3"
+  "name": "source_s3",
+  "done": true
 }
