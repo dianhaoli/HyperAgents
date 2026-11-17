@@ -182,3 +182,4 @@ The user allowed deviations from the prompt's design where clearly better; each 
     s3 gen 3, s5 gen 6 (all edited meta_agent.py) and s6 gen 4 (edited utils/git_utils.py). All transplants pass a
     sandboxed import check. Trial iterations (step 7) run before the pay-off runs. The pay-off runs start before
     the pilot exams finish (timing only, like item 22). If the pilot gate fails, they are stopped and reported.
+31b. Transplant check (step 7) passed: all 5 trial coach steps exited 0 with no missing-file errors (s2 and s5 made no edit in their trial; s1, s3, s6 made edits).

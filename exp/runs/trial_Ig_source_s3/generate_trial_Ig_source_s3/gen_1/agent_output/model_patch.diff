@@ -1,0 +1,36 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..7273983 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -137,9 +137,17 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
++    def solve_once(self, inputs, previous_answer=None):
+         """One direct model response -> one parsed grid (or None)."""
+         prompt = build_prompt(inputs)
++        if previous_answer is not None:
++            prompt += (
++                "\n\nThis is your second and final attempt. Your first candidate was "
++                f"{json.dumps(previous_answer)}. Recheck the candidate against every example: "
++                "verify the inferred rule, output dimensions, and each changed or preserved cell. "
++                "Do not copy the candidate merely because it is provided; return your best "
++                "independently checked output grid using the required <answer> tags."
++            )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,9 +161,10 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                previous_answer = answers[0] if attempt == 1 and answers else None
++                g = self.solve_once(inputs, previous_answer=previous_answer)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

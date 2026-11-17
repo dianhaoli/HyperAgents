@@ -47,7 +47,7 @@ def launch(name):
 def payoff_i0(i):
     name = f"payoff_I0_{i}"
     make(name, phase="payoff", arm="I0", seed=f"r{i}", task_set="payoff", max_generation=K,
-         template_dir="agent_template", freeze_paths=BASE_FREEZE, rng_seed=(1200 + i if i == 2 else 1100 + i), workers=16)  # reruns after harness bugs, see DECISIONS 23-24
+         template_dir="agent_template", freeze_paths=BASE_FREEZE, rng_seed=(1200 + i if i == 2 else 1100 + i), workers=12)  # reruns after harness bugs, see DECISIONS 23-24
     return name
 
 
@@ -89,7 +89,7 @@ def cmd_payoff():
         name = f"payoff_Ig_{src}"
         make(name, phase="payoff", arm="Ig", seed=s["source_seed"], source_seed=s["source_seed"], task_set="payoff",
              max_generation=K, template_dir=os.path.relpath(os.path.join(EXP, "transplants", src, "template"), REPO),
-             freeze_paths=man["freeze_paths"], rng_seed=2000 + int(s["source_seed"]), workers=16)
+             freeze_paths=man["freeze_paths"], rng_seed=2000 + int(s["source_seed"]), workers=12)
         launch(name)
     for i in range(3, N_I0 + 1):
         launch(payoff_i0(i))

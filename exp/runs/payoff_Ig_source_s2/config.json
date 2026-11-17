@@ -1,0 +1,27 @@
+{
+  "phase": "payoff",
+  "arm": "Ig",
+  "seed": 2,
+  "source_seed": 2,
+  "task_set": "payoff",
+  "max_generation": 8,
+  "template_dir": "exp/transplants/source_s2/template",
+  "freeze_paths": [
+    "agent",
+    "agent/base_agent.py",
+    "agent/llm.py",
+    "agent/llm_withtools.py",
+    "agent/tools/__init__.py",
+    "agent/tools/bash.py",
+    "agent/tools/edit.py",
+    "meta_agent.py",
+    "run_meta_agent.py",
+    "utils",
+    "utils/git_utils.py",
+    "utils/thread_logger.py"
+  ],
+  "rng_seed": 2002,
+  "workers": 12,
+  "name": "payoff_Ig_source_s2",
+  "root_commit": "ba25c4ad88ee3bb87bfdd848abeaa2146ddc5fdf"
+}

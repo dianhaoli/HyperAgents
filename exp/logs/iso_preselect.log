@@ -1,0 +1,94 @@
+{
+ "n_patterns": 1474,
+ "probe": {
+  "/opt/arc_private": "blocked",
+  "/opt/arc_private/ARC-AGI-2/data/evaluation": "blocked",
+  "/home/user": "blocked",
+  "/home/user/HyperAgents": "blocked",
+  "/root": "blocked",
+  "admin.sock": "blocked",
+  "net": "down",
+  "env_proxy": []
+ },
+ "agent_fs_scan": {
+  "files": 68132,
+  "hits": []
+ },
+ "visible_roots": [
+  "/home/user/HyperAgents/agent_template",
+  "/opt/arc_runner",
+  "/home/user/HyperAgents/outputs",
+  "/home/user/HyperAgents/exp/initial",
+  "/home/user/HyperAgents/exp/stage",
+  "/home/user/HyperAgents/exp/transplants",
+  "/dev/shm",
+  "/var/tmp",
+  "/run/lock",
+  "/var/lib/php/sessions",
+  "/home/user/HyperAgents/exp/runs/source_s3/_ctmp",
+  "/home/user/HyperAgents/exp/runs/source_s3/_evalcode",
+  "/home/user/HyperAgents/exp/runs/source_s3/nodes",
+  "/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3",
+  "/home/user/HyperAgents/exp/runs/source_s5/_ctmp",
+  "/home/user/HyperAgents/exp/runs/source_s5/_evalcode",
+  "/home/user/HyperAgents/exp/runs/source_s5/nodes",
+  "/home/user/HyperAgents/exp/runs/source_s5/generate_source_s5",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s1/_ctmp",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s1/generate_trial_Ig_source_s1",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s5/_ctmp",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s5/generate_trial_Ig_source_s5",
+  "/home/user/HyperAgents/exp/runs/smoke/_ctmp",
+  "/home/user/HyperAgents/exp/runs/smoke/generate_smoke",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s3/_ctmp",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s3/_evalcode",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s3/generate_trial_Ig_source_s3",
+  "/home/user/HyperAgents/exp/runs/source_s6/_ctmp",
+  "/home/user/HyperAgents/exp/runs/source_s6/_evalcode",
+  "/home/user/HyperAgents/exp/runs/source_s6/nodes",
+  "/home/user/HyperAgents/exp/runs/source_s6/generate_source_s6",
+  "/home/user/HyperAgents/exp/runs/payoff_I0_1/_ctmp",
+  "/home/user/HyperAgents/exp/runs/payoff_I0_1/_evalcode",
+  "/home/user/HyperAgents/exp/runs/payoff_I0_1/final_agents",
+  "/home/user/HyperAgents/exp/runs/payoff_I0_1/generate_payoff_I0_1",
+  "/home/user/HyperAgents/exp/runs/payoff_I0_2/_ctmp",
+  "/home/user/HyperAgents/exp/runs/payoff_I0_2/_evalcode",
+  "/home/user/HyperAgents/exp/runs/payoff_I0_2/final_agents",
+  "/home/user/HyperAgents/exp/runs/payoff_I0_2/generate_payoff_I0_2",
+  "/home/user/HyperAgents/exp/runs/source_s1/_ctmp",
+  "/home/user/HyperAgents/exp/runs/source_s1/_evalcode",
+  "/home/user/HyperAgents/exp/runs/source_s1/nodes",
+  "/home/user/HyperAgents/exp/runs/source_s1/generate_source_s1",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s6/_ctmp",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s6/_evalcode",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s6/generate_trial_Ig_source_s6",
+  "/home/user/HyperAgents/exp/runs/source_s2/_ctmp",
+  "/home/user/HyperAgents/exp/runs/source_s2/_evalcode",
+  "/home/user/HyperAgents/exp/runs/source_s2/nodes",
+  "/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s2/_ctmp",
+  "/home/user/HyperAgents/exp/runs/trial_Ig_source_s2/generate_trial_Ig_source_s2",
+  "/home/user/HyperAgents/exp/runs/source_s4/_ctmp",
+  "/home/user/HyperAgents/exp/runs/source_s4/_evalcode",
+  "/home/user/HyperAgents/exp/runs/source_s4/generate_source_s4",
+  "/home/user/HyperAgents/exp/runs/source_s4/nodes"
+ ],
+ "visible_files_scanned": 3317,
+ "visible_hits": [
+  [
+   "/home/user/HyperAgents/exp/stage/80b7c55678bb/chat_history.md",
+   "test output 9edfc990[0]"
+  ],
+  [
+   "/home/user/HyperAgents/exp/stage/8683645e8840/task.json",
+   "held-out grid abc82100 train[0]"
+  ],
+  [
+   "/home/user/HyperAgents/exp/stage/07c066f723bd/chat_history.md",
+   "test output 5dbc8537[1]"
+  ],
+  [
+   "/home/user/HyperAgents/exp/stage/07c066f723bd/task.json",
+   "held-out grid 5dbc8537 train[0]"
+  ],
+  [
+   "/home/user/HyperAgents/exp/

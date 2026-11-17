@@ -1,0 +1,27 @@
+{
+  "phase": "payoff",
+  "arm": "Ig",
+  "seed": 6,
+  "source_seed": 6,
+  "task_set": "payoff",
+  "max_generation": 8,
+  "template_dir": "exp/transplants/source_s6/template",
+  "freeze_paths": [
+    "agent",
+    "agent/base_agent.py",
+    "agent/llm.py",
+    "agent/llm_withtools.py",
+    "agent/tools/__init__.py",
+    "agent/tools/bash.py",
+    "agent/tools/edit.py",
+    "meta_agent.py",
+    "run_meta_agent.py",
+    "utils",
+    "utils/git_utils.py",
+    "utils/thread_logger.py"
+  ],
+  "rng_seed": 2006,
+  "workers": 12,
+  "name": "payoff_Ig_source_s6",
+  "root_commit": "f4b975a4354a286578defb0868cdc12864fc563b"
+}

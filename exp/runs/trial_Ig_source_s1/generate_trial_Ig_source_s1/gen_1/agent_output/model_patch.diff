@@ -1,0 +1,61 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..a3676bc 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,7 +50,7 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, review_candidate=None):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+@@ -71,6 +71,18 @@ def build_prompt(inputs):
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+     parts.append(grid_to_text(t))
+     parts.append("")
++    if review_candidate is not None:
++        parts.extend([
++            "A previous attempt proposed this grid (it may be wrong):",
++            json.dumps(review_candidate),
++            "Do not simply repeat it. Re-derive the transformation from the demonstrations and check the proposed grid against that rule. In particular, verify any changes to grid dimensions, row or column ordering, and object placement by applying the rule to every example. If the proposal fails those checks, correct it; otherwise return it.",
++            "",
++        ])
++    else:
++        parts.extend([
++            "Before answering, identify the transformation and check that it accounts for every demonstration, including any changes to grid dimensions, row or column ordering, and object placement.",
++            "",
++        ])
+     parts.append(
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+@@ -137,9 +149,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def solve_once(self, inputs, review_candidate=None):
++        """One model response -> one parsed grid (or None)."""
++        prompt = build_prompt(inputs, review_candidate=review_candidate)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,9 +165,13 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Spend the second permitted call reviewing the first answer rather than
++                # issuing the identical prompt: this gives the model a chance to catch a
++                # mistaken rule by explicitly checking it against all demonstrations.
++                candidate = answers[0] if answers else None
++                g = self.solve_once(inputs, review_candidate=candidate if attempt == 1 else None)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
