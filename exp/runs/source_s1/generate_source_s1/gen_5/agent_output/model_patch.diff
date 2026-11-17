@@ -1,0 +1,35 @@
+diff --git a/task_agent.py b/task_agent.py
+index 2ed1436..7cb8e98 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -146,15 +146,23 @@ class TaskAgent:
+         """
+         prompt = build_prompt(inputs)
+         if candidate is not None:
++            # Candidate-first review encourages anchoring: previous traces often show the
++            # second call repeating the same plausible-but-wrong grid. Require a fresh
++            # reconstruction from the demonstrations before exposing that grid.
+             prompt += (
+-                "\n\nIndependent verification of a previous candidate: "
++                "\n\nSECOND-PASS CHECK (use this order):\n"
++                "1. Ignore any earlier proposed answer. Infer a concrete transformation "
++                "from the training pairs alone, and check that it reproduces every "
++                "demonstration.\n"
++                "2. Apply that transformation from scratch to the test input. Check the "
++                "result's dimensions, color mapping, object placement, and every changed "
++                "region against the rule. Do not copy a demonstration output.\n"
++                "3. Only after deriving your own test grid, compare it cell by cell with "
++                "this previous candidate (which may be wrong): "
+                 f"{json.dumps(candidate)}\n"
+-                "First infer the transformation from the demonstrations and check that it "
+-                "accounts for every input/output pair. Compare the candidate with the test "
+-                "input and that inferred rule; do not copy a demonstration output or accept "
+-                "the candidate merely because it looks plausible. If the candidate fails "
+-                "any check, correct it. Return the verified test grid in the required "
+-                "<answer> tags, with nothing else inside the tags."
++                "If they differ, resolve the discrepancy using the rule and demonstrations, "
++                "not by favoring either grid. Return the independently verified test grid "
++                "inside <answer> tags, with nothing else inside the tags."
+             )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)

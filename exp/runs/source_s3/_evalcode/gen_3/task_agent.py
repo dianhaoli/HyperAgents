@@ -78,14 +78,14 @@ def build_prompt(inputs, prior_guess=None):
     parts.append("")
     if prior_guess is not None:
         parts.extend([
-            "## Verification pass",
-            "A previous attempt proposed this grid, but it may be wrong:",
+            "## Independent review of a first attempt",
+            "A first attempt proposed this test output (it may be wrong):",
             json.dumps(prior_guess),
-            "Independently re-derive the transformation from all training examples. Check the proposed "
-            "grid against the test input cell by cell, including dimensions, object positions, colors, "
-            "and unchanged cells. Do not preserve the guess merely because it was proposed; correct it "
-            "if the examples imply a different result. If it is consistent, return it unchanged.",
-            "",
+            "Independently infer the transformation from all training examples. Check the proposed "
+            "grid against the inferred rule, including its dimensions, colors, positions, and every "
+            "cell that changes or stays fixed. Do not copy the proposed grid unless it follows from "
+            "the examples; return a corrected grid if needed. A different valid interpretation is "
+            "not enough: the rule must explain every training pair.",
         ])
     parts.append(
         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
@@ -154,7 +154,7 @@ class TaskAgent:
             pass
 
     def solve_once(self, inputs, prior_guess=None):
-        """One model response -> one parsed grid (or None)."""
+        """One direct model response -> one parsed grid (or None)."""
         prompt = build_prompt(inputs, prior_guess=prior_guess)
         self.log(f"Input: {prompt}")
         text = call_model(prompt)
@@ -171,13 +171,13 @@ class TaskAgent:
         answers = []
         for attempt in range(2):
             try:
-                # Use the second permitted call to verify the first candidate against the
-                # examples, while keeping the first candidate available to the evaluator.
+                # Keep the first answer and use the second budgeted call to check it
+                # against the demonstrations, rather than repeating the same prompt.
                 prior_guess = answers[0] if attempt == 1 and answers else None
                 g = self.solve_once(inputs, prior_guess=prior_guess)
             except Exception as e:
                 self.log(f"Error: {e}")
                 g = None
-            if g is not None and g not in answers:
+            if g is not None:
                 answers.append(g)
         return answers, []

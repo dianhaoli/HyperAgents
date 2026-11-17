@@ -55,5 +55,26 @@ def main(phases):
         print(ph, "rows", len(rows), "invalidated", len(bad), "test inputs", len(bad) // 2)
 
 
+def invalidate_timeouts(phases):
+    """Move test inputs that hit the old 30-min limit to <phase>.invalidated.jsonl so they re-run under the new limit."""
+    for ph in phases:
+        p = os.path.join(EXP, "results", f"{ph}.jsonl")
+        rows = read_jsonl(p)
+        bad_ts = {(r["iteration"], r["task"], r["test_input"], r.get("ts")) for r in rows if r.get("timeout")}
+        keep = [r for r in rows if (r["iteration"], r["task"], r["test_input"], r.get("ts")) not in bad_ts]
+        bad = [r for r in rows if (r["iteration"], r["task"], r["test_input"], r.get("ts")) in bad_ts]
+        with open(p + ".tmp", "w") as f:
+            for r in keep:
+                f.write(json.dumps(r) + "\n")
+        os.replace(p + ".tmp", p)
+        with open(os.path.join(EXP, "results", f"{ph}.invalidated.jsonl"), "a") as f:
+            for r in bad:
+                f.write(json.dumps({**r, "invalidated_reason": "hit the old 30-min per-test-input limit; re-run under the ~2 h limit"}) + "\n")
+        print(ph, "timeout test inputs invalidated:", len(bad) // 2)
+
+
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    if sys.argv[1] == "--timeouts":
+        invalidate_timeouts(sys.argv[2:])
+    else:
+        main(sys.argv[1:])

@@ -137,33 +137,17 @@ class TaskAgent:
         except Exception:
             pass
 
-    def solve_once(self, inputs, candidate=None, independent=False):
-        """One direct model response -> one parsed grid (or None).
-
-        When a candidate is supplied, use this call to verify it against every
-        demonstration before answering. ``independent`` requests a distinct,
-        structured solve without revealing any earlier candidate.
-        """
+    def solve_once(self, inputs, previous_candidate=None):
+        """Make one model call and parse its grid response, if any."""
         prompt = build_prompt(inputs)
-        if independent:
+        if previous_candidate is not None:
             prompt += (
-                "\n\nSolve this independently using a different line of reasoning: "
-                "first identify the objects or repeated structures and their roles, "
-                "then state a rule that explains every demonstration, checking for "
-                "exceptions. Apply that rule to the test input and verify the output "
-                "dimensions and each changed region before returning the grid. Do not "
-                "assume any prior answer."
-            )
-        if candidate is not None:
-            prompt += (
-                "\n\nIndependent verification of a previous candidate: "
-                f"{json.dumps(candidate)}\n"
-                "First infer the transformation from the demonstrations and check that it "
-                "accounts for every input/output pair. Compare the candidate with the test "
-                "input and that inferred rule; do not copy a demonstration output or accept "
-                "the candidate merely because it looks plausible. If the candidate fails "
-                "any check, correct it. Return the verified test grid in the required "
-                "<answer> tags, with nothing else inside the tags."
+                "\n\nA first attempt proposed this candidate test output:\n"
+                f"{json.dumps(previous_candidate)}\n"
+                "Do not assume that candidate is correct. Independently re-check the inferred rule "
+                "against every training input-output pair, then compare the rule's result with the "
+                "candidate. Correct any mismatch and return your best final grid in the required "
+                "<answer> tags."
             )
         self.log(f"Input: {prompt}")
         text = call_model(prompt)
@@ -180,10 +164,10 @@ class TaskAgent:
         answers = []
         for attempt in range(2):
             try:
-                # Keep the second answer blind to the first to avoid anchoring, but
-                # request a structured alternate derivation rather than repeating
-                # the exact same prompt.
-                g = self.solve_once(inputs, independent=(attempt == 1))
+                # Spend the second call on explicit rule verification when the first
+                # call produced a parseable candidate; otherwise make another attempt.
+                previous = answers[0] if attempt == 1 and answers else None
+                g = self.solve_once(inputs, previous_candidate=previous)
             except Exception as e:
                 self.log(f"Error: {e}")
                 g = None

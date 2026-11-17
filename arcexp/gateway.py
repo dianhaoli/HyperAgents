@@ -31,7 +31,7 @@ GLOBAL_CAP_USD = 150.0
 TASK_MAX_CALLS = 2
 META_MAX_TOKENS = 600_000
 MAX_OUTPUT_TOKENS = {"task": 64000, "task_xhigh": 64000, "meta": 64000, "probe": 2000}
-REQUEST_TIMEOUT = 1800
+REQUEST_TIMEOUT = 3600
 
 RUN_DIR = os.environ.get("ARCGW_RUN_DIR", "/run/arcgw")
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

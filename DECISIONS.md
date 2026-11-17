@@ -147,3 +147,12 @@ The user allowed deviations from the prompt's design where clearly better; each 
     handicapped by the harness. source_s6 keeps its run: one of 12 generations was lost to the bug, which only
     affects which I_g candidates exist, and that is recorded here. All runs were restarted (resumable)
     on the fixed code; in-flight work of the interrupted generations was redone.
+25. **Effort clarification:** task agent = high and meta agent = high throughout. The xhigh pass is only
+    the one-time check the prompt required.
+26. **Time limit raised (user request).** At the old 30-minute per-test-input limit, a hung or slow
+    `forward()` was killed and scored unsolved. That hit 17/501 B0 inputs and 32/167 xhigh inputs, plus 1
+    source-loop input, and 0 pay-off inputs. The limit is now ~2 h (7500 s) per test input, and the gateway's
+    per-call timeout is 60 min, so it effectively never binds. The timed-out B0 and xhigh inputs were moved
+    to `<phase>.invalidated.jsonl` and re-run under the new limit, so B0 and every final agent are scored
+    under the same rule. The single timed-out source-loop input stays as recorded; it only affected the
+    loop's own node score. All runs were restarted (resumable) to pick up the change.

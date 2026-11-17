@@ -50,7 +50,7 @@ def grid_to_text(grid):
     return "\n".join(" ".join(str(v) for v in row) for row in grid)
 
 
-def build_prompt(inputs, independent_attempt=False):
+def build_prompt(inputs, independent_attempt=False, previous_candidate=None):
     parts = [
         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
@@ -66,6 +66,15 @@ def build_prompt(inputs, independent_attempt=False):
             "colors, repetition, symmetry, and boundaries where relevant. Check the operation against all "
             "training pairs before applying it to the test; do not assume unchanged background cells or "
             "the input dimensions without checking.",
+            "",
+        ])
+    if previous_candidate is not None:
+        parts.extend([
+            "A previous attempt proposed this test output, but it may be wrong:",
+            json.dumps(previous_candidate, separators=(",", ":")),
+            "Do not copy it automatically. Independently infer the rule from every training pair, "
+            "check whether the proposed output follows that rule, and correct it if needed. "
+            "Return your best single test grid.",
             "",
         ])
     for i, pair in enumerate(inputs["train"], 1):
@@ -148,9 +157,10 @@ class TaskAgent:
         except Exception:
             pass
 
-    def solve_once(self, inputs, independent_attempt=False):
+    def solve_once(self, inputs, independent_attempt=False, previous_candidate=None):
         """One model response -> one parsed grid (or None)."""
-        prompt = build_prompt(inputs, independent_attempt=independent_attempt)
+        prompt = build_prompt(inputs, independent_attempt=independent_attempt,
+                              previous_candidate=previous_candidate)
         self.log(f"Input: {prompt}")
         text = call_model(prompt)
         self.log(f"Output: {text}")
@@ -163,16 +173,17 @@ class TaskAgent:
         Returns:
             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
         """
-        # Keep the two answers independent: an answer shown to the second attempt
-        # can anchor it. The second prompt instead asks for a deliberate check of
-        # dimensions, cell changes, and consistency across all demonstrations.
         answers = []
+        # Keep both attempts independent so the second answer can provide useful
+        # diversity, while using a more systematic grid-comparison checklist.
         for attempt_number, independent_attempt in enumerate((False, True), start=1):
             try:
-                grid = self.solve_once(inputs, independent_attempt=independent_attempt)
+                previous_candidate = answers[0] if attempt_number > 1 and answers else None
+                g = self.solve_once(inputs, independent_attempt=independent_attempt,
+                                    previous_candidate=previous_candidate)
             except Exception as e:
                 self.log(f"Error on attempt {attempt_number}: {e}")
-                grid = None
-            if grid is not None:
-                answers.append(grid)
+                g = None
+            if g is not None:
+                answers.append(g)
         return answers, []
