@@ -2,3 +2,5 @@
 B0 rep 0: 0.3014 missing=0 fmt_fail=5
 [eval] {'phase': 'b0', 'arm': 'A0', 'seed': '-', 'iteration': 0} round 0: 3 test inputs to run (164 cached)
 [eval] {'phase': 'b0', 'arm': 'A0', 'seed': '-', 'iteration': 0} round 1: 1 test inputs to run (166 cached)
+[eval] {'phase': 'b0', 'arm': 'A0', 'seed': '-', 'iteration': 0} round 2: 1 test inputs to run (166 cached)
+B0 rep 0: 0.3014 missing=0 fmt_fail=2

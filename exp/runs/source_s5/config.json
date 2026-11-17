@@ -9,5 +9,6 @@
   "rng_seed": 5,
   "workers": 12,
   "root_commit": "a0c81b3141b3fe807ccdbbbc1e3349ef97c347d0",
-  "name": "source_s5"
+  "name": "source_s5",
+  "done": true
 }
