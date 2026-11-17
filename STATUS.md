@@ -8,6 +8,9 @@
   Prices: $0.0028/task call (training tasks), $0.007 per meta iteration.
 - Step 2 design: **Full** (see DESIGN.md).
 
+## Pre-registration commit (step 4)
+DESIGN.md, splits.json and analysis.py were committed at `f577cc77d8fac1125623c6a85e9ad3ad86ca2964` (before any pay-off result).
+
 ## In progress
 - Step 3 checks: screen (100 tasks x 3), B0 x3 on held-out, xhigh pass (all running as background jobs).
 
