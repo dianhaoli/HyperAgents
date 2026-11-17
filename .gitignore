@@ -4,3 +4,5 @@ exp/stage/
 exp/runs/*/_ctmp/
 __pycache__/
 *.pyc
+exp/runs/*/generate_*/gen_initial/hyperagents/
+exp/runs/*/final_agents/
