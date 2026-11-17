@@ -43,6 +43,11 @@ def unix_request(path, method, url, body=None, timeout=3600):
     return r.status, json.loads(out or b"{}")
 
 
+def revoke_token(tok):
+    st, d = unix_request(ADMIN_SOCK, "POST", "/revoke", {"token": tok}, timeout=60)
+    return d
+
+
 def register_token(role, scope, effort_role=None):
     tok = secrets.token_hex(16)
     body = {"token": tok, "role": role, "scope": scope}
@@ -87,28 +92,28 @@ def read_jsonl(path):
 
 
 def tree_hash(root, exclude_dirs=(".git", "__pycache__")):
+    """Hash of the regular files of a tree (links and special files are skipped, never followed/opened)."""
+    from arcexp.safeio import safe_read_bytes
     h = hashlib.sha256()
-    for dp, dns, fns in os.walk(root):
-        dns[:] = sorted(d for d in dns if d not in exclude_dirs)
+    for dp, dns, fns in os.walk(root, followlinks=False):
+        dns[:] = sorted(d for d in dns if d not in exclude_dirs and not os.path.islink(os.path.join(dp, d)))
         for fn in sorted(fns):
             if fn.endswith(".pyc"):
                 continue
             p = os.path.join(dp, fn)
-            rel = os.path.relpath(p, root)
-            h.update(rel.encode())
-            try:
-                with open(p, "rb") as f:
-                    h.update(hashlib.sha256(f.read()).digest())
-            except Exception:
-                pass
+            b = safe_read_bytes(p)
+            if b is None:
+                continue
+            h.update(os.path.relpath(p, root).encode())
+            h.update(hashlib.sha256(b).digest())
     return h.hexdigest()[:16]
 
 
 def chown_agent(path):
-    for dp, dns, fns in os.walk(path):
-        os.chown(dp, AGENT_UID, AGENT_GID)
-        for fn in fns:
+    for dp, dns, fns in os.walk(path, followlinks=False):
+        os.lchown(dp, AGENT_UID, AGENT_GID)
+        for fn in dns + fns:
             try:
-                os.chown(os.path.join(dp, fn), AGENT_UID, AGENT_GID, follow_symlinks=False)
+                os.lchown(os.path.join(dp, fn), AGENT_UID, AGENT_GID)
             except FileNotFoundError:
                 pass

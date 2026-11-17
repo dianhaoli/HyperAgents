@@ -17,6 +17,9 @@ import subprocess
 from arcexp.common import AGENT_GID, AGENT_UID, GW_SOCK, RUNNER_DIR
 
 
+SHARED_WRITABLE = ["/dev/shm", "/var/tmp", "/run/lock", "/var/lib/php/sessions", "/dev/mqueue"]
+
+
 def run_sandboxed(cmd, binds, cwd="/tmp", env_extra=None, timeout=3600, ro_paths=(), tmp_host=None, stdin_data=None):
     """binds: list of (host_path, target_path, read_only). If tmp_host is given it is bound to /tmp,
     else /tmp is a fresh tmpfs. ro_paths: paths (inside the sandbox) to remount read-only."""
@@ -27,6 +30,9 @@ def run_sandboxed(cmd, binds, cwd="/tmp", env_extra=None, timeout=3600, ro_paths
         lines.append(f"mount --bind {shlex.quote(tmp_host)} /tmp")
     else:
         lines.append("mount -t tmpfs -o size=4g,mode=1777 tmpfs /tmp")
+    # every other world-writable location gets a private, empty tmpfs (no cross-sandbox channels)
+    for d in SHARED_WRITABLE:
+        lines.append(f"if [ -d {d} ]; then mount -t tmpfs -o size=256m,mode=1777 tmpfs {d}; fi")
     for host, target, ro in binds:
         q_t = shlex.quote(target)
         if os.path.isdir(host):

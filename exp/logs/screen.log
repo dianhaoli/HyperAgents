@@ -1,1 +1,6 @@
 [eval] {'phase': 'screen', 'arm': 'A0', 'seed': '-', 'iteration': 0} round 0: 103 test inputs to run (0 cached)
+screen call 0: 0.735 missing=0 infra_rows=0 fmt_fail=0
+[eval] {'phase': 'screen', 'arm': 'A0', 'seed': '-', 'iteration': 1} round 0: 103 test inputs to run (0 cached)
+screen call 1: 0.755 missing=0 infra_rows=0 fmt_fail=0
+[eval] {'phase': 'screen', 'arm': 'A0', 'seed': '-', 'iteration': 2} round 0: 103 test inputs to run (0 cached)
+screen call 2: 0.760 missing=0 infra_rows=0 fmt_fail=1

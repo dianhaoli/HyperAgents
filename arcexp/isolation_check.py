@@ -53,7 +53,7 @@ def build_patterns():
 SCANNER = r'''
 import os, sys, json
 pats = json.load(open(sys.argv[1]))
-skip = ("/proc", "/sys", "/dev", "/usr", "/lib", "/lib64", "/lib32", "/bin", "/sbin", "/boot", "/var/lib", "/snap", "/etc", "/var/cache", "/var/log", "/tmp/scan")
+skip = ("/proc", "/sys", "/dev/pts", "/usr", "/lib", "/lib64", "/lib32", "/bin", "/sbin", "/boot", "/var/lib", "/snap", "/etc", "/var/cache", "/var/log", "/tmp/scan")
 hits = []; n = 0
 for root, dns, fns in os.walk("/", onerror=lambda e: None):
     if root.startswith(skip) and root != "/":
@@ -94,15 +94,14 @@ print(json.dumps(res))
 
 
 def scan_tree(root, pats, hits, counter):
-    for dp, dns, fns in os.walk(root):
-        dns[:] = [d for d in dns if d != ".git"]
+    from arcexp.safeio import safe_read_text
+    for dp, dns, fns in os.walk(root, followlinks=False):
+        # .git is scanned too (agents could stash files there); packed/loose objects are zlib-compressed
+        dns[:] = [d for d in dns if not (os.path.basename(dp) == ".git" and d == "objects")]
         for fn in fns:
             p = os.path.join(dp, fn)
-            try:
-                if os.path.islink(p) or os.path.getsize(p) > MAX_FILE:
-                    continue
-                txt = open(p, errors="ignore").read()
-            except Exception:
+            txt = safe_read_text(p, MAX_FILE)
+            if txt is None:
                 continue
             counter[0] += 1
             for k, v in pats.items():
@@ -113,10 +112,11 @@ def scan_tree(root, pats, hits, counter):
 
 def agent_visible_roots():
     roots = [os.path.join(REPO, "agent_template"), RUNNER_DIR, os.path.join(REPO, "outputs"),
-             os.path.join(EXP, "initial"), os.path.join(EXP, "stage"), os.path.join(EXP, "transplants")]
+             os.path.join(EXP, "initial"), os.path.join(EXP, "stage"), os.path.join(EXP, "transplants"),
+             "/dev/shm", "/var/tmp", "/run/lock", "/var/lib/php/sessions"]
     for d in glob.glob(os.path.join(EXP, "runs", "*")):
         for sub in os.listdir(d):
-            if sub.startswith("generate_") or sub == "_ctmp":
+            if sub.startswith("generate_") or sub in ("_ctmp", "_evalcode", "final_agents", "nodes"):
                 roots.append(os.path.join(d, sub))
     return [r for r in roots if os.path.exists(r)]
 

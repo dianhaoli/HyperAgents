@@ -73,3 +73,39 @@ The user allowed deviations from the prompt's design where clearly better; each 
     a bare `{"tool_name","tool_input"}` object is accepted when no `<json>` block exists, and a reply with no
     tool call is nudged at most twice in a row ("make the next tool call, or reply DONE").
     Same starting point for both arms; evolved agents may change it.
+
+## Hardening after an independent adversarial review (before any meta agent ran in earnest)
+16. An adversarial review (4 reviewers, 2 skeptics per finding; 21 verified findings) found ways a hostile
+    meta agent could get from its shell to root. The paths were: host git in agent-owned repos (hooks/fsmonitor),
+    and root following agent-planted symlinks during copies and reads. It also found budget and scoring holes.
+    Fixes, all before the pilot:
+    - Every generation works in a **fresh clone** of the run's root-owned pristine repo (`_ctmp/<name>/ws`), deleted
+      afterwards. Root never runs git in an agent-writable repo. Global `safe.directory=*` was removed and
+      `fs.protected_*` sysctls were enabled.
+    - Root reads and copies agent-written files only via `arcexp/safeio.py`: regular single-link files, opened
+      with O_NOFOLLOW, never through a symlinked path component, no FIFOs or devices. Agent processes are dead
+      (their pid namespace is gone) before any host read.
+    - The **exact evaluated code** of every node is snapshotted (regular files) right before evaluation.
+      Re-scoring, held-out scoring and transplants use the snapshot, not a patch replay.
+    - Gateway: tokens are **revoked** as soon as their sandbox exits, and calls are serialized per token. The
+      worst-case cost and tokens are reserved before each call, so the 600k-token cap and the $150 stop
+      cannot be overshot. A restart revokes all older tokens. Errors that were certainly not billed refund the
+      slot. Timeouts and bad 200 responses are charged at worst case and not retried.
+    - Infra-failure classification uses only gateway facts (server/network errors, global-budget refusal,
+      restart revocation), never agent-written text or exit codes. Up to 4 retry rounds with backoff.
+      Incomplete evaluations abort the run (resumable), so a node is never recorded with a deflated score,
+      and final scoring refuses to record incomplete held-out scores.
+    - Gateway/infra outages during a run raise `InfraAbort` (a BaseException). The run stops, resumable,
+      instead of the loop marking parents invalid and burning the remaining generations.
+    - The freeze filter matches whole path components. `filter_patch_by_files` matched substrings and
+      would have dropped, e.g., `agent_helpers.py`.
+    - The sandbox mounts private tmpfs over every world-writable dir (/dev/shm, /var/tmp, /run/lock, ...).
+    - Agent-visible chat logs, errors and wrong answers are **withheld whole** if any true output of the
+      task appears in them as a digit sequence in any serialization. They used to be redacted in place,
+      which could act as an oracle.
+    - The isolation check also scans .git contents, shared writable dirs, workspaces, snapshots extracted for
+      evaluation, final agents and node dirs, all with FIFO-safe reads.
+17. The repo's `analysis/` folder is a namespace package that the required top-level `analysis.py` would
+    shadow, so `analysis/__init__.py` was added.
+18. Splits: 38 screened tasks were solved once or twice (24 twice, 14 once), 54 always and 8 never. Each set has
+    19 intermediate tasks + 3 always-solved + 3 never-solved (identical composition), drawn with seed 20261118.

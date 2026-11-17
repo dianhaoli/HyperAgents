@@ -1,26 +1,24 @@
 """Budget gateway: the ONLY path from any agent to the model.
 
-Runs as root on the host, outside every agent-editable tree. Agents reach it through
-a unix socket (agents run in network-less sandboxes), presenting a per-scope token.
+Runs as root on the host, outside every agent-editable tree. Agents reach it through a unix socket
+(agents run in network-less sandboxes), presenting a per-scope token.
 
 Fixed here and nowhere else (agents cannot edit this file):
-  * model = gpt-6-luna
-  * reasoning effort per role: task=high, meta=high (user changed from max) (task_xhigh=xhigh for the one check pass)
+  * model = gpt-6-luna (Responses API)
+  * reasoning effort per role: task=high, meta=high (user changed it from max), task_xhigh=xhigh (one check pass)
   * per-token caps: task tokens -> at most 2 model calls (one token per test input);
-    meta tokens -> at most 600k total tokens (one token per meta-agent iteration)
-  * global hard stop: refuse every call once ledger spend >= $150
+    meta tokens -> at most 600k total tokens (one token per meta-agent iteration). Worst-case usage of a call
+    is reserved before it starts, and calls on one token are serialized, so caps cannot be exceeded.
+  * tokens are revoked by the host as soon as their sandbox exits (no reuse/stashing)
+  * global hard stop: refuse every call once settled spend + reserved worst case would exceed $150
   * token & dollar ledger by role (append-only JSONL)
 """
-import http.client
 import http.server
 import json
 import os
-import socket
 import socketserver
-import sys
 import threading
 import time
-import traceback
 
 import requests
 
@@ -41,7 +39,12 @@ LEDGER = os.environ.get("ARCGW_LEDGER", os.path.join(REPO, "exp", "ledger", "cal
 TOKENS_FILE = os.path.join(REPO, "exp", "ledger", "tokens.jsonl")
 
 lock = threading.Lock()
-state = {"spent": 0.0, "by_role": {}, "tokens": {}}  # token -> dict
+state = {"spent": 0.0, "reserved": 0.0, "by_role": {}, "tokens": {}}
+
+
+def new_tok():
+    return {"calls": 0, "tokens_used": 0, "reserved_tokens": 0, "busy": False, "revoked": False,
+            "upstream_errors": 0, "refusals": 0, "refused_global": 0, "possibly_billed_failures": 0}
 
 
 def cost_of(usage):
@@ -53,21 +56,6 @@ def cost_of(usage):
 
 def load_state():
     os.makedirs(os.path.dirname(LEDGER), exist_ok=True)
-    if os.path.exists(LEDGER):
-        with open(LEDGER) as f:
-            for line in f:
-                try:
-                    r = json.loads(line)
-                except Exception:
-                    continue
-                state["spent"] += r.get("cost", 0.0)
-                role = r.get("role", "?")
-                state["by_role"][role] = state["by_role"].get(role, 0.0) + r.get("cost", 0.0)
-                tok = r.get("token")
-                if tok:
-                    t = state["tokens"].setdefault(tok, {"calls": 0, "tokens_used": 0, "role": role, "scope": r.get("scope", {})})
-                    t["calls"] += 1
-                    t["tokens_used"] += r.get("total_tokens", 0)
     if os.path.exists(TOKENS_FILE):
         with open(TOKENS_FILE) as f:
             for line in f:
@@ -75,8 +63,39 @@ def load_state():
                     r = json.loads(line)
                 except Exception:
                     continue
-                t = state["tokens"].setdefault(r["token"], {"calls": 0, "tokens_used": 0})
-                t.update({k: v for k, v in r.items() if k not in ("calls", "tokens_used")})
+                if r.get("event") == "revoke":
+                    state["tokens"].setdefault(r["token"], new_tok())["revoked"] = True
+                    continue
+                t = state["tokens"].setdefault(r["token"], new_tok())
+                t.update({k: v for k, v in r.items() if k in ("role", "scope", "effort_role")})
+    if os.path.exists(LEDGER):
+        with open(LEDGER) as f:
+            for line in f:
+                try:
+                    r = json.loads(line)
+                except Exception:
+                    continue
+                c = r.get("cost", 0.0)
+                state["spent"] += c
+                role = r.get("role", "?")
+                state["by_role"][role] = state["by_role"].get(role, 0.0) + c
+                tok = r.get("token")
+                if not tok:
+                    continue
+                t = state["tokens"].setdefault(tok, new_tok())
+                if r.get("error"):
+                    t["upstream_errors"] += 1
+                    if r.get("possibly_billed"):
+                        t["calls"] += 1
+                        t["possibly_billed_failures"] += 1
+                else:
+                    t["calls"] += 1
+                t["tokens_used"] += r.get("total_tokens", 0)
+    # a restarted gateway has no live sandboxes from before: tokens registered earlier are dead
+    for t in state["tokens"].values():
+        if not t["revoked"]:
+            t["revoked"] = True
+            t["restart_revoked"] = True
 
 
 def ledger_write(rec):
@@ -84,8 +103,13 @@ def ledger_write(rec):
         f.write(json.dumps(rec) + "\n")
 
 
+class UpstreamError(Exception):
+    def __init__(self, msg, possibly_billed=False):
+        super().__init__(msg)
+        self.possibly_billed = possibly_billed
+
+
 def call_openai(messages, effort, max_out):
-    # Convert chat-style messages to Responses API input
     inp = []
     for m in messages:
         role = m.get("role", "user")
@@ -102,21 +126,26 @@ def call_openai(messages, effort, max_out):
     last_err = None
     for attempt in range(7):
         try:
-            r = requests.post("https://api.openai.com/v1/responses", json=body, timeout=REQUEST_TIMEOUT)
-            if r.status_code == 200:
-                d = r.json()
-                return d
-            last_err = f"HTTP {r.status_code}: {r.text[:500]}"
-            if r.status_code in (400, 401, 403, 404):
-                # sporadic false-positive "flagged" 400s: retry those twice, everything else is final
-                if not (r.status_code == 400 and "flagged" in r.text and attempt < 2):
-                    raise RuntimeError(last_err)
-        except RuntimeError:
-            raise
+            r = requests.post("https://api.openai.com/v1/responses", json=body, timeout=(30, REQUEST_TIMEOUT))
+        except requests.exceptions.ReadTimeout as e:
+            # the generation may have been billed: do not retry, report as possibly billed
+            raise UpstreamError(f"read timeout: {e}", possibly_billed=True)
         except Exception as e:
             last_err = f"{type(e).__name__}: {e}"
+            time.sleep(min(60, 2 ** attempt * 2))
+            continue
+        if r.status_code == 200:
+            try:
+                return r.json()
+            except Exception as e:
+                raise UpstreamError(f"bad 200 body: {e}", possibly_billed=True)
+        last_err = f"HTTP {r.status_code}: {r.text[:500]}"
+        if r.status_code in (400, 401, 403, 404):
+            # sporadic false-positive "flagged" 400s: retry those twice, everything else is final
+            if not (r.status_code == 400 and "flagged" in r.text and attempt < 2):
+                raise UpstreamError(last_err)
         time.sleep(min(60, 2 ** attempt * 2))
-    raise RuntimeError(f"upstream failed after retries: {last_err}")
+    raise UpstreamError(f"upstream failed after retries: {last_err}")
 
 
 def extract_text(d):
@@ -127,6 +156,11 @@ def extract_text(d):
                 if c.get("type") in ("output_text", "text"):
                     texts.append(c.get("text", ""))
     return "\n".join(t for t in texts if t)
+
+
+def estimate_tokens(msgs):
+    # conservative: ~2 characters per token for grids/code
+    return sum(len(str(m.get("content", m.get("text", "")))) for m in msgs) // 2 + 200
 
 
 class AgentHandler(http.server.BaseHTTPRequestHandler):
@@ -148,16 +182,19 @@ class AgentHandler(http.server.BaseHTTPRequestHandler):
 
     def _body(self):
         n = int(self.headers.get("Content-Length", 0))
+        if n > 50_000_000:
+            raise ValueError("too large")
         return json.loads(self.rfile.read(n) or b"{}")
 
     def do_GET(self):
         if self.path == "/status":
             with lock:
-                return self._send(200, {"spent": state["spent"], "by_role": state["by_role"], "cap": GLOBAL_CAP_USD})
+                return self._send(200, {"spent": state["spent"], "reserved": state["reserved"],
+                                        "by_role": state["by_role"], "cap": GLOBAL_CAP_USD})
         if self.admin and self.path.startswith("/token/"):
             tok = self.path.split("/token/")[1]
             with lock:
-                return self._send(200, state["tokens"].get(tok, {}))
+                return self._send(200, {k: v for k, v in state["tokens"].get(tok, {}).items()})
         self._send(404, {"error": "not found"})
 
     def do_POST(self):
@@ -169,44 +206,72 @@ class AgentHandler(http.server.BaseHTTPRequestHandler):
             rec = {"token": body["token"], "role": body["role"], "scope": body.get("scope", {}),
                    "effort_role": body.get("effort_role", body["role"]), "registered_at": time.time()}
             with lock:
-                t = state["tokens"].setdefault(rec["token"], {"calls": 0, "tokens_used": 0})
-                t.update(rec)
+                t = state["tokens"].setdefault(rec["token"], new_tok())
+                t.update({k: rec[k] for k in ("role", "scope", "effort_role")})
+                t["revoked"] = False
                 with open(TOKENS_FILE, "a") as f:
                     f.write(json.dumps(rec) + "\n")
             return self._send(200, {"ok": True})
+        if self.admin and self.path == "/revoke":
+            with lock:
+                t = state["tokens"].get(body.get("token"))
+                if t is not None:
+                    t["revoked"] = True
+                    with open(TOKENS_FILE, "a") as f:
+                        f.write(json.dumps({"event": "revoke", "token": body["token"], "ts": time.time()}) + "\n")
+                info = dict(t) if t else {}
+            return self._send(200, info)
         if self.path not in ("/v1/chat", "/chat"):
             return self._send(404, {"error": "not found"})
         tok = body.get("token") or self.headers.get("X-GW-Token")
+        msgs = body.get("messages") or []
         with lock:
             t = state["tokens"].get(tok)
-            if not t or "role" not in t:
-                return self._send(403, {"error": "unknown token"})
-            if state["spent"] >= GLOBAL_CAP_USD:
-                return self._send(402, {"error": "GLOBAL BUDGET EXHAUSTED ($150). All calls refused."})
+            if not t or "role" not in t or t["revoked"]:
+                if t is not None and t.get("restart_revoked"):
+                    t["refused_after_restart"] = t.get("refused_after_restart", 0) + 1
+                return self._send(403, {"error": "unknown or revoked token"})
+            if t["busy"]:
+                t["refusals"] += 1
+                return self._send(429, {"error": "one model call at a time per token"})
             role = t["role"]
             eff_role = t.get("effort_role", role)
             if role == "task" and t["calls"] >= TASK_MAX_CALLS:
+                t["refusals"] += 1
                 return self._send(429, {"error": f"call budget exhausted: at most {TASK_MAX_CALLS} model calls per test input",
                                         "budget_exhausted": True})
             max_out = MAX_OUTPUT_TOKENS.get(eff_role, 64000)
-            msgs = body.get("messages") or []
-            est_in = sum(len(str(m.get("content", m.get("text", "")))) for m in msgs) // 3 + 50
+            est_in = estimate_tokens(msgs)
             if role == "meta":
                 remaining = META_MAX_TOKENS - t["tokens_used"]
                 if remaining - est_in < 2000:
-                    t["calls"] += 0
                     return self._send(200, {"text": "[GATEWAY] The token budget for this meta-agent iteration (600k tokens) is exhausted. No further model calls are possible in this iteration; finish now.",
                                             "usage": {}, "budget_exhausted": True})
                 max_out = max(1000, min(max_out, remaining - est_in))
-            t["calls"] += 1  # reserve the call slot
+            worst = est_in * PRICE_IN + max_out * PRICE_OUT
+            if state["spent"] + state["reserved"] + worst > GLOBAL_CAP_USD:
+                t["refused_global"] += 1
+                return self._send(402, {"error": "GLOBAL BUDGET EXHAUSTED ($150). All calls refused."})
+            t["busy"] = True
+            t["calls"] += 1
+            state["reserved"] += worst
         t0 = time.time()
         try:
             d = call_openai(msgs, EFFORT[eff_role], max_out)
-        except Exception as e:
+        except UpstreamError as e:
             with lock:
-                t["calls"] -= 1  # infra failure does not consume a call slot
-            ledger_write({"ts": time.time(), "token": tok, "role": role, "scope": t.get("scope", {}),
-                          "error": str(e)[:500], "cost": 0.0, "total_tokens": 0})
+                t["busy"] = False
+                state["reserved"] -= worst
+                t["upstream_errors"] += 1
+                c = worst if e.possibly_billed else 0.0  # charge worst case if the call may have been billed
+                if e.possibly_billed:
+                    t["possibly_billed_failures"] += 1
+                else:
+                    t["calls"] -= 1  # infra failure that was certainly not billed does not consume a slot
+                state["spent"] += c
+                state["by_role"][role] = state["by_role"].get(role, 0.0) + c
+                ledger_write({"ts": time.time(), "token": tok, "role": role, "scope": t.get("scope", {}),
+                              "error": str(e)[:500], "possibly_billed": e.possibly_billed, "cost": c, "total_tokens": 0})
             return self._send(502, {"error": f"upstream error: {e}"})
         usage = d.get("usage") or {}
         c = cost_of(usage)
@@ -220,6 +285,8 @@ class AgentHandler(http.server.BaseHTTPRequestHandler):
                "reasoning_tokens": (usage.get("output_tokens_details") or {}).get("reasoning_tokens", 0),
                "total_tokens": usage.get("total_tokens", 0), "cost": c}
         with lock:
+            t["busy"] = False
+            state["reserved"] -= worst
             state["spent"] += c
             state["by_role"][role] = state["by_role"].get(role, 0.0) + c
             t["tokens_used"] += usage.get("total_tokens", 0)
@@ -234,6 +301,7 @@ class AdminHandler(AgentHandler):
 
 class UServer(socketserver.ThreadingMixIn, socketserver.UnixStreamServer):
     daemon_threads = True
+    request_queue_size = 256
 
     def get_request(self):
         req, _ = super().get_request()
@@ -253,8 +321,8 @@ def main():
     os.makedirs(RUN_DIR, exist_ok=True)
     os.chmod(RUN_DIR, 0o755)
     load_state()
-    serve(os.path.join(RUN_DIR, "gw.sock"), AgentHandler, 0o666)
     serve(os.path.join(RUN_DIR, "admin.sock"), AdminHandler, 0o600)
+    serve(os.path.join(RUN_DIR, "gw.sock"), AgentHandler, 0o666)
     with open(os.path.join(RUN_DIR, "gateway.pid"), "w") as f:
         f.write(str(os.getpid()))
     print(f"gateway up; spent so far ${state['spent']:.4f}", flush=True)

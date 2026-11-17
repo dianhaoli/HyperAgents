@@ -20,11 +20,13 @@ every call refused once total spend reaches $150. Prices: $0.10/M input, $0.01/M
 $0.50/M output (reasoning bills as output).
 
 ## Chosen design: **Full**
-Measured in the smoke test: $0.0028 per task-agent call on training tasks; held-out calls measured during the
-checks at about $0.0043. Meta iteration: $0.007 (worst case under the 600k cap about $0.30).
-Projection, Full: 13,820 calls x $0.0043 ≈ $59, plus 174 iterations x $0.30 (worst case) ≈ $52, total ≈ $111.
-That is at most $135, so **Full**:
-6 source seeds, g = 12 generations, 6 runs with I_0, k = 8 iterations, 25 tasks per set, B0 scored 3 times.
+Rule: projected cost = task calls x call price + meta iterations x iteration price, with prices measured in the
+smoke test ($0.0028 per task call, $0.007 per meta iteration): Full = 13,820 x 0.0028 + 174 x 0.007 = $40 <= $135, so
+**Full**: 6 source seeds, g = 12 generations, 6 runs with I_0, k = 8 iterations, 25 tasks per set, B0 scored 3 times.
+Conservative re-projection with prices measured during the checks: held-out calls cost $0.0075, and ARC-AGI-2 has
+167 held-out test inputs (334 calls per pass, not 240). That gives about 5,350 held-out calls ($40), about 8,500
+training-set calls at <= $0.005 ($43), and 174 meta iterations at a worst case of about $0.30 each ($52): <= $135.
+The gateway's $150 hard stop applies regardless.
 
 ## Data splits (splits.json, seed 20261117)
 - Held-out: all 120 public evaluation tasks of ARC-AGI-2 (commit f3283f7); 167 test inputs. No meta agent sees them.

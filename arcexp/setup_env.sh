@@ -12,6 +12,7 @@ if [ ! -d /opt/arc_private/ARC-AGI-2 ]; then
 fi
 mkdir -p /opt/arc_runner && cp arcexp/runner/*.py /opt/arc_runner/ && chown -R root:root /opt/arc_runner && chmod 755 /opt/arc_runner && chmod 644 /opt/arc_runner/*.py
 mkdir -p /hyperagents && chmod 755 /hyperagents
-git config --global safe.directory '*'
+git config --global --unset-all safe.directory || true
+sysctl -q fs.protected_symlinks=1 fs.protected_hardlinks=1 fs.protected_fifos=1 fs.protected_regular=1 || true
 git config --global user.name "arc-exp"; git config --global user.email "arc-exp@localhost"
 echo setup ok

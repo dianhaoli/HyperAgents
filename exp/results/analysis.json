@@ -10,15 +10,15 @@
   "I0": null,
   "Ig": null
  },
- "headline": "Neither improver beat two plain attempts on ARC-AGI-2",
+ "headline": "Incomplete: not enough runs to evaluate the headline",
  "self_edit": {},
  "self_edit_rate": null,
  "spend_by_role": {
   "probe": 9.3e-06,
-  "task": 0.33535101999999994,
+  "task": 2.930950629999999,
   "meta": 0.04166185000000001
  },
- "spend_total": 0.37702216999999993,
+ "spend_total": 2.972621779999999,
  "tokens_by_arm": {},
  "final_runs": []
 }

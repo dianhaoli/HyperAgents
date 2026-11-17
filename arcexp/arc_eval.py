@@ -14,12 +14,12 @@ import uuid
 from concurrent.futures import ThreadPoolExecutor
 
 from arcexp import arc_data
-from arcexp.common import EXP, RUNNER_DIR, append_jsonl, chown_agent, read_jsonl, register_token, token_info, tree_hash
+from arcexp.common import EXP, RUNNER_DIR, append_jsonl, chown_agent, gw_status, read_jsonl, register_token, revoke_token, tree_hash
+from arcexp.safeio import safe_read_text
 from arcexp.sandbox import run_sandboxed
 
 STAGE = os.path.join(EXP, "stage")
 TEST_INPUT_TIMEOUT = 1800  # whole forward() for one test input (two high-effort calls); code exec has its own 30 s budget
-INFRA_MARKERS = ("upstream error", "upstream failed", "GLOBAL BUDGET", "ConnectionRefused", "FileNotFoundError: [Errno 2] No such file or directory: '/run/arcgw")
 
 
 def results_path(phase):
@@ -37,8 +37,13 @@ def load_done(phase, code_hash=None):
             continue
         if code_hash is not None and r.get("code_hash") != code_hash:
             continue
-        done.setdefault(_key(r), []).append(r)
-    return {k: v for k, v in done.items() if len(v) >= 2}
+        slot = done.setdefault(_key(r), {})
+        slot.setdefault(r["attempt"], r)  # first complete execution wins; duplicates never add attempts
+    return {k: [v[1], v[2]] for k, v in done.items() if 1 in v and 2 in v}
+
+
+class HostInfraError(Exception):
+    pass
 
 
 def run_test_input(workspace, scope, tid, ti, code_hash, single=False, effort_role=None):
@@ -49,39 +54,48 @@ def run_test_input(workspace, scope, tid, ti, code_hash, single=False, effort_ro
         json.dump(arc_data.task_input_for(tid, ti), f)
     chown_agent(stage)
     tok_scope = dict(scope, task=tid, test_input=ti)
-    tok = register_token("task", tok_scope, effort_role=effort_role)
+    try:
+        tok = register_token("task", tok_scope, effort_role=effort_role)
+    except Exception as e:  # nothing ran yet: infrastructure
+        shutil.rmtree(stage, ignore_errors=True)
+        raise HostInfraError(f"token registration failed: {e}")
     cmd = ["python3", os.path.join(RUNNER_DIR, "run_one.py")] + (["--single"] if single else [])
     t0 = time.time()
-    rc, out = run_sandboxed(cmd, binds=[(workspace, "/hyperagents", True), (stage, "/tmp/task", False)],
-                            cwd="/tmp/task", env_extra={"GW_TOKEN": tok}, timeout=TEST_INPUT_TIMEOUT)
-    dur = time.time() - t0
-    res = {"answers": [], "error": None, "raw": None}
-    ap = os.path.join(stage, "answer.json")
-    if os.path.exists(ap):
-        try:
-            with open(ap) as f:
-                res = json.load(f)
-        except Exception as e:
-            res["error"] = f"unreadable answer.json: {e}"
-    else:
-        res["error"] = f"no answer.json (rc={rc}): {out.decode(errors='replace')[-1500:]}"
-    chat = ""
-    cp = os.path.join(stage, "chat_history.md")
-    if os.path.exists(cp):
-        try:
-            with open(cp, errors="replace") as f:
-                chat = f.read()[-60000:]
-        except Exception:
-            pass
-    shutil.rmtree(stage, ignore_errors=True)
-    info = {}
     try:
-        info = token_info(tok)
-    except Exception:
-        pass
+        rc, out = run_sandboxed(cmd, binds=[(workspace, "/hyperagents", True), (stage, "/tmp/task", False)],
+                                cwd="/tmp/task", env_extra={"GW_TOKEN": tok}, timeout=TEST_INPUT_TIMEOUT)
+    finally:
+        try:
+            info = revoke_token(tok)  # the sandbox is gone; its token must never work again
+        except Exception:
+            info = None
+    dur = time.time() - t0
+    if info is None:
+        shutil.rmtree(stage, ignore_errors=True)
+        raise HostInfraError("gateway unreachable after the sandbox ran")
+    # agent-controlled files: read without following links / opening special files
+    res = {"answers": [], "error": None}
+    raw = safe_read_text(os.path.join(stage, "answer.json"), 20_000_000)
+    if raw is None:
+        res["error"] = f"no readable answer.json (rc={rc}): {out.decode(errors='replace')[-1500:]}"
+    else:
+        try:
+            d = json.loads(raw)
+            if not isinstance(d, dict):
+                raise ValueError("answer.json is not an object")
+            res["answers"] = d.get("answers") if isinstance(d.get("answers"), list) else []
+            res["error"] = d.get("error") if isinstance(d.get("error"), str) else (None if d.get("error") is None else str(d.get("error")))
+        except Exception as e:
+            res["error"] = f"malformed answer.json: {e}"
+    chat = safe_read_text(os.path.join(stage, "chat_history.md"), 5_000_000) or ""
+    chat = chat[-60000:]
+    shutil.rmtree(stage, ignore_errors=True)
     calls = info.get("calls", 0)
+    billed_ok = calls - info.get("possibly_billed_failures", 0)
+    # infrastructure failure = gateway-side facts only (never agent-controlled text or exit codes)
+    infra = bool(info.get("upstream_errors", 0) or info.get("refused_global", 0) or info.get("refused_after_restart", 0)) \
+        and billed_ok < (1 if single else 2)
     err = res.get("error") or ""
-    infra = bool(err) and any(m in err for m in INFRA_MARKERS) or (rc == 124 and calls == 0)
     answers = [a for a in (res.get("answers") or []) if arc_data.valid_grid(a)][:2]
     truth = arc_data.truth(tid, ti)
     recs = []
@@ -90,13 +104,13 @@ def run_test_input(workspace, scope, tid, ti, code_hash, single=False, effort_ro
         recs.append(dict(scope, task=tid, test_input=ti, attempt=a + 1, code_hash=code_hash,
                          pred=pred, correct=(pred == truth), n_answers=len(answers),
                          agent_error=(err[-1500:] if err else None), infra_error=infra,
-                         timeout=(rc == 124), calls=calls, tokens=info.get("tokens_used", 0), dur=round(dur, 1),
-                         ts=time.time()))
+                         timeout=(rc == 124), calls=calls, tokens=info.get("tokens_used", 0),
+                         upstream_errors=info.get("upstream_errors", 0), dur=round(dur, 1), ts=time.time()))
     return recs, chat
 
 
 def evaluate_set(workspace, task_ids, scope, workers=16, single=False, effort_role=None,
-                 visible_dir=None, retries=1, code_hash=None, log=print):
+                 visible_dir=None, retries=4, code_hash=None, log=print):
     """scope: dict with phase, arm, seed, iteration (+ anything else). Returns summary dict."""
     phase = scope["phase"]
     code_hash = code_hash or tree_hash(workspace)
@@ -112,15 +126,21 @@ def evaluate_set(workspace, task_ids, scope, workers=16, single=False, effort_ro
         todo = [(tid, ti) for tid, ti in jobs if key_of(tid, ti) not in done]
         if not todo:
             break
+        if attempt_round > 0:
+            time.sleep(min(600, 30 * 2 ** (attempt_round - 1)))
+            try:
+                gw_status()
+            except Exception:
+                time.sleep(120)
         log(f"[eval] {scope} round {attempt_round}: {len(todo)} test inputs to run ({len(jobs)-len(todo)} cached)")
 
         def work(j):
             tid, ti = j
             try:
                 recs, chat = run_test_input(workspace, scope, tid, ti, code_hash, single=single, effort_role=effort_role)
-            except Exception as e:
+            except HostInfraError as e:
                 recs = [dict(scope, task=tid, test_input=ti, attempt=a + 1, code_hash=code_hash, pred=None,
-                             correct=False, infra_error=True, agent_error=f"host error: {e}", ts=time.time())
+                             correct=False, infra_error=True, agent_error=f"host infra error: {e}", ts=time.time())
                         for a in range(2)]
                 chat = ""
             for r in recs:
@@ -158,19 +178,21 @@ def evaluate_set(workspace, task_ids, scope, workers=16, single=False, effort_ro
     return summary
 
 
-def _grid_strings(g):
-    yield json.dumps(g)
-    yield json.dumps(g, separators=(",", ":"))
-    yield "\n".join(" ".join(str(v) for v in r) for r in g)
-    yield "\n".join("".join(str(v) for v in r) for r in g)
-
-
-def redact(text, truths):
+def contains_truth(text, truths):
+    """True if any true grid appears in the text in any serialization (digits in row-major order,
+    ignoring every non-digit character)."""
+    if not text:
+        return False
+    digits = re.sub(r"\D", "", text)
     for g in truths:
-        for s in _grid_strings(g):
-            if len(s) >= 5 and s in text:
-                text = text.replace(s, "[REDACTED]")
-    return text
+        flat = "".join(str(v) for r in g for v in r)
+        if len(flat) >= 4 and flat in digits:
+            return True
+    return False
+
+
+def withhold(text, truths):
+    return "[withheld: contains a sequence equal to a true output]" if contains_truth(text, truths) else text
 
 
 def write_visible(visible_dir, task_ids, per_task, per_ti, done, key_of, chats):
@@ -184,13 +206,14 @@ def write_visible(visible_dir, task_ids, per_task, per_ti, done, key_of, chats):
             solved = bool(per_ti.get((tid, ti)))
             item = {"task_id": tid, "test_input": ti, "solved": solved,
                     "n_answers_returned": rs[0].get("n_answers") if rs else None,
-                    "agent_error": (rs[0].get("agent_error") or None) if rs else "not evaluated"}
+                    "agent_error": withhold((rs[0].get("agent_error") or None), truths) if rs else "not evaluated"}
             if not solved:
-                item["wrong_answers"] = [r["pred"] for r in rs if r.get("pred") is not None and r["pred"] not in truths]
+                item["wrong_answers"] = [r["pred"] if not contains_truth(json.dumps(r["pred"]), truths) else "[withheld]"
+                                         for r in rs if r.get("pred") is not None and r["pred"] not in truths]
                 chat = chats.get((tid, ti))
                 if chat:
                     with open(os.path.join(visible_dir, "agent_evals", f"chat_history_{tid}_{ti}.md"), "w") as f:
-                        f.write(redact(chat, truths))
+                        f.write(withhold(chat, truths))
             details.append(item)
     report = {"overall_accuracy": sum(per_task.values()) / max(1, len(per_task)),
               "total": len(per_task), "total_test_inputs": len(details),
