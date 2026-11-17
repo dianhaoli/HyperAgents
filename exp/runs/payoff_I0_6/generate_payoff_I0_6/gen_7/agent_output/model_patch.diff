@@ -1,0 +1,49 @@
+diff --git a/task_agent.py b/task_agent.py
+index a486c9a..50fabd2 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -83,7 +83,10 @@ def build_prompt(inputs):
+ 
+ 
+ def _valid(g):
+-    return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
++    # ARC-AGI grids are bounded; reject oversized parses rather than returning an
++    # accidental numeric table from surrounding model commentary.
++    return (isinstance(g, list) and 0 < len(g) <= 30
++            and all(isinstance(r, list) and 0 < len(r) <= 30 for r in g)
+             and len({len(r) for r in g}) == 1
+             and all(isinstance(v, int) and not isinstance(v, bool) and 0 <= v <= 9 for r in g for v in r))
+ 
+@@ -121,11 +124,27 @@ def parse_grid(text):
+         g = _parse_block(m)
+         if g is not None:
+             return g
+-    for m in reversed(re.findall(r"\[\s*\[[\d\s,\[\]]*\]\s*\]", text)):
+-        g = _parse_block(m)
+-        if g is not None:
+-            return g
+-    return None
++    # Last resort: decode JSON arrays embedded in ordinary prose. Advance past
++    # each successfully decoded grid so its nested rows are not mistaken for
++    # separate candidate grids; later complete grids take precedence.
++    decoder = json.JSONDecoder()
++    candidate = None
++    i = 0
++    while i < len(text):
++        if text[i] != "[":
++            i += 1
++            continue
++        try:
++            grid, end = decoder.raw_decode(text[i:])
++        except (json.JSONDecodeError, ValueError):
++            i += 1
++            continue
++        if _valid(grid):
++            candidate = grid
++            i += end
++        else:
++            i += 1
++    return candidate
+ 
+ 
+ class TaskAgent:

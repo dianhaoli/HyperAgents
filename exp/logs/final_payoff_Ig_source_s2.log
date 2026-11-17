@@ -1,3 +1,5 @@
 [eval] {'phase': 'rescore', 'arm': 'Ig', 'seed': 2, 'iteration': 5} round 0: 26 test inputs to run (0 cached)
 payoff_Ig_source_s2 cand gen_5: loop score 0.680 rescore 0.560 combined 0.620
 [eval] {'phase': 'rescore', 'arm': 'Ig', 'seed': 2, 'iteration': 3} round 0: 26 test inputs to run (0 cached)
+payoff_Ig_source_s2 cand gen_3: loop score 0.660 rescore 0.660 combined 0.660
+[eval] {'phase': 'heldout', 'arm': 'Ig', 'seed': 2, 'iteration': 3} round 0: 167 test inputs to run (0 cached)

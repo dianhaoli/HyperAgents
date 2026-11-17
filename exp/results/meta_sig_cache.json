@@ -83,5 +83,22 @@
 "source_s4:6": [
 "meta_agent.py",
 "run_meta_agent.py"
+],
+"source_s4:9": [],
+"source_s4:10": [],
+"source_s4:12": [
+"agent/tools/bash.py"
+],
+"source_s4:13": [
+"meta_agent.py"
+],
+"source_s4:15": [
+"meta_agent.py"
+],
+"source_s4:18": [
+"meta_agent.py"
+],
+"source_s4:20": [
+"meta_agent.py"
 ]
 }

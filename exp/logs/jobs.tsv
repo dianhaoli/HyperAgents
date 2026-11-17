@@ -21,3 +21,5 @@ run_source_s2	16	python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/
 final_payoff_Ig_source_s1	16	python3 -m arcexp.phases final --run payoff_Ig_source_s1
 run_source_s4	16	python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/source_s4/config.json > /home/user/HyperAgents/exp/runs/source_s4/run.log 2>&1
 final_payoff_Ig_source_s5	16	python3 -m arcexp.phases final --run payoff_Ig_source_s5
+final_payoff_Ig_source_s6	16	python3 -m arcexp.phases final --run payoff_Ig_source_s6
+run_ext_source_s4_g20	16	python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/ext_source_s4_g20/config.json > /home/user/HyperAgents/exp/runs/ext_source_s4_g20/run.log 2>&1

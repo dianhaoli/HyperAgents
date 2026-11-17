@@ -22,3 +22,8 @@ resumed payoff_I0_6 (infra aborts so far: 1)
 resumed payoff_Ig_source_s6 (infra aborts so far: 1)
 resumed source_s4 (infra aborts so far: 1)
 launched final exam for payoff_Ig_source_s5
+launched final exam for payoff_Ig_source_s6
+pick source_s4:g20: source_s4 g20 -> (12, 1, None) | no changed coach with >=3 descendants (and scored children): most descendants
+   transplant check: True __ARC_SANDBOX_STARTED__
+IMPORT_OK 
+launched extension test ext_source_s4_g20: launched run_ext_source_s4_g20

@@ -1,0 +1,15 @@
+diff --git a/task_agent.py b/task_agent.py
+index cd2ca6e..f90e547 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -60,6 +60,10 @@ def build_prompt(inputs):
+         "check that it also applies to the test. Before answering, verify the output's dimensions, every "
+         "changed cell, and preservation of cells that should remain unchanged. Do not merely copy an "
+         "example or assume a familiar rule without checking it against all demonstrations.",
++        "When lines or barriers divide a grid, also trace the orthogonally connected regions of "
++        "background cells. Check whether the grid edge or marker cells close a region, and infer from "
++        "all examples which regions are transformed and which remain unchanged; do not treat all "
++        "background cells as equivalent.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
