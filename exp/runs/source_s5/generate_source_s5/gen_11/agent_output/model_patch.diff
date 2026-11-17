@@ -1,0 +1,53 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..8ecbf4a 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,7 +50,7 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, independent=False):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+@@ -71,6 +71,14 @@ def build_prompt(inputs):
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+     parts.append(grid_to_text(t))
+     parts.append("")
++    if independent:
++        parts.append(
++            "Independent second attempt: start again from the training pairs rather than reusing a prior answer. "
++            "Consider whether a different rule could explain all examples, then check your chosen rule against "
++            "each training pair and the test grid. Do not force a different answer: repeat a candidate only if "
++            "your independent derivation supports it."
++        )
++        parts.append("")
+     parts.append(
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+@@ -137,9 +145,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
++    def solve_once(self, inputs, independent=False):
+         """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++        prompt = build_prompt(inputs, independent=independent)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,9 +161,10 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Use the second budgeted call for an unanchored, independent derivation.
++                g = self.solve_once(inputs, independent=(attempt == 1))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

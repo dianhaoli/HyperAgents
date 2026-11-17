@@ -161,3 +161,11 @@ The user allowed deviations from the prompt's design where clearly better; each 
     unparsed tool call, or the model answering the nudge with "DONE". I_0 is pre-registered (commit f577cc7) and
     is the same starting point for both arms, so it is not changed mid-experiment. An evolved improver may
     legitimately repair this. That is part of what Delta measures, and RESULTS.md reports it.
+28. **Transport fix: streaming.** Non-streamed requests running past ~25-40 minutes were cut by the network path
+    (HTTP 502). There were 82 such failures, 65 of them in the xhigh pass. Those test inputs were infra-retried,
+    sometimes for hours. The gateway now streams responses and requests a reasoning *summary* only so that
+    events keep the connection alive (max gap between events ~4 s in a test). The summary is discarded.
+    Model, effort, prompts, `max_output_tokens` and the text returned to agents are unchanged, so this is a
+    transport change, not a behaviour change. A broken stream is treated as possibly billed (worst-case cost
+    charged, slot consumed, infra-retried). Earlier calls that succeeded are unaffected. Earlier 502 failures
+    were infra and were retried under the same rules.

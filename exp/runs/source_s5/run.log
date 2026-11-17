@@ -15,3 +15,5 @@ generate_loop: generation 9 completed, parent 8
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s5/generate_source_s5/gen_10', 'current_genid': 10, 'parent_genid': 8, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
 generate_loop: generation 10 completed, parent 3
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s5/generate_source_s5/gen_11', 'current_genid': 11, 'parent_genid': 3, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 11 completed, parent 2
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s5/generate_source_s5/gen_12', 'current_genid': 12, 'parent_genid': 2, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}

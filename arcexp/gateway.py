@@ -128,30 +128,47 @@ def call_openai(messages, effort, max_out):
         if not isinstance(content, str):
             content = json.dumps(content)
         inp.append({"role": role, "content": content})
-    body = {"model": MODEL, "input": inp, "reasoning": {"effort": effort},
-            "max_output_tokens": max_out, "store": False}
+    # Streamed, with a reasoning summary requested only so that events keep flowing during long reasoning:
+    # non-streamed requests longer than ~25-40 min were being cut by the network path (HTTP 502). The summary
+    # is discarded; agents receive exactly the same message text as before.
+    body = {"model": MODEL, "input": inp, "reasoning": {"effort": effort, "summary": "auto"},
+            "max_output_tokens": max_out, "store": False, "stream": True}
     last_err = None
     for attempt in range(7):
+        started = False
         try:
-            r = requests.post("https://api.openai.com/v1/responses", json=body, timeout=(30, REQUEST_TIMEOUT))
-        except requests.exceptions.ReadTimeout as e:
-            # the generation may have been billed: do not retry, report as possibly billed
-            raise UpstreamError(f"read timeout: {e}", possibly_billed=True)
+            with requests.post("https://api.openai.com/v1/responses", json=body, stream=True,
+                               timeout=(30, 300)) as r:  # read timeout = max silence between events
+                if r.status_code != 200:
+                    txt = r.text
+                    last_err = f"HTTP {r.status_code}: {txt[:500]}"
+                    if r.status_code in (400, 401, 403, 404):
+                        if not (r.status_code == 400 and "flagged" in txt and attempt < 2):
+                            raise UpstreamError(last_err, client=(r.status_code == 400))
+                    time.sleep(min(60, 2 ** attempt * 2))
+                    continue
+                for line in r.iter_lines():
+                    if not line or not line.startswith(b"data:"):
+                        continue
+                    started = True
+                    try:
+                        ev = json.loads(line[5:])
+                    except Exception:
+                        continue
+                    et = ev.get("type", "")
+                    if et in ("response.completed", "response.incomplete"):
+                        return ev["response"]
+                    if et in ("response.failed", "error"):
+                        err = ev.get("response", {}).get("error") or ev.get("error") or ev
+                        raise UpstreamError(f"stream failure: {str(err)[:400]}", possibly_billed=True)
+                raise UpstreamError("stream ended without completion", possibly_billed=started)
+        except UpstreamError:
+            raise
         except Exception as e:
+            if started:  # generation was under way: may be billed, do not retry
+                raise UpstreamError(f"stream broken: {type(e).__name__}: {e}", possibly_billed=True)
             last_err = f"{type(e).__name__}: {e}"
             time.sleep(min(60, 2 ** attempt * 2))
-            continue
-        if r.status_code == 200:
-            try:
-                return r.json()
-            except Exception as e:
-                raise UpstreamError(f"bad 200 body: {e}", possibly_billed=True)
-        last_err = f"HTTP {r.status_code}: {r.text[:500]}"
-        if r.status_code in (400, 401, 403, 404):
-            # sporadic false-positive "flagged" 400s: retry those twice, everything else is final
-            if not (r.status_code == 400 and "flagged" in r.text and attempt < 2):
-                raise UpstreamError(last_err, client=(r.status_code == 400))
-        time.sleep(min(60, 2 ** attempt * 2))
     raise UpstreamError(f"upstream failed after retries: {last_err}")
 
 
