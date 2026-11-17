@@ -47,7 +47,7 @@ def launch(name):
 def payoff_i0(i):
     name = f"payoff_I0_{i}"
     make(name, phase="payoff", arm="I0", seed=f"r{i}", task_set="payoff", max_generation=K,
-         template_dir="agent_template", freeze_paths=BASE_FREEZE, rng_seed=1100 + i, workers=16)  # 1000+i crashed (harness bug), see DECISIONS
+         template_dir="agent_template", freeze_paths=BASE_FREEZE, rng_seed=(1200 + i if i == 2 else 1100 + i), workers=16)  # reruns after harness bugs, see DECISIONS 23-24
     return name
 
 

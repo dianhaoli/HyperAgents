@@ -140,3 +140,10 @@ The user allowed deviations from the prompt's design where clearly better; each 
     No meta agent ran and no pay-off result existed. Both were moved to `exp/crashed/` and rerun with new seeds
     (1101/1102). A new guard now raises InfraAbort (run stops, resumable) whenever a generation ends without
     its meta step having run, so harness failures can no longer burn generations.
+24. **Harness bug: patch sanitizer too strict.** It rejected any path whose component started with `.git`, so
+    a meta-agent edit that also created a harmless `.gitignore` was discarded in full. This hit
+    payoff_I0_2 iteration 7 and source_s6 generation 3. Now only the `.git` directory itself is forbidden.
+    payoff_I0_2 (rng 1102) was moved to `exp/crashed/` and rerun with a new seed (1202), so the I_0 arm is not
+    handicapped by the harness. source_s6 keeps its run: one of 12 generations was lost to the bug, which only
+    affects which I_g candidates exist, and that is recorded here. All runs were restarted (resumable)
+    on the fixed code; in-flight work of the interrupted generations was redone.

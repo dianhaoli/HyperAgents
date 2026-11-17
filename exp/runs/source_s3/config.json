@@ -8,6 +8,6 @@
   "freeze_paths": [],
   "rng_seed": 3,
   "workers": 12,
-  "name": "source_s3",
-  "root_commit": "abf2a504f61867c752bed49a51cb19fee444fce1"
+  "root_commit": "abf2a504f61867c752bed49a51cb19fee444fce1",
+  "name": "source_s3"
 }

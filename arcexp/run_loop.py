@@ -72,7 +72,8 @@ _EXT_HDR = ("index ", "new file mode ", "deleted file mode ", "old mode ", "new 
 
 def _bad_path(p):
     parts = p.split("/")
-    return (not p or p.startswith("/") or ".." in parts or any(x == ".git" or x.startswith(".git") for x in parts)
+    # only the .git directory itself (repo internals: config, hooks) is forbidden; .gitignore etc. are ordinary files
+    return (not p or p.startswith("/") or ".." in parts or any(x == ".git" for x in parts)
             or any(c in p for c in "\\\"\t"))
 
 
