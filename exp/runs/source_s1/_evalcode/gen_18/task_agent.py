@@ -4,10 +4,9 @@ import re
 import socket
 import http.client
 import time
+from collections import Counter
 
-# Starting task agent (A_0) for the ARC-AGI-2 domain: one direct model response per attempt.
-# forward() makes two independent plain attempts (the budget is 2 model calls and 2 answers per
-# test input) and returns both parsed grids.
+# ARC task agent: two model calls and up to two candidate answers per test input.
 
 
 class _UnixConn(http.client.HTTPConnection):
@@ -50,20 +49,32 @@ def grid_to_text(grid):
     return "\n".join(" ".join(str(v) for v in row) for row in grid)
 
 
+def _training_change_audit(pair, number, limit=60):
+    """Summarize the observed input/output differences, without inferring a rule."""
+    a, b = pair["input"], pair["output"]
+    h, w = min(len(a), len(b)), min(len(a[0]), len(b[0]))
+    changes = [(r, c, a[r][c], b[r][c]) for r in range(h) for c in range(w)
+               if a[r][c] != b[r][c]]
+    lines = [f"Example {number} change audit (0-based): {len(changes)} changed, "
+             f"{h*w-len(changes)} unchanged cells in shared {h}x{w} area."]
+    transitions = Counter((old, new) for _, _, old, new in changes)
+    for (old, new), count in sorted(transitions.items()):
+        cells = [(r, c) for r, c, x, y in changes if (x, y) == (old, new)]
+        if len(cells) <= limit:
+            locations = ", ".join(f"({r},{c})" for r, c in cells)
+            lines.append(f"  {old}->{new} ({count}): {locations}")
+        else:
+            rows, cols = [r for r, _ in cells], [c for _, c in cells]
+            lines.append(f"  {old}->{new} ({count}): rows {min(rows)}-{max(rows)}, "
+                         f"columns {min(cols)}-{max(cols)}; coordinates omitted")
+    return "\n".join(lines)
+
+
 def build_prompt(inputs):
     parts = [
         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
-        "Compare every example carefully: identify which objects, colors, shapes, positions, counts, and "
-        "grid dimensions change or stay fixed. Prefer the simplest rule that explains all examples, and "
-        "check that it also applies to the test. Before answering, verify the output's dimensions, every "
-        "changed cell, and preservation of cells that should remain unchanged. Do not merely copy an "
-        "example or assume a familiar rule without checking it against all demonstrations.",
-        "When lines or barriers divide a grid, also trace the orthogonally connected regions of "
-        "background cells. Check whether the grid edge or marker cells close a region, and infer from "
-        "all examples which regions are transformed and which remain unchanged; do not treat all "
-        "background cells as equivalent.",
         "",
     ]
     for i, pair in enumerate(inputs["train"], 1):
@@ -80,6 +91,14 @@ def build_prompt(inputs):
     parts.append(f"Input ({len(t)}x{len(t[0])}):")
     parts.append(grid_to_text(t))
     parts.append("")
+    parts.append("## Training change audit")
+    parts.extend(_training_change_audit(pair, i) for i, pair in enumerate(inputs["train"], 1))
+    parts.append(
+        "Use this audit as evidence, not as a proposed rule. State what input property selects "
+        "the changed cells, and check the rule against every demonstration, including unchanged "
+        "cells. Reject any rule that does not explain every listed change. Then apply it to the "
+        "test grid and verify dimensions and changed cells.\n\n"
+    )
     parts.append(
         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
@@ -146,9 +165,37 @@ class TaskAgent:
         except Exception:
             pass
 
-    def solve_once(self, inputs):
-        """One direct model response -> one parsed grid (or None)."""
+    def solve_once(self, inputs, candidate=None, independent=False):
+        """Make one model call and parse its output grid, if present.
+
+        ``candidate`` retains the explicit verification mode for callers that use it.
+        ``independent`` asks for a fresh derivation without exposing an earlier guess;
+        this is useful for a second attempt because candidate-visible checks can anchor
+        the model on the same incorrect transformation.
+        """
         prompt = build_prompt(inputs)
+        if candidate is not None:
+            prompt += (
+                "\n\nIndependent verification: derive the transformation from the "
+                "demonstrations and apply it to the test input before comparing any "
+                "candidate. Check the rule against every changed and unchanged training "
+                "cell. Only after deriving the complete test grid, compare it cell by cell "
+                "and by dimensions with the candidate below. If even one cell differs, "
+                "return your independently derived grid; do not repair the candidate by "
+                "visual guesswork or keep it because it appears plausible. Return only "
+                "the verified grid in the required <answer> tags.\n"
+                "Candidate for comparison after derivation: "
+                f"{json.dumps(candidate)}"
+            )
+        elif independent:
+            prompt += (
+                "\n\nMake this a fresh, independent solve: do not assume or reuse any "
+                "earlier proposed rule or grid. Infer a concrete rule from the training "
+                "pairs, check that it reproduces every demonstrated output, then apply it "
+                "to the test input. Verify the dimensions and changed cells against that "
+                "rule before returning the grid in <answer> tags, with nothing else inside "
+                "the tags."
+            )
         self.log(f"Input: {prompt}")
         text = call_model(prompt)
         self.log(f"Output: {text}")
@@ -162,9 +209,11 @@ class TaskAgent:
             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
         """
         answers = []
-        for _ in range(2):
+        for attempt in range(2):
             try:
-                g = self.solve_once(inputs)
+                # A fresh second derivation avoids anchoring on a plausible-but-wrong
+                # first grid, while preserving the two-call/two-answer budget.
+                g = self.solve_once(inputs, independent=(attempt == 1))
             except Exception as e:
                 self.log(f"Error: {e}")
                 g = None

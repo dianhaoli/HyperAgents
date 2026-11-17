@@ -32,3 +32,4 @@ pick source_s2:g20: source_s2 g20 -> (9, 3, -0.03999999999999998) | max mean chi
    transplant check: True __ARC_SANDBOX_STARTED__
 IMPORT_OK 
 launched extension test ext_source_s2_g20: launched run_ext_source_s2_g20
+launched final exam for payoff_I0_4

@@ -5,7 +5,8 @@ import socket
 import http.client
 import time
 
-# ARC task agent: two model calls and up to two candidate answers per test input.
+# Starting task agent (A_0) for the ARC-AGI-2 domain. The second permitted model call
+# independently verifies the first candidate against the demonstrations before returning it.
 
 
 class _UnixConn(http.client.HTTPConnection):
@@ -48,45 +49,12 @@ def grid_to_text(grid):
     return "\n".join(" ".join(str(v) for v in row) for row in grid)
 
 
-def _training_change_audit(input_grid, output_grid, coordinate_limit=48):
-    """Summarize demonstrated cell edits as checkable evidence for rule inference."""
-    in_shape = (len(input_grid), len(input_grid[0]) if input_grid else 0)
-    out_shape = (len(output_grid), len(output_grid[0]) if output_grid else 0)
-    if in_shape != out_shape:
-        return f"dimensions {in_shape[0]}x{in_shape[1]} -> {out_shape[0]}x{out_shape[1]}"
-
-    changes = {}
-    for r, (in_row, out_row) in enumerate(zip(input_grid, output_grid)):
-        for c, (before, after) in enumerate(zip(in_row, out_row)):
-            if before != after:
-                changes.setdefault((before, after), []).append((r, c))
-    if not changes:
-        return "no cells changed"
-
-    total = sum(len(cells) for cells in changes.values())
-    descriptions = []
-    for (before, after), cells in sorted(changes.items()):
-        item = f"{before}->{after}: {len(cells)} cell(s)"
-        if total <= coordinate_limit:
-            item += " at " + ", ".join(f"({r},{c})" for r, c in cells)
-        else:
-            row_counts = {}
-            for r, _ in cells:
-                row_counts[r] = row_counts.get(r, 0) + 1
-            item += "; per-row counts " + ", ".join(
-                f"row {r}: {count}" for r, count in sorted(row_counts.items())
-            )
-        descriptions.append(item)
-    return f"{total} changed cell(s): " + "; ".join(descriptions)
-
-
 def build_prompt(inputs):
     parts = [
         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input. "
-        "Treat the change audit after each example as evidence: the same concrete rule must account "
-        "for every listed edit and every unchanged cell in every demonstration.",
+        "that maps each input grid to its output grid. Infer the rule, check that it reproduces every "
+        "demonstration exactly, and apply it to the test input.",
         "",
     ]
     for i, pair in enumerate(inputs["train"], 1):
@@ -97,10 +65,6 @@ def build_prompt(inputs):
         h, w = len(pair["output"]), len(pair["output"][0])
         parts.append(f"Output ({h}x{w}):")
         parts.append(grid_to_text(pair["output"]))
-        parts.append(
-            "Change audit (input value -> output value; coordinates are zero-based): "
-            + _training_change_audit(pair["input"], pair["output"])
-        )
         parts.append("")
     t = inputs["test_input"]
     parts.append("## Test")
@@ -173,34 +137,17 @@ class TaskAgent:
         except Exception:
             pass
 
-    def solve_once(self, inputs, candidate=None, independent=False):
-        """Make one model call and parse its output grid, if present.
-
-        ``candidate`` retains the explicit verification mode for callers that use it.
-        ``independent`` asks for a fresh derivation without exposing an earlier guess;
-        this is useful for a second attempt because candidate-visible checks can anchor
-        the model on the same incorrect transformation.
-        """
+    def solve_once(self, inputs, previous_candidate=None):
+        """Make one model call and parse its grid response, if any."""
         prompt = build_prompt(inputs)
-        if candidate is not None:
+        if previous_candidate is not None:
             prompt += (
-                "\n\nIndependent verification of a previous candidate: "
-                f"{json.dumps(candidate)}\n"
-                "First infer the transformation from the demonstrations and check that it "
-                "accounts for every input/output pair. Compare the candidate with the test "
-                "input and that inferred rule; do not copy a demonstration output or accept "
-                "the candidate merely because it looks plausible. If the candidate fails "
-                "any check, correct it. Return the verified test grid in the required "
-                "<answer> tags, with nothing else inside the tags."
-            )
-        elif independent:
-            prompt += (
-                "\n\nMake this a fresh, independent solve: do not assume or reuse any "
-                "earlier proposed rule or grid. Infer a concrete rule from the training "
-                "pairs, check that it reproduces every demonstrated output, then apply it "
-                "to the test input. Verify the dimensions and changed cells against that "
-                "rule before returning the grid in <answer> tags, with nothing else inside "
-                "the tags."
+                "\n\nA first attempt proposed this candidate test output:\n"
+                f"{json.dumps(previous_candidate)}\n"
+                "Do not assume that candidate is correct. Independently re-check the inferred rule "
+                "against every training input-output pair, then compare the rule's result with the "
+                "candidate. Correct any mismatch and return your best final grid in the required "
+                "<answer> tags."
             )
         self.log(f"Input: {prompt}")
         text = call_model(prompt)
@@ -217,16 +164,10 @@ class TaskAgent:
         answers = []
         for attempt in range(2):
             try:
-                if attempt == 1 and answers:
-                    # Use the second call to audit a concrete first candidate against
-                    # every demonstration, rather than spending both calls on
-                    # independent derivations. ARC misses often come from a rule that
-                    # sounds plausible but does not reproduce all demonstrated edits.
-                    g = self.solve_once(inputs, candidate=answers[0])
-                else:
-                    # If the first response had no parseable grid, there is no
-                    # candidate to audit; use the remaining call for a fresh solve.
-                    g = self.solve_once(inputs, independent=(attempt == 1))
+                # Use the second call for explicit verification when the first call
+                # yielded a candidate; if not, use it as another independent attempt.
+                previous = answers[0] if attempt == 1 and answers else None
+                g = self.solve_once(inputs, previous_candidate=previous)
             except Exception as e:
                 self.log(f"Error: {e}")
                 g = None

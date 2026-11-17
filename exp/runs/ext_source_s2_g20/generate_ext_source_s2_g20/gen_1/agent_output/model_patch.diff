@@ -1,0 +1,67 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..d078279 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -79,6 +79,17 @@ def build_prompt(inputs):
+     return "\n".join(parts)
+ 
+ 
++def build_verification_prompt(inputs, candidate):
++    """Ask the second attempt to check the first candidate against the demonstrations."""
++    return (
++        build_prompt(inputs)
++        + "\n\nA first attempt proposed this test output candidate:\n"
++        + json.dumps(candidate)
++        + "\nIndependently infer the transformation from all demonstration pairs. Check whether this exact candidate follows the rule, including its dimensions and cell values. "
++        + "If it is wrong, correct it; if it is consistent, return it unchanged. Return only the final grid inside <answer></answer> tags as a JSON list of rows."
++    )
++
++
+ def _valid(g):
+     return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
+             and len({len(r) for r in g}) == 1
+@@ -137,9 +148,10 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def solve_once(self, inputs, candidate=None):
++        """One model response -> one parsed grid (or None)."""
++        prompt = (build_prompt(inputs) if candidate is None
++                  else build_verification_prompt(inputs, candidate))
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,12 +165,22 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
+-            try:
+-                g = self.solve_once(inputs)
+-            except Exception as e:
+-                self.log(f"Error: {e}")
+-                g = None
+-            if g is not None:
+-                answers.append(g)
++        first = None
++        try:
++            first = self.solve_once(inputs)
++        except Exception as e:
++            self.log(f"Error: {e}")
++        if first is not None:
++            answers.append(first)
++
++        # The saved evaluation histories show repeated identical answers from two plain attempts.
++        # Use the second allowed call to verify/correct the first; keep the first candidate so this
++        # added check cannot remove a potentially correct answer from the two-answer budget.
++        try:
++            second = self.solve_once(inputs, candidate=first) if first is not None else self.solve_once(inputs)
++        except Exception as e:
++            self.log(f"Error: {e}")
++            second = None
++        if second is not None:
++            answers.append(second)
+         return answers, []
