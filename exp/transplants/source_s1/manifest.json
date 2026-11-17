@@ -1,0 +1,35 @@
+{
+ "source_run": "source_s1",
+ "gen": 1,
+ "code_files": [
+  "agent/base_agent.py",
+  "agent/llm.py",
+  "agent/llm_withtools.py",
+  "agent/tools/__init__.py",
+  "agent/tools/bash.py",
+  "agent/tools/edit.py",
+  "meta_agent.py",
+  "run_meta_agent.py",
+  "utils/git_utils.py",
+  "utils/thread_logger.py"
+ ],
+ "state_files_emptied": [],
+ "freeze_paths": [
+  "agent",
+  "agent/base_agent.py",
+  "agent/llm.py",
+  "agent/llm_withtools.py",
+  "agent/tools/__init__.py",
+  "agent/tools/bash.py",
+  "agent/tools/edit.py",
+  "meta_agent.py",
+  "run_meta_agent.py",
+  "utils",
+  "utils/git_utils.py",
+  "utils/thread_logger.py"
+ ],
+ "dynamic_trace_err": null,
+ "files_differing_from_I0": [
+  "meta_agent.py"
+ ]
+}

@@ -1,0 +1,28 @@
+{
+  "phase": "trial",
+  "arm": "Ig",
+  "seed": 2,
+  "source_seed": 2,
+  "task_set": "payoff",
+  "max_generation": 1,
+  "template_dir": "exp/transplants/source_s2/template",
+  "freeze_paths": [
+    "agent",
+    "agent/base_agent.py",
+    "agent/llm.py",
+    "agent/llm_withtools.py",
+    "agent/tools/__init__.py",
+    "agent/tools/bash.py",
+    "agent/tools/edit.py",
+    "meta_agent.py",
+    "run_meta_agent.py",
+    "utils",
+    "utils/git_utils.py",
+    "utils/thread_logger.py"
+  ],
+  "rng_seed": 502,
+  "workers": 16,
+  "name": "trial_Ig_source_s2",
+  "root_commit": "0d31297900bd48d751887b5ef1baf659202c8a2a",
+  "done": true
+}

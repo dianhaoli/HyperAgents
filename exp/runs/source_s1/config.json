@@ -3,12 +3,14 @@
   "arm": "I0src",
   "seed": 1,
   "task_set": "source",
-  "max_generation": 12,
+  "max_generation": 40,
   "template_dir": "agent_template",
   "freeze_paths": [],
   "rng_seed": 1,
-  "workers": 12,
+  "workers": 8,
   "root_commit": "e14eebc9bed3f43b2114864d07d9aeef94ad1460",
   "name": "source_s1",
-  "done": true
+  "done": false,
+  "max_generation_committed": 12,
+  "extension": "DESIGN_v2: continued from the saved archive to 40 generations, same rules"
 }

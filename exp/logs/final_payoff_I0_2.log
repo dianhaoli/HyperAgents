@@ -8,3 +8,5 @@ payoff_I0_2 cand gen_3: loop score 0.760 rescore 0.580 combined 0.670
 payoff_I0_2 cand gen_4: loop score 0.740 rescore 0.680 combined 0.710
 [eval] {'phase': 'heldout', 'arm': 'I0', 'seed': 'r2', 'iteration': 4} round 0: 53 test inputs to run (114 cached)
 payoff_I0_2 cand gen_3: loop score 0.760 rescore 0.580 combined 0.670
+payoff_I0_2 cand gen_4: loop score 0.740 rescore 0.680 combined 0.710
+[eval] {'phase': 'heldout', 'arm': 'I0', 'seed': 'r2', 'iteration': 4} round 0: 53 test inputs to run (114 cached)

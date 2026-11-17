@@ -1,0 +1,27 @@
+{
+  "phase": "trial",
+  "arm": "Ig",
+  "seed": 1,
+  "source_seed": 1,
+  "task_set": "payoff",
+  "max_generation": 1,
+  "template_dir": "exp/transplants/source_s1/template",
+  "freeze_paths": [
+    "agent",
+    "agent/base_agent.py",
+    "agent/llm.py",
+    "agent/llm_withtools.py",
+    "agent/tools/__init__.py",
+    "agent/tools/bash.py",
+    "agent/tools/edit.py",
+    "meta_agent.py",
+    "run_meta_agent.py",
+    "utils",
+    "utils/git_utils.py",
+    "utils/thread_logger.py"
+  ],
+  "rng_seed": 501,
+  "workers": 16,
+  "name": "trial_Ig_source_s1",
+  "root_commit": "b92a21c3e2c89517d70cbf3c80b90f7de3965a00"
+}

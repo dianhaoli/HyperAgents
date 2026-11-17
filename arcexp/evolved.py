@@ -216,26 +216,51 @@ def patch_touches(patch_path, files_or_dirs):
     return sorted(hit)
 
 
-def cmd_select():
+def archive_at(out_dir, max_gen=None):
+    """The archive as it stood after generation max_gen (all of it if None)."""
+    arch = load_archive_data(os.path.join(out_dir, "archive.jsonl"), last_only=True)["archive"]
+    if max_gen is None:
+        return arch
+    return [g for g in arch if g == "initial" or (isinstance(g, int) and g <= max_gen)]
+
+
+_SIG_CACHE_P = os.path.join(EXP, "results", "meta_sig_cache.json")
+
+
+def node_meta_changed(run_name, g, i0_sig):
+    """(changed_files_vs_I0) for node g of a run, from its snapshot; cached."""
     from arcexp.phases import materialize
+    cache = json.load(open(_SIG_CACHE_P)) if os.path.exists(_SIG_CACHE_P) else {}
+    k = f"{run_name}:{g}"
+    if k not in cache:
+        run_dir = os.path.join(EXP, "runs", run_name)
+        d = materialize(run_dir, g, os.path.join(run_dir, "nodes", f"gen_{g}"))
+        cache[k] = diff_meta(i0_sig, meta_signature(d))
+        shutil.rmtree(d, ignore_errors=True)
+        json.dump(cache, open(_SIG_CACHE_P, "w"), indent=0)
+    return cache[k]
+
+
+def cmd_select(max_gen=12):
+    """Committed rule (DESIGN.md step 6), applied to each source archive as it stood at generation max_gen."""
     i0 = meta_signature(TEMPLATE)
     sel = {}
     for name, cfg in source_runs():
         run_dir = os.path.join(EXP, "runs", name)
         out_dir = os.path.join(run_dir, f"generate_{name}")
-        arch = load_archive_data(os.path.join(out_dir, "archive.jsonl"), last_only=True)["archive"]
+        arch = archive_at(out_dir, max_gen)
         parent = {g: get_parent_genid(out_dir, g) for g in arch}
         children = {g: [c for c in arch if parent.get(c) == g] for g in arch}
         cands = []
         for g in arch:
             if not children[g]:
                 continue
-            d = materialize(run_dir, g, os.path.join(run_dir, "nodes", f"gen_{g}"))
-            sig = meta_signature(d)
-            changed = diff_meta(i0, sig)
-            shutil.rmtree(d, ignore_errors=True)
+            if g != "initial" and not os.path.exists(os.path.join(run_dir, "snapshots", f"gen_{g}.tar.gz")):
+                continue
+            changed = node_meta_changed(name, g, i0)
             if not changed:
                 continue
+            sig = {f: None for f in changed}
             ps = node_score(out_dir, g)
             kid_scores = [node_score(out_dir, c) for c in children[g]]
             scored = [k for k in kid_scores if k is not None]
@@ -253,10 +278,96 @@ def cmd_select():
                           "mean_child_improvement": imp, "meta_files_changed_vs_I0": changed,
                           "meta_edit_generations_in_ancestry": meta_edit_gens})
         cands.sort(key=lambda c: (-c["mean_child_improvement"], int(c["gen"])))
-        sel[name] = {"source_seed": cfg["seed"], "qualifying": bool(cands), "I_g": cands[0] if cands else None,
-                     "all_candidates": cands}
+        sel[name] = {"source_seed": cfg["seed"], "archive_at_generation": max_gen, "qualifying": bool(cands),
+                     "I_g": cands[0] if cands else None, "all_candidates": cands}
         print(name, "->", (cands[0]["gen"], round(cands[0]["mean_child_improvement"], 3)) if cands else "NO QUALIFYING AGENT")
     json.dump(sel, open(os.path.join(EXP, "results", "ig_selection.json"), "w"), indent=1)
+
+
+def descendants(g, children):
+    out, stack = set(), list(children.get(g, []))
+    while stack:
+        x = stack.pop()
+        if x not in out:
+            out.add(x)
+            stack.extend(children.get(x, []))
+    return out
+
+
+def ext_pick(name, gen):
+    """DESIGN_v2 rule: archive as it stood at generation `gen`. Among agents with changed coach code and at
+    least 3 descendants, the one whose (scored) children improved most on average; if none has 3, the changed
+    coach with the most descendants; if no coach has changed code, None."""
+    i0 = meta_signature(TEMPLATE)
+    run_dir = os.path.join(EXP, "runs", name)
+    out_dir = os.path.join(run_dir, f"generate_{name}")
+    arch = archive_at(out_dir, gen)
+    parent = {g: get_parent_genid(out_dir, g) for g in arch}
+    children = {g: [c for c in arch if parent.get(c) == g] for g in arch}
+    cands = []
+    for g in arch:
+        if g == "initial" or not os.path.exists(os.path.join(run_dir, "snapshots", f"gen_{g}.tar.gz")):
+            continue
+        changed = node_meta_changed(name, g, i0)
+        if not changed:
+            continue
+        ps = node_score(out_dir, g)
+        kids = [node_score(out_dir, c) for c in children[g]]
+        scored = [k for k in kids if k is not None]
+        imp = (sum(k - ps for k in scored) / len(scored)) if (scored and ps is not None) else None
+        cands.append({"gen": g, "score": ps, "n_descendants": len(descendants(g, children)), "n_children": len(children[g]),
+                      "n_scored_children": len(scored), "mean_child_improvement": imp, "meta_files_changed_vs_I0": changed})
+    rec = {"run": name, "generation": gen, "n_changed_coaches": len(cands), "candidates": cands}
+    three = [c for c in cands if c["n_descendants"] >= 3 and c["mean_child_improvement"] is not None]
+    if three:
+        three.sort(key=lambda c: (-c["mean_child_improvement"], c["gen"]))
+        rec.update(pick=three[0], rule="max mean child improvement among changed coaches with >=3 descendants")
+    elif cands:
+        cands_sorted = sorted(cands, key=lambda c: (-c["n_descendants"], c["gen"]))
+        rec.update(pick=cands_sorted[0], rule="no changed coach with >=3 descendants (and scored children): most descendants")
+    else:
+        rec.update(pick=None, rule="no coach with changed code: skipped")
+    return rec
+
+
+def cmd_ext_pick(names, gens):
+    p = os.path.join(EXP, "results", "ext_picks.json")
+    allp = json.load(open(p)) if os.path.exists(p) else {}
+    for name in names:
+        for gen in gens:
+            out_dir = os.path.join(EXP, "runs", name, f"generate_{name}")
+            if len(archive_at(out_dir, gen)) < gen + 1:
+                print(name, gen, "not reached yet"); continue
+            rec = ext_pick(name, gen)
+            allp[f"{name}:g{gen}"] = rec
+            pk = rec["pick"]
+            print(name, f"g{gen}", "->", (pk["gen"], pk["n_descendants"], pk["mean_child_improvement"]) if pk else None, "|", rec["rule"])
+            if pk:
+                dest = os.path.join(EXP, "transplants_ext", f"{name}_g{gen}", "template")
+                m = transplant(name, pk["gen"], dest)
+                ok, msg = import_check(dest)
+                rec["transplant_check"] = {"ok": ok, "msg": msg[-500:], "files_differing_from_I0": m["files_differing_from_I0"]}
+                print("   transplant check:", ok, msg[-200:])
+            json.dump(allp, open(p, "w"), indent=1)
+
+
+IMPORT_CHECK = r'''
+import sys, os
+sys.path.insert(0, "/hyperagents"); os.chdir("/hyperagents")
+import importlib
+for m in ["meta_agent", "run_meta_agent", "task_agent"]:
+    importlib.import_module(m)
+from meta_agent import MetaAgent
+from task_agent import TaskAgent
+print("IMPORT_OK")
+'''
+
+
+def import_check(repo):
+    """Sandboxed check that the transplanted coach and the task agent load (no model calls)."""
+    rc, out = run_sandboxed(["python3", "-c", IMPORT_CHECK], binds=[(repo, "/hyperagents", True)], cwd="/hyperagents", timeout=300)
+    o = out.decode(errors="replace")
+    return ("IMPORT_OK" in o), o
 
 
 # ---------------------------------------------------------------- transplant
@@ -325,12 +436,12 @@ def cmd_transplant():
               "diff vs I0", m["files_differing_from_I0"])
 
 
-def cmd_stats():
+def cmd_stats(max_gen=12):
     i0_files = set(meta_code_files(TEMPLATE)[0]) | set(BASE_FREEZE)
     stats = {}
     for name, cfg in source_runs():
         out_dir = os.path.join(EXP, "runs", name, f"generate_{name}")
-        arch = load_archive_data(os.path.join(out_dir, "archive.jsonl"), last_only=True)["archive"]
+        arch = archive_at(out_dir, max_gen)
         parents = {get_parent_genid(out_dir, g) for g in arch}
         gens = [g for g in arch if g not in ("initial", 0)]
         rows = []
@@ -344,8 +455,15 @@ def cmd_stats():
                        "n_self_edit": sum(1 for r in rows if r["meta_files_changed"]),
                        "n_self_edit_parents": sum(1 for r in rows if r["meta_files_changed"] and r["became_parent"])}
         print(name, stats[name]["n_self_edit"], "/", len(rows), "self-edits;", stats[name]["n_self_edit_parents"], "became parents")
-    json.dump(stats, open(os.path.join(EXP, "results", "source_stats.json"), "w"), indent=1)
+    fn = "source_stats.json" if max_gen == 12 else f"source_stats_g{max_gen}.json"
+    json.dump(stats, open(os.path.join(EXP, "results", fn), "w"), indent=1)
 
 
 if __name__ == "__main__":
-    {"select": cmd_select, "transplant": cmd_transplant, "stats": cmd_stats}[sys.argv[1]]()
+    if sys.argv[1] == "ext_pick":
+        # python -m arcexp.evolved ext_pick source_s1,source_s2 6,20,30,40
+        cmd_ext_pick(sys.argv[2].split(","), [int(x) for x in sys.argv[3].split(",")])
+    elif sys.argv[1] == "select":
+        cmd_select(int(sys.argv[2]) if len(sys.argv) > 2 else 12)
+    else:
+        {"transplant": cmd_transplant, "stats": cmd_stats}[sys.argv[1]]()

@@ -169,3 +169,16 @@ The user allowed deviations from the prompt's design where clearly better; each 
     transport change, not a behaviour change. A broken stream is treated as possibly billed (worst-case cost
     charged, slot consumed, infra-retried). Earlier calls that succeeded are unaffected. Earlier 502 failures
     were infra and were retried under the same rules.
+29. **User instructions (part A finish, part B extension, budget, operations).** Hard cap raised to $200. The
+    per-test-input limit is 3 h for every arm, including B0 and the remaining B0/xhigh re-runs (no completed
+    rollout ever came near 2 h, so earlier rows are unaffected). Coach effort is `high` throughout (all 1,019
+    coach calls so far sent and echoed `high`). Seed index i maps to run `source_s{i+1}`. A's I_g selection
+    and self-edit statistics use each source archive **as it stood at generation 12** (`archive_at`), so
+    continuing seeds 0-3 to 40 generations for the extension cannot change part A.
+30. **Single gateway.** After a VM reboot, parallel job launches started several gateways (a race in
+    `start_gateway.sh`). The script now holds a flock, kills strays and checks the pid. The gateway child
+    closes the lock fd, which it had inherited and held, deadlocking later starts.
+31. **Part A selection:** 5 of 6 source seeds have a qualifying I_g (source_s4 does not). Picks: s1 gen 1, s2 gen 5,
+    s3 gen 3, s5 gen 6 (all edited meta_agent.py) and s6 gen 4 (edited utils/git_utils.py). All transplants pass a
+    sandboxed import check. Trial iterations (step 7) run before the pay-off runs. The pay-off runs start before
+    the pilot exams finish (timing only, like item 22). If the pilot gate fails, they are stopped and reported.
