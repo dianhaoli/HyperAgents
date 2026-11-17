@@ -1,0 +1,141 @@
+diff --git a/task_agent.py b/task_agent.py
+index 138add9..ced7344 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -49,7 +49,7 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs, prior_response=None):
++def build_prompt(inputs, prior_response=None, symbolic_candidate=None):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+@@ -70,6 +70,12 @@ def build_prompt(inputs, prior_response=None):
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+     parts.append(grid_to_text(t))
+     parts.append("")
++    if symbolic_candidate is not None:
++        parts.append(
++            "A bounded search found this candidate under a rotation/reflection and consistent "
++            "global color mapping. Verify that the same rule reproduces every demonstration "
++            "before accepting it:\n" + json.dumps(symbolic_candidate)
++        )
+     if prior_response is None:
+         parts.append(
+             "Solve the task by inferring one precise transformation from the demonstrations. "
+@@ -144,6 +150,65 @@ def parse_grid(text):
+     return None
+ 
+ 
++def _dihedral_grids(grid):
++    """Return the eight rotations/reflections of a rectangular grid."""
++    result = []
++    current = [row[:] for row in grid]
++    for _ in range(4):
++        result.append(current)
++        result.append([row[::-1] for row in current])
++        current = [list(row) for row in zip(*current[::-1])]
++    return result
++
++
++def find_symmetry_candidate(inputs):
++    """Find an unambiguous D4 transform with a consistent global color map.
++
++    Return a candidate only when every train-consistent transform yields the same
++    test grid. Unseen test colors are allowed only when the learned map is identity.
++    """
++    train, test = inputs.get("train", []), inputs.get("test_input")
++    if not train or not _valid(test):
++        return None
++    predictions = set()
++    for symmetry in range(8):
++        mapping = {}
++        valid = True
++        for pair in train:
++            source, target = pair.get("input"), pair.get("output")
++            if not _valid(source) or not _valid(target):
++                valid = False
++                break
++            source = _dihedral_grids(source)[symmetry]
++            if len(source) != len(target) or len(source[0]) != len(target[0]):
++                valid = False
++                break
++            for src_row, dst_row in zip(source, target):
++                for src, dst in zip(src_row, dst_row):
++                    if src in mapping and mapping[src] != dst:
++                        valid = False
++                        break
++                    mapping[src] = dst
++                if not valid:
++                    break
++            if not valid:
++                break
++        if not valid:
++            continue
++        oriented = _dihedral_grids(test)[symmetry]
++        colors = {value for row in oriented for value in row}
++        if any(value not in mapping for value in colors) and any(
++            src != dst for src, dst in mapping.items()
++        ):
++            continue
++        prediction = [[mapping.get(value, value) for value in row] for row in oriented]
++        if _valid(prediction):
++            predictions.add(tuple(tuple(row) for row in prediction))
++    if len(predictions) != 1:
++        return None
++    return [list(row) for row in next(iter(predictions))]
++
++
+ class TaskAgent:
+     def __init__(self, model="gpt-6-luna", chat_history_file="./chat_history.md"):
+         self.model = model
+@@ -156,9 +221,11 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs, prior_response=None):
++    def solve_once(self, inputs, prior_response=None, symbolic_candidate=None):
+         """One model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs, prior_response=prior_response)
++        prompt = build_prompt(
++            inputs, prior_response=prior_response, symbolic_candidate=symbolic_candidate
++        )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -174,17 +241,26 @@ class TaskAgent:
+         """
+         answers = []
+         first_response = None
+-        for attempt in range(2):
++        symbolic_candidate = find_symmetry_candidate(inputs)
++        # If the demonstrations determine an exact candidate in this limited rule
++        # family, reserve an answer slot for it. Otherwise use both model calls, with
++        # the second independently reviewing the first proposal.
++        attempts = 1 if symbolic_candidate is not None else 2
++        for attempt in range(attempts):
+             try:
+-                # Spend the second allowed call reviewing the first answer instead of repeating
+-                # the identical prompt, which commonly produced duplicate predictions.
+                 prompt_context = first_response if attempt == 1 else None
+-                g = self.solve_once(inputs, prior_response=prompt_context)
+-                # Keep the raw response for the second-call review.
+-                first_response = getattr(self, "_last_response", None) if attempt == 0 else first_response
++                g = self.solve_once(
++                    inputs,
++                    prior_response=prompt_context,
++                    symbolic_candidate=symbolic_candidate if attempt == 0 else None,
++                )
++                if attempt == 0:
++                    first_response = getattr(self, "_last_response", None)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+-            if g is not None:
++            if g is not None and g not in answers:
+                 answers.append(g)
+-        return answers, []
++        if symbolic_candidate is not None and symbolic_candidate not in answers:
++            answers.append(symbolic_candidate)
++        return answers[:2], []

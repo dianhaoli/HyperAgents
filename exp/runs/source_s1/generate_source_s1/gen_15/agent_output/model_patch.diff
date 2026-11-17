@@ -1,0 +1,62 @@
+diff --git a/task_agent.py b/task_agent.py
+index d60c474..6a37c90 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -48,11 +48,45 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
++def _training_change_audit(input_grid, output_grid, coordinate_limit=48):
++    """Summarize demonstrated cell edits as checkable evidence for rule inference."""
++    in_shape = (len(input_grid), len(input_grid[0]) if input_grid else 0)
++    out_shape = (len(output_grid), len(output_grid[0]) if output_grid else 0)
++    if in_shape != out_shape:
++        return f"dimensions {in_shape[0]}x{in_shape[1]} -> {out_shape[0]}x{out_shape[1]}"
++
++    changes = {}
++    for r, (in_row, out_row) in enumerate(zip(input_grid, output_grid)):
++        for c, (before, after) in enumerate(zip(in_row, out_row)):
++            if before != after:
++                changes.setdefault((before, after), []).append((r, c))
++    if not changes:
++        return "no cells changed"
++
++    total = sum(len(cells) for cells in changes.values())
++    descriptions = []
++    for (before, after), cells in sorted(changes.items()):
++        item = f"{before}->{after}: {len(cells)} cell(s)"
++        if total <= coordinate_limit:
++            item += " at " + ", ".join(f"({r},{c})" for r, c in cells)
++        else:
++            row_counts = {}
++            for r, _ in cells:
++                row_counts[r] = row_counts.get(r, 0) + 1
++            item += "; per-row counts " + ", ".join(
++                f"row {r}: {count}" for r, count in sorted(row_counts.items())
++            )
++        descriptions.append(item)
++    return f"{total} changed cell(s): " + "; ".join(descriptions)
++
++
+ def build_prompt(inputs):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "that maps each input grid to its output grid. Infer the rule and apply it to the test input. "
++        "Treat the change audit after each example as evidence: the same concrete rule must account "
++        "for every listed edit and every unchanged cell in every demonstration.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -63,6 +97,10 @@ def build_prompt(inputs):
+         h, w = len(pair["output"]), len(pair["output"][0])
+         parts.append(f"Output ({h}x{w}):")
+         parts.append(grid_to_text(pair["output"]))
++        parts.append(
++            "Change audit (input value -> output value; coordinates are zero-based): "
++            + _training_change_audit(pair["input"], pair["output"])
++        )
+         parts.append("")
+     t = inputs["test_input"]
+     parts.append("## Test")
