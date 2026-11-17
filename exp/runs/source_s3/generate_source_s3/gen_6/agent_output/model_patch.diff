@@ -1,0 +1,18 @@
+diff --git a/__pycache__/meta_agent.cpython-313.pyc b/__pycache__/meta_agent.cpython-313.pyc
+index e69de29..789a8b0 100644
+Binary files a/__pycache__/meta_agent.cpython-313.pyc and b/__pycache__/meta_agent.cpython-313.pyc differ
+diff --git a/meta_agent.py b/meta_agent.py
+index c42dcbd..a6d0aa8 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -29,7 +29,9 @@ class MetaAgent(AgentSystem):
+             "identify a specific, plausible cause of failure and a change that addresses it without undermining solved cases. "
+             "Avoid unsupported task-specific hints (for example, hardcoded colors, shapes, or grid dimensions); prefer general "
+             "improvements supported by multiple examples or repeated failure evidence. Keep the task-agent interface and enforced "
+-            "model-call/answer budgets intact. Make a focused change, and do not claim an improvement unless evaluation demonstrates it."
++            "model-call/answer budgets intact. Make a focused change, and do not claim an improvement unless evaluation demonstrates it. "
++            "In source_s3, gen_2 combined a prior-guess second-call prompt and a leading color/boundary hint, and scored 0.84 versus gen_1's 0.96. "
++            "Because these changes were bundled, do not attribute the regression to either one alone; avoid adopting the bundle without an isolated, evaluated test."
+         )
+ 
+         new_msg_history = chat_with_agent(instruction, model=self.model, msg_history=[], logging=self.log, tools_available='all')

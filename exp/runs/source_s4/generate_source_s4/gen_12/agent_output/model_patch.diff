@@ -1,0 +1,47 @@
+diff --git a/agent/tools/bash.py b/agent/tools/bash.py
+index 54ae6c2..bb1bc6f 100644
+--- a/agent/tools/bash.py
++++ b/agent/tools/bash.py
+@@ -38,7 +38,7 @@ class BashSession:
+         if self._started:
+             return
+         self._process = await asyncio.create_subprocess_shell(
+-            "/bin/bash -i",
++            "/bin/bash --noprofile --norc",
+             preexec_fn=os.setsid,
+             stdin=asyncio.subprocess.PIPE,
+             stdout=asyncio.subprocess.PIPE,
+@@ -128,15 +128,16 @@ def filter_error(error):
+         i += 1
+     return '\n'.join(filtered_lines).strip()
+ 
++_bash_loop = asyncio.new_event_loop()
++_bash_session = BashSession()
++
+ async def tool_function_call(command):
+-    """Execute a command in the bash shell."""
++    """Execute a command in the persistent bash shell."""
+     try:
+-        bash_session = BashSession()
+-
+-        if not bash_session._started:
+-            await bash_session.start()
++        if not _bash_session._started:
++            await _bash_session.start()
+ 
+-        output, error = await bash_session.run(command)
++        output, error = await _bash_session.run(command)
+         error = filter_error(error)
+         result = ""
+         if output:
+@@ -148,7 +149,9 @@ async def tool_function_call(command):
+         return f"Error: {str(e)}"
+ 
+ def tool_function(command):
+-    return asyncio.run(tool_function_call(command))
++    # Keep the event loop alive along with the shell process so that shell state
++    # (working directory, variables, functions, and so on) survives tool calls.
++    return _bash_loop.run_until_complete(tool_function_call(command))
+ 
+ if __name__ == "__main__":
+     # Example usage

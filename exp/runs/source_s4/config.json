@@ -9,5 +9,6 @@
   "rng_seed": 4,
   "workers": 12,
   "root_commit": "c4ef3c5b16ecc02987888d80002530d09e75ed7a",
-  "name": "source_s4"
+  "name": "source_s4",
+  "done": true
 }

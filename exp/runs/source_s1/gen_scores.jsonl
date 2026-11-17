@@ -4,3 +4,6 @@
 {"iteration": "5", "score": 0.92, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "fe602018625f7ca3", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "6", "score": 0.72, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "28cd9653681334cc", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "7", "score": 0.76, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "cdd6a39a33d10bab", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "9", "score": 0.84, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "4c9c3963f4f706dc", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "11", "score": 0.84, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "55130edf043b490e", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "12", "score": 0.96, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "96fe7c49df5a5084", "format_failures": 0, "snapshot_skipped": []}

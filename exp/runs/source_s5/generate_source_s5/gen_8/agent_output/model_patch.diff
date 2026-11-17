@@ -1,0 +1,33 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index 2641de1..20f8ebc 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -51,6 +51,15 @@ def summarize_evaluations(eval_path, max_reports=40, max_task_ids=8):
+             failed = report.get("question_ids_failed", [])
+             if not isinstance(failed, list):
+                 failed = []
++            # Some report formats omit or incompletely populate the explicit failed-ID
++            # list. Derive failures from per-task scores as well so persistent failures
++            # remain visible in the summary (not only in parent-to-child comparisons).
++            failed_ids = {str(task_id) for task_id in failed}
++            failed_ids.update(
++                str(task_id) for task_id, task_score in task_scores.items()
++                if isinstance(task_score, (int, float)) and not isinstance(task_score, bool)
++                and task_score < 1
++            )
+             passed = report.get("question_ids_passed", [])
+             if not isinstance(passed, list):
+                 passed = []
+@@ -58,7 +67,7 @@ def summarize_evaluations(eval_path, max_reports=40, max_task_ids=8):
+                 "score": float(score),
+                 "total": report.get("total"),
+                 "task_scores": task_scores,
+-                "failed": {str(task_id) for task_id in failed},
++                "failed": failed_ids,
+                 "passed": {str(task_id) for task_id in passed},
+             }
+ 
+diff --git a/__pycache__/meta_agent.cpython-313.pyc b/__pycache__/meta_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..4861546
+Binary files /dev/null and b/__pycache__/meta_agent.cpython-313.pyc differ
