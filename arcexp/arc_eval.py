@@ -19,7 +19,7 @@ from arcexp.safeio import safe_read_text
 from arcexp.sandbox import SANDBOX_STARTED, run_sandboxed
 
 STAGE = os.path.join(EXP, "stage")
-TEST_INPUT_TIMEOUT = 7500  # ~2 h: room for two full-length calls; effectively never binds (user request)
+TEST_INPUT_TIMEOUT = 10800  # 3 h per test input: above the worst case of two max-length calls (~2.5 h); never binds in practice
 
 
 def results_path(phase):

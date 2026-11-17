@@ -1842,3 +1842,45 @@ BrokenPipeError: [Errno 32] Broken pipe
 ----------------------------------------
 gateway up; spent so far $18.7809
 gateway up; spent so far $31.6492
+gateway up; spent so far $37.1579
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/HyperAgents/arcexp/gateway.py", line 362, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/HyperAgents/arcexp/gateway.py", line 353, in main
+    serve(os.path.join(RUN_DIR, "gw.sock"), AgentHandler, 0o666)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/HyperAgents/arcexp/gateway.py", line 342, in serve
+    srv = UServer(path, handler)
+  File "/usr/local/lib/python3.13/socketserver.py", line 457, in __init__
+    self.server_bind()
+    ~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/socketserver.py", line 478, in server_bind
+    self.socket.bind(self.server_address)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno 98] Address already in use
+gateway up; spent so far $37.1579
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/HyperAgents/arcexp/gateway.py", line 362, in <module>
+    main()
+    ~~~~^^
+  File "/home/user/HyperAgents/arcexp/gateway.py", line 353, in main
+    serve(os.path.join(RUN_DIR, "gw.sock"), AgentHandler, 0o666)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/user/HyperAgents/arcexp/gateway.py", line 342, in serve
+    srv = UServer(path, handler)
+  File "/usr/local/lib/python3.13/socketserver.py", line 457, in __init__
+    self.server_bind()
+    ~~~~~~~~~~~~~~~~^^
+  File "/usr/local/lib/python3.13/socketserver.py", line 478, in server_bind
+    self.socket.bind(self.server_address)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno 98] Address already in use
+gateway up; spent so far $37.1579
+gateway up; spent so far $37.1579
+gateway up; spent so far $37.1579
+gateway up; spent so far $37.1579

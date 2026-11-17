@@ -418,7 +418,7 @@ def arc_generate(*a, **kw):
         st = gw_status()
     except Exception as e:
         raise InfraAbort(f"gateway down before generation {CTX['current_genid']}: {e}")
-    if st["spent"] + st.get("reserved", 0) >= 150.0:
+    if st["spent"] + st.get("reserved", 0) >= st.get("cap", 200.0):
         raise InfraAbort("global budget exhausted")
     CTX["meta_ran"] = False
     md = _orig_generate(*a, **kw)
