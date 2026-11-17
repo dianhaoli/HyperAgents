@@ -1,0 +1,92 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..1bdf5e7 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -5,9 +5,8 @@ import socket
+ import http.client
+ import time
+ 
+-# Starting task agent (A_0) for the ARC-AGI-2 domain: one direct model response per attempt.
+-# forward() makes two independent plain attempts (the budget is 2 model calls and 2 answers per
+-# test input) and returns both parsed grids.
++# Starting task agent (A_0) for the ARC-AGI-2 domain. The first model call proposes a solution;
++# the second call independently checks that proposal against the demonstrations.
+ 
+ 
+ class _UnixConn(http.client.HTTPConnection):
+@@ -50,7 +49,7 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, prior_response=None):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+@@ -71,11 +70,27 @@ def build_prompt(inputs):
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+     parts.append(grid_to_text(t))
+     parts.append("")
+-    parts.append(
+-        "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+-        "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+-        "Put nothing else inside the tags."
+-    )
++    if prior_response is None:
++        parts.append(
++            "Solve the task by inferring one precise transformation from the demonstrations. "
++            "Compare dimensions, colors, object shapes, positions and repeated patterns. Check that "
++            "your rule reproduces every demonstrated output exactly before applying it to the test. "
++            "Preserve the full grid and dimensions unless the examples show a change. Briefly explain "
++            "the rule outside the answer tags, then end with the complete output grid inside "
++            "<answer></answer> tags as a JSON list of rows, for example: "
++            "<answer>[[0, 1, 2], [3, 4, 5]]</answer>. Put nothing else inside the tags."
++        )
++    else:
++        parts.append(
++            "A previous attempt proposed this solution (it may be wrong):\n"
++            + prior_response
++            + "\n\nInfer the rule afresh from the demonstrations and check it against every pair. "
++            "Independently verify whether the proposed grid follows that rule, including its dimensions, "
++            "colors, object boundaries, repeated patterns and every cell. Correct it if inconsistent; "
++            "otherwise return it unchanged. Briefly explain the rule outside the answer tags. End with "
++            "the complete output grid inside <answer></answer> tags as a JSON list of rows, with nothing "
++            "else inside the tags."
++        )
+     return "\n".join(parts)
+ 
+ 
+@@ -137,12 +152,13 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def solve_once(self, inputs, prior_response=None):
++        """One model response -> one parsed grid (or None)."""
++        prompt = build_prompt(inputs, prior_response=prior_response)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
++        self._last_response = text
+         return parse_grid(text)
+ 
+     def forward(self, inputs):
+@@ -153,9 +169,14 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        first_response = None
++        self._last_response = None
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Use the second allowed call to independently review the first proposal.
++                g = self.solve_once(inputs, prior_response=first_response)
++                if attempt == 0:
++                    first_response = self._last_response
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

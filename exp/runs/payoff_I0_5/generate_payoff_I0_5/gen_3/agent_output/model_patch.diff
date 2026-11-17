@@ -1,0 +1,38 @@
+diff --git a/task_agent.py b/task_agent.py
+index 8f6fc92..e2c8077 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -76,10 +76,14 @@ def build_prompt(inputs, candidate=None):
+     parts.append("")
+     if candidate is not None:
+         parts.extend([
+-            "## Candidate from an earlier attempt (it may be wrong)",
++            "## Candidate already returned in the first answer slot (it may be wrong)",
+             json.dumps(candidate),
+-            "Independently derive the rule from the training pairs. Check this candidate against "
+-            "the rule and correct it if needed; do not copy it without verification.",
++            "First derive the rule independently from the training pairs, without assuming the "
++            "candidate is correct. If the candidate conflicts with your independently derived "
++            "rule, return your corrected grid. If your best solution is the same as the candidate, "
++            "do not spend this second answer slot repeating it: return the strongest distinct "
++            "alternative grid you can justify from the examples. Do not make an arbitrary change "
++            "just to be different.",
+             "",
+         ])
+     parts.append(
+diff --git a/tests/test_task_agent.py b/tests/test_task_agent.py
+index 56ddc8f..68ac571 100644
+--- a/tests/test_task_agent.py
++++ b/tests/test_task_agent.py
+@@ -38,8 +38,10 @@ class TaskAgentTests(unittest.TestCase):
+ 
+         self.assertEqual(answers, [[[0, 2]], [[2, 0]]])
+         self.assertEqual(history, [])
+-        self.assertNotIn("Candidate from an earlier attempt", prompts[0])
++        self.assertNotIn("Candidate already returned", prompts[0])
+         self.assertIn('[[0, 2]]', prompts[1])
++        self.assertIn("do not spend this second answer slot repeating it", prompts[1])
++        self.assertIn("Do not make an arbitrary change", prompts[1])
+ 
+ 
+ if __name__ == "__main__":

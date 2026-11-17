@@ -1,0 +1,166 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..2357009 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -5,9 +5,8 @@ import socket
+ import http.client
+ import time
+ 
+-# Starting task agent (A_0) for the ARC-AGI-2 domain: one direct model response per attempt.
+-# forward() makes two independent plain attempts (the budget is 2 model calls and 2 answers per
+-# test input) and returns both parsed grids.
++# ARC-AGI-2 task agent: forward() uses two model calls per test input. The second attempt
++# audits the first candidate, and a conservative exact transform may fill an unused answer slot.
+ 
+ 
+ class _UnixConn(http.client.HTTPConnection):
+@@ -50,31 +49,91 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def _dihedral_variants(grid):
++    """Return the eight rotations/reflections of a non-empty rectangular grid."""
++    current = [row[:] for row in grid]
++    variants = []
++    for turns in range(4):
++        if turns:
++            current = [list(row) for row in zip(*current[::-1])]
++        variants.append((f"rotate_{90 * turns}", current))
++    current = [row[::-1] for row in grid]
++    for turns in range(4):
++        if turns:
++            current = [list(row) for row in zip(*current[::-1])]
++        variants.append((f"reflect_then_rotate_{90 * turns}", current))
++    return variants
++
++
++def infer_simple_transform_candidates(inputs):
++    """Find exact geometric/color transforms consistent with all training pairs."""
++    train = inputs.get("train", [])
++    if not train:
++        return []
++
++    candidates = []
++    for name, _ in _dihedral_variants(train[0]["input"]):
++        color_map = {}
++        consistent = True
++        for pair in train:
++            transformed = dict(_dihedral_variants(pair["input"])).get(name)
++            output = pair["output"]
++            if transformed is None or len(transformed) != len(output) or any(
++                len(source_row) != len(target_row)
++                for source_row, target_row in zip(transformed, output)
++            ):
++                consistent = False
++                break
++            for source_row, target_row in zip(transformed, output):
++                for source, target in zip(source_row, target_row):
++                    if source in color_map and color_map[source] != target:
++                        consistent = False
++                        break
++                    color_map[source] = target
++                if not consistent:
++                    break
++            if not consistent:
++                break
++
++        if not consistent:
++            continue
++        transformed_test = dict(_dihedral_variants(inputs["test_input"]))[name]
++        if any(value not in color_map for row in transformed_test for value in row):
++            continue
++        prediction = [[color_map[value] for value in row] for row in transformed_test]
++        if prediction not in candidates:
++            candidates.append(prediction)
++    return candidates
++
++
++
++def build_prompt(inputs, previous_candidate=None):
+     parts = [
+-        "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+-        "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "Solve this ARC-AGI puzzle. Infer a rule that explains every training pair, then apply it "
++        "to the test input. Grids are rectangular arrays of colors 0-9. Outputs may change dimensions.",
++        "Carefully compare object positions, colors, symmetry, and grid structure; verify your rule "
++        "against all examples and check every row and dimension of your proposed answer.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+-        parts.append(f"## Example {i}")
+-        h, w = len(pair["input"]), len(pair["input"][0])
+-        parts.append(f"Input ({h}x{w}):")
+-        parts.append(grid_to_text(pair["input"]))
+-        h, w = len(pair["output"]), len(pair["output"][0])
+-        parts.append(f"Output ({h}x{w}):")
+-        parts.append(grid_to_text(pair["output"]))
++        parts.append(f"## Training pair {i}")
++        for label, grid in (("Input", pair["input"]), ("Output", pair["output"])):
++            parts.append(f"{label} ({len(grid)}x{len(grid[0])}):")
++            parts.append(grid_to_text(grid))
+         parts.append("")
+-    t = inputs["test_input"]
+-    parts.append("## Test")
+-    parts.append(f"Input ({len(t)}x{len(t[0])}):")
+-    parts.append(grid_to_text(t))
+-    parts.append("")
++    test = inputs["test_input"]
++    parts.extend(["## Test input", f"({len(test)}x{len(test[0])}):", grid_to_text(test), ""])
++    if previous_candidate is not None:
++        parts.extend([
++            "A candidate answer from another attempt is:",
++            json.dumps(previous_candidate),
++            "Independently derive the transformation from the demonstrations. Check this candidate "
++            "against the rule and correct it if needed; do not copy it without verification.",
++            "",
++        ])
+     parts.append(
+-        "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+-        "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+-        "Put nothing else inside the tags."
++        "End your response with the test output inside <answer></answer> tags as valid JSON, "
++        "for example <answer>[[0, 1], [2, 3]]</answer>. Put only the grid inside the tags."
+     )
+     return "\n".join(parts)
+ 
+@@ -146,19 +205,26 @@ class TaskAgent:
+         return parse_grid(text)
+ 
+     def forward(self, inputs):
+-        """
+-        Args:
+-            inputs (dict): {"domain": "arc", "train": [{"input": grid, "output": grid}, ...], "test_input": grid}
+-        Returns:
+-            tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+-        """
++        """Return up to two distinct predictions using the fixed two-call budget."""
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                prompt = build_prompt(inputs, answers[0] if attempt and answers else None)
++                self.log(f"Input: {prompt}")
++                text = call_model(prompt)
++                self.log(f"Output: {text}")
++                candidate = parse_grid(text)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+-                g = None
+-            if g is not None:
+-                answers.append(g)
+-        return answers, []
++                candidate = None
++            if candidate is not None and candidate not in answers:
++                answers.append(candidate)
++
++        # Use an exact, training-verified geometric/color rule as a fallback when
++        # the language-model attempts produced fewer than two usable candidates.
++        if len(answers) < 2:
++            simple_candidates = infer_simple_transform_candidates(inputs)
++            if simple_candidates and all(candidate == simple_candidates[0] for candidate in simple_candidates):
++                if simple_candidates[0] not in answers:
++                    answers.append(simple_candidates[0])
++        return answers[:2], []

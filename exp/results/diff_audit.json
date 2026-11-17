@@ -1,0 +1,99 @@
+{
+ "A_gen12:source_s1": {
+  "hunks": [
+   {
+    "pick": "A_gen12:source_s1",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "This hunk adds generic machinery for reading evaluations. It finds report.json files, pulls out accuracy and failed IDs, and attaches the start and end of each failed task's chat-history log. It also adds generic prompt advice: be evidence-driven, don't hard-code answers, respect budgets, validate changes. Nothing in it mentions ARC, grids, colors, puzzles, transformation rules, specific task IDs or scores from this run.",
+     "The hunk adds generic evaluation-context code: it walks eval_path for report.json files, reads the generic fields (accuracy, failed ids, per_task_score), and pulls bounded excerpts of failure-trace logs. It also adds evidence-driven prompt text (\"identify a recurring weakness\", \"do not hard-code task IDs\", \"validate your change\"). Nothing in it mentions ARC, grids, colors or puzzles, and it contains no scores from this run. The \"reasoning, output formatting, or tool reliability\" comment is domain-agnostic too."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "A_gen12:source_s2": {
+  "hunks": [
+   {
+    "pick": "A_gen12:source_s2",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds summarize_evaluation_history, which walks gen_* folders and reads report.json files. It pulls out overall_accuracy and per_task_score, lists failed task IDs, and flags regressions against the best earlier generation. All of this logic works for any task domain. The only ARC-related text is \"for example, arc_eval\" in the docstring. That is an illustrative comment, not domain knowledge the code relies on. The hunk has no grid, color, puzzle or solving advice, no hard-coded task ids, and no scores from this run.",
+     "The hunk adds a summarize_evaluation_history helper that is not tied to any domain. It walks gen_* directories, reads report.json accuracy and per_task_score values, lists the IDs of partial or failed tasks, flags regressions against the best score for each evaluation kind, and adds generic advice to be evidence-driven. It contains no grid, color or puzzle content and no hardcoded task IDs or scores. The only ARC reference is \"for example, arc_eval\" in the docstring, which is an illustrative comment and does not change the logic."
+    ],
+    "agreement": "unanimous"
+   },
+   {
+    "pick": "A_gen12:source_s2",
+    "file": "meta_agent.py",
+    "idx": 1,
+    "tag": "general",
+    "reasons": [
+     "This hunk adds a generic evaluation-history summary to the coach's instruction. It also tells the coach to inspect prior patches, predictions and reports, and not to assume that one score change proves a technique is generally better. None of it mentions ARC, grids, puzzles, task ids or this run's scores.",
+     "The hunk adds a generic evaluation-history summary (summarize_evaluation_history(eval_path)) to the prompt. It also tells the coach to look at earlier patches and predictions, and not to treat a single score change as proof that a technique works. None of it mentions ARC, grids, puzzles or results from this run."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "A_gen12:source_s3": {
+  "hunks": [
+   {
+    "pick": "A_gen12:source_s3",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "ARC-specific",
+    "reasons": [
+     "This hunk is mostly general advice: treat evaluation results as evidence, compare scores with the parent, inspect failures and make focused changes. Two parts tie it to this run and to ARC. The line \"in the supplied source_s3 results, gen_1 scored 0.96, while gen_2 scored 0.84 and the initial agent scored 0.72\" gives scores from this particular run. The line \"hardcoded colors, shapes, or grid dimensions\" is ARC grid-puzzle content.",
+     "Most of the hunk is general guidance: treat results as evidence, compare against the parent, make focused changes. Two parts make it ARC-specific. It hardcodes this run's results (\"in the supplied source_s3 results, gen_1 scored 0.96, while gen_2 scored 0.84 and the initial agent scored 0.72\"). It also uses domain examples (\"hardcoded colors, shapes, or grid dimensions\")."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "A_gen12:source_s5": {
+  "hunks": [
+   {
+    "pick": "A_gen12:source_s5",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds a generic summarize_evaluations helper and rewrites the coach prompt. The helper reads report.json files and picks the score from several metric keys that come from different domains (overall_accuracy, points_percentage, average_fitness and others). It then compares each generation with its parent and lists passed and failed task IDs. The new prompt adds evidence-driven guidance: compare against the parent, results may be noisy, make one focused change, run tests. None of it mentions ARC, grids, colors, puzzles, specific task IDs, or scores from this run, so it would work for any task domain.",
+     "The hunk adds a generic summarize_evaluations() helper. It reads gen_*/metadata.json and report.json files and takes the score from whichever of several domain-neutral metric keys is present (overall_accuracy, accuracy_score, points_percentage, average_progress, average_fitness). It compares each generation with its parent and lists task IDs that newly passed or failed. The rest rewrites the meta-agent prompt with general advice: treat results as evidence rather than proof, inspect patches, make one focused change, don't modify evaluation artifacts, and run tests. Nothing in it refers to ARC, grids, colors, puzzles, specific task IDs or this run's scores."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "A_gen12:source_s6": {
+  "hunks": [
+   {
+    "pick": "A_gen12:source_s6",
+    "file": "utils/git_utils.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "This is a git diff helper change. It skips Python bytecode and __pycache__ files in diffs, reads file lists split on NUL bytes, and diffs each tracked file on its own. It is general robustness work with no mention of ARC, grids or puzzles.",
+     "This is a git helper change. diff_versus_commit now leaves out generated Python bytecode (__pycache__, .pyc, .pyo) but still records deliberate deletions of tracked files. It also reads file lists NUL-delimited and decodes the output more robustly. Nothing in it refers to ARC, grids or puzzles."
+    ],
+    "agreement": "unanimous"
+   },
+   {
+    "pick": "A_gen12:source_s6",
+    "file": "utils/git_utils.py",
+    "idx": 1,
+    "tag": "general",
+    "reasons": [
+     "This is a formatting-only refactor of a git diff helper. It adds a trailing comma, switches to double quotes, and folds the decode straight into diff_output. Nothing in it is specific to ARC.",
+     "This is a cosmetic refactor of the git diff helper: it adds a trailing comma, switches to double quotes and folds a temporary variable into a direct append of the decoded stdout. None of it touches ARC or the task domain."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ }
+}

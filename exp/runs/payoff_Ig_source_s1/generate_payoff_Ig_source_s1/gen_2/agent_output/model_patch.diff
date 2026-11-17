@@ -1,0 +1,41 @@
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+index e69de29..58f9a06 100644
+Binary files a/__pycache__/task_agent.cpython-313.pyc and b/__pycache__/task_agent.cpython-313.pyc differ
+diff --git a/task_agent.py b/task_agent.py
+index 6f74849..1cced02 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -70,20 +70,24 @@ def build_prompt(inputs, previous_candidate=None):
+         parts.append(f"Output ({h}x{w}):")
+         parts.append(grid_to_text(pair["output"]))
+         parts.append("")
+-    if previous_candidate is not None:
+-        parts.extend([
+-            "## Candidate from the first attempt",
+-            json.dumps(previous_candidate),
+-            "You are the independent verification attempt. Re-derive the rule from the demonstrations, "
+-            "check this candidate against that rule, and correct it if any cell, row order, or dimension "
+-            "is inconsistent. Do not repeat the candidate merely because it is provided.",
+-            "",
+-        ])
+     t = inputs["test_input"]
+     parts.append("## Test")
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+     parts.append(grid_to_text(t))
+     parts.append("")
++    if previous_candidate is not None:
++        parts.extend([
++            "## Candidate from the first attempt (unverified)",
++            json.dumps(previous_candidate),
++            "This candidate may be wrong. First derive the rule independently from the demonstrations; "
++            "do not use the candidate to infer the rule. Make a positional audit: state which input "
++            "rows/columns produce each output row/column, including any crop, reordering, or repetition. "
++            "Apply that exact operation to every training input and check dimensions and cell positions "
++            "against its output. Only after those checks, apply it to the test input and compare the "
++            "result cell by cell with the candidate. Correct the candidate if any row, column, or value "
++            "does not match. In particular, do not assume rows with equal sort keys can be reordered.",
++            "",
++        ])
+     parts.append(
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
