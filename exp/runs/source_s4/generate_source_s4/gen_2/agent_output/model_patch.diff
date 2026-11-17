@@ -1,0 +1,66 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..550b72a 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -5,9 +5,8 @@ import socket
+ import http.client
+ import time
+ 
+-# Starting task agent (A_0) for the ARC-AGI-2 domain: one direct model response per attempt.
+-# forward() makes two independent plain attempts (the budget is 2 model calls and 2 answers per
+-# test input) and returns both parsed grids.
++# Starting task agent (A_0) for the ARC-AGI-2 domain. The second permitted model call
++# independently verifies the first candidate against the demonstrations before returning it.
+ 
+ 
+ class _UnixConn(http.client.HTTPConnection):
+@@ -54,7 +53,8 @@ def build_prompt(inputs):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "that maps each input grid to its output grid. Infer the rule, check that it reproduces every "
++        "demonstration exactly, and apply it to the test input.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -137,9 +137,18 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
++    def solve_once(self, inputs, previous_candidate=None):
++        """Make one model call and parse its grid response, if any."""
+         prompt = build_prompt(inputs)
++        if previous_candidate is not None:
++            prompt += (
++                "\n\nA first attempt proposed this candidate test output:\n"
++                f"{json.dumps(previous_candidate)}\n"
++                "Do not assume that candidate is correct. Independently infer and re-check the rule "
++                "against every training input-output pair, then compare the rule's result with the "
++                "candidate. Correct any mismatch and return your best final grid in the required "
++                "<answer> tags."
++            )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,9 +162,12 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Use the second call for explicit verification when the first call
++                # yielded a candidate; if not, use it as another independent attempt.
++                previous = answers[0] if attempt == 1 and answers else None
++                g = self.solve_once(inputs, previous_candidate=previous)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..7751191
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

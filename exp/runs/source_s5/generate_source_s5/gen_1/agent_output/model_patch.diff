@@ -1,0 +1,16 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..b5e96c6 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -72,6 +72,11 @@ def build_prompt(inputs):
+     parts.append(grid_to_text(t))
+     parts.append("")
+     parts.append(
++        "Infer one compact transformation rule from the demonstrations and check that it explains every "
++        "training pair, including object shapes, colors, positions, and grid dimensions. Apply that rule to "
++        "the test grid; do not assume its output has the same dimensions or layout as the input. Before "
++        "answering, check the proposed grid cell-by-cell and ensure it follows the rule. If multiple rules "
++        "fit, choose the simplest rule that explains all examples.\n\n"
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+         "Put nothing else inside the tags."

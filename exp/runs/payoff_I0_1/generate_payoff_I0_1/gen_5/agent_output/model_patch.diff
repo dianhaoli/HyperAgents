@@ -1,0 +1,104 @@
+diff --git a/task_agent.py b/task_agent.py
+index 73e0eed..c1260d5 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -136,6 +136,76 @@ def parse_grid(text):
+     return None
+ 
+ 
++def _enclosed_cells(grid, background):
++    """Return background cells in 4-connected components that do not touch an edge."""
++    h, w = len(grid), len(grid[0])
++    seen = set()
++    enclosed = set()
++    for r in range(h):
++        for c in range(w):
++            if grid[r][c] != background or (r, c) in seen:
++                continue
++            stack = [(r, c)]
++            seen.add((r, c))
++            component = []
++            touches_edge = False
++            while stack:
++                y, x = stack.pop()
++                component.append((y, x))
++                touches_edge |= y == 0 or x == 0 or y == h - 1 or x == w - 1
++                for ny, nx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
++                    if (0 <= ny < h and 0 <= nx < w and grid[ny][nx] == background
++                            and (ny, nx) not in seen):
++                        seen.add((ny, nx))
++                        stack.append((ny, nx))
++            if not touches_edge:
++                enclosed.update(component)
++    return enclosed
++
++
++def infer_enclosed_fill(inputs):
++    """Infer a globally consistent ARC rule that fills enclosed background regions.
++
++    A candidate is used only when one background/fill-color pair reproduces every
++    training output exactly. This gives a deterministic candidate for common
++    hollow-object tasks without overriding the model on merely approximate fits.
++    """
++    train = inputs.get("train", [])
++    if not train:
++        return None
++    for background in range(10):
++        for fill in range(10):
++            if background == fill:
++                continue
++            fits = True
++            changed_anywhere = False
++            for pair in train:
++                src, target = pair["input"], pair["output"]
++                if (not _valid(src) or not _valid(target) or len(src) != len(target)
++                        or len(src[0]) != len(target[0])):
++                    fits = False
++                    break
++                cells = _enclosed_cells(src, background)
++                if not cells:
++                    fits = False
++                    break
++                expected = [row[:] for row in src]
++                for r, c in cells:
++                    expected[r][c] = fill
++                if expected != target:
++                    fits = False
++                    break
++                changed_anywhere = True
++            if fits and changed_anywhere:
++                test = inputs.get("test_input")
++                if _valid(test):
++                    result = [row[:] for row in test]
++                    for r, c in _enclosed_cells(test, background):
++                        result[r][c] = fill
++                    return result
++    return None
++
++
+ class TaskAgent:
+     def __init__(self, model="gpt-6-luna", chat_history_file="./chat_history.md"):
+         self.model = model
+@@ -164,9 +234,15 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        # Keep both attempts independent so the second answer can provide useful
+-        # diversity, while using a more systematic grid-comparison checklist.
+-        for attempt_number, independent_attempt in enumerate((False, True), start=1):
++        # Use a small exact-by-demonstrations solver for enclosed-region fill tasks.
++        # If it finds a rule that reproduces every training output cell-for-cell,
++        # retain it as one candidate and use one model answer as a diverse fallback.
++        # Otherwise spend the full two-call budget on independent model attempts.
++        rule_candidate = infer_enclosed_fill(inputs)
++        attempts = (True,) if rule_candidate is not None else (False, True)
++        if rule_candidate is not None:
++            answers.append(rule_candidate)
++        for attempt_number, independent_attempt in enumerate(attempts, start=1):
+             try:
+                 g = self.solve_once(inputs, independent_attempt=independent_attempt)
+             except Exception as e:
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..0a152ee
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

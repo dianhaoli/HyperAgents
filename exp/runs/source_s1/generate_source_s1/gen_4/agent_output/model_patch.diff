@@ -1,0 +1,60 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..8d3b3cb 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -5,9 +5,9 @@ import socket
+ import http.client
+ import time
+ 
+-# Starting task agent (A_0) for the ARC-AGI-2 domain: one direct model response per attempt.
+-# forward() makes two independent plain attempts (the budget is 2 model calls and 2 answers per
+-# test input) and returns both parsed grids.
++# Starting task agent for the ARC-AGI-2 domain. The second call uses the first candidate as
++# an explicit verification target, while retaining it as a separate answer in case the
++# verification attempt makes a different mistake.
+ 
+ 
+ class _UnixConn(http.client.HTTPConnection):
+@@ -137,9 +137,20 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
++    def solve_once(self, inputs, candidate=None):
++        """Make one model call and parse its grid, optionally checking a prior candidate."""
+         prompt = build_prompt(inputs)
++        if candidate is not None:
++            prompt += (
++                "\n\nIndependently verify this candidate: "
++                f"{json.dumps(candidate)}\n"
++                "Infer the rule from the demonstrations and check that it explains every "
++                "input/output pair. Apply that rule to the test input, then compare the "
++                "result with the candidate. Do not accept the candidate just because it "
++                "looks plausible, and do not copy a demonstration output. If it is wrong, "
++                "correct it. Return the verified test grid in the required <answer> tags; "
++                "put nothing else inside the tags."
++            )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,9 +164,13 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Use the existing second-call budget to scrutinize the first candidate;
++                # retaining both candidates means a mistaken verification cannot discard
++                # a correct first answer.
++                candidate = answers[0] if attempt == 1 and answers else None
++                g = self.solve_once(inputs, candidate=candidate)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..f4aaaf1
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

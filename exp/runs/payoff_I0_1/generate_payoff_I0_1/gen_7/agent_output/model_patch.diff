@@ -1,0 +1,106 @@
+diff --git a/task_agent.py b/task_agent.py
+index 3b53f4e..bbe444b 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,13 +50,24 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, independent_attempt=False):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
+         "",
+     ]
++    if independent_attempt:
++        parts.extend([
++            "Solve this independently using a deliberate grid comparison, not a guess based on one example.",
++            "First determine whether the output dimensions change. Compare each training input and output "
++            "cell by cell (using row and column positions), noting what stays fixed and what changes. "
++            "Look for one simple operation that explains every example, including object shapes, positions, "
++            "colors, repetition, symmetry, and boundaries where relevant. Check the operation against all "
++            "training pairs before applying it to the test; do not assume unchanged background cells or "
++            "the input dimensions without checking.",
++            "",
++        ])
+     for i, pair in enumerate(inputs["train"], 1):
+         parts.append(f"## Example {i}")
+         h, w = len(pair["input"]), len(pair["input"][0])
+@@ -79,19 +90,6 @@ def build_prompt(inputs):
+     return "\n".join(parts)
+ 
+ 
+-def build_verification_prompt(inputs, candidate):
+-    """Ask the remaining model call to audit a candidate against all demonstrations."""
+-    return build_prompt(inputs) + (
+-        "\n\nINDEPENDENT VERIFICATION (do not assume the candidate is correct):\n"
+-        f"The first attempt proposed this test output: {json.dumps(candidate)}\n"
+-        "Infer the transformation again from the training pairs. Check that the proposed rule "
+-        "accounts for every changed cell in every example, and apply that rule to the test grid. "
+-        "If the candidate is fully consistent, return it; otherwise return the corrected grid. "
+-        "Check the output dimensions and every row before responding. End with exactly one grid "
+-        "inside <answer></answer> tags as a JSON list of rows, with nothing else inside the tags."
+-    )
+-
+-
+ def _valid(g):
+     return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
+             and len({len(r) for r in g}) == 1
+@@ -150,9 +148,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def solve_once(self, inputs, independent_attempt=False):
++        """One model response -> one parsed grid (or None)."""
++        prompt = build_prompt(inputs, independent_attempt=independent_attempt)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -165,31 +163,16 @@ class TaskAgent:
+         Returns:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+-        # The evaluation budget is two model calls. Use the first to solve and the
+-        # second to check the proposed answer against every demonstration, rather
+-        # than spending both calls on identical independent prompts.
++        # Keep the two answers independent: an answer shown to the second attempt
++        # can anchor it. The second prompt instead asks for a deliberate check of
++        # dimensions, cell changes, and consistency across all demonstrations.
+         answers = []
+-        try:
+-            first = self.solve_once(inputs)
+-        except Exception as e:
+-            self.log(f"Error on initial attempt: {e}")
+-            first = None
+-        if first is not None:
+-            answers.append(first)
+-
+-        try:
+-            if first is None:
+-                # No candidate to audit (for example, a transient gateway failure).
+-                second = self.solve_once(inputs)
+-            else:
+-                prompt = build_verification_prompt(inputs, first)
+-                self.log(f"Verification input: {prompt}")
+-                text = call_model(prompt)
+-                self.log(f"Verification output: {text}")
+-                second = parse_grid(text)
+-        except Exception as e:
+-            self.log(f"Error on verification attempt: {e}")
+-            second = None
+-        if second is not None:
+-            answers.append(second)
++        for attempt_number, independent_attempt in enumerate((False, True), start=1):
++            try:
++                grid = self.solve_once(inputs, independent_attempt=independent_attempt)
++            except Exception as e:
++                self.log(f"Error on attempt {attempt_number}: {e}")
++                grid = None
++            if grid is not None:
++                answers.append(grid)
+         return answers, []

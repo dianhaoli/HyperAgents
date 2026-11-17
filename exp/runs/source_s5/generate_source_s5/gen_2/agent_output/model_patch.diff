@@ -1,0 +1,69 @@
+diff --git a/task_agent.py b/task_agent.py
+index b5e96c6..fa3d9a4 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,7 +50,7 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, prior_candidate=None, deliberate=False):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+@@ -81,6 +81,24 @@ def build_prompt(inputs):
+         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+         "Put nothing else inside the tags."
+     )
++    if deliberate:
++        parts.append(
++            "\nIndependent verification pass: derive the rule from the demonstrations yourself rather "
++            "than assuming a familiar ARC pattern. Check whether the scene is best explained by objects, "
++            "symmetry, movement, repetition, a path or flood fill, color/count relationships, or a "
++            "composed template. Trace the proposed operation against each training pair and verify that "
++            "it changes only the cells or objects required by the rule. Recheck dimensions, boundaries, "
++            "and every unusual test feature before choosing the output."
++        )
++        if prior_candidate is not None:
++            parts.append(
++                "A previous independent attempt proposed this test grid: "
++                + json.dumps(prior_candidate)
++                + ". Treat it only as a hypothesis: independently derive the rule and check whether this "
++                  "candidate follows it. Keep it only if it passes that check; otherwise provide the grid "
++                  "that does."
++            )
++        parts.append("Return the final grid using the requested <answer> JSON tags.")
+     return "\n".join(parts)
+ 
+ 
+@@ -142,9 +160,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
++    def solve_once(self, inputs, prior_candidate=None, deliberate=False):
+         """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++        prompt = build_prompt(inputs, prior_candidate=prior_candidate, deliberate=deliberate)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -158,9 +176,16 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Use the second budgeted call for a deliberate, independent verification pass.
++                # The first answer is evidence to check, not a result to copy blindly.
++                prior_candidate = answers[0] if answers else None
++                g = self.solve_once(
++                    inputs,
++                    prior_candidate=prior_candidate,
++                    deliberate=(attempt == 1),
++                )
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

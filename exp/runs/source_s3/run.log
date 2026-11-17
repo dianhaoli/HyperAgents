@@ -1,3 +1,7 @@
 [eval] {'phase': 'initial', 'arm': 'A0', 'seed': '-', 'iteration': 'source'} round 0: 26 test inputs to run (0 cached)
 A_0 on source: 0.720
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3/gen_1', 'current_genid': 1, 'parent_genid': 'initial', 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 1 completed, parent 1
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3/gen_2', 'current_genid': 2, 'parent_genid': 1, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 2 completed, parent 1
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3/gen_3', 'current_genid': 3, 'parent_genid': 1, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}

@@ -1,2 +1,5 @@
 {"iteration": "1", "score": 0.54, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "928f26a234d43060", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "2", "score": 0.62, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "f720d4cfab9434cd", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "4", "score": 0.76, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "9347d3d161b733bb", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "5", "score": 0.68, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "c1c289b46704246b", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "6", "score": 0.54, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "5fd2d4e102d96e83", "format_failures": 1, "snapshot_skipped": []}

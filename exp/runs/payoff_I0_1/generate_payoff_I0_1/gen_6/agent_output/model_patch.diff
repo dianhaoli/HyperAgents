@@ -1,0 +1,96 @@
+diff --git a/task_agent.py b/task_agent.py
+index 73e0eed..362041f 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -96,6 +96,69 @@ def _valid(g):
+             and all(isinstance(v, int) and not isinstance(v, bool) and 0 <= v <= 9 for r in g for v in r))
+ 
+ 
++def infer_exact_grid_transform(inputs):
++    """Find an exact geometric/color transform shared by all demonstrations.
++
++    This deliberately covers only the eight rectangle symmetries with an
++    optional one-to-one color relabeling. A rule is returned only when every
++    demonstration is reproduced exactly and all fitting rules agree on the
++    test grid, so uncertain cases remain with the language-model attempts.
++    """
++    train = inputs.get("train", [])
++    test = inputs.get("test_input")
++    if not train or not _valid(test):
++        return None
++
++    def orientations(grid):
++        # Keep dimensions and cell positions exact for non-square grids.
++        variants = [grid]
++        for _ in range(3):
++            prev = variants[-1]
++            variants.append([list(row) for row in zip(*prev[::-1])])
++        base = list(variants)
++        variants.extend([row[::-1] for row in grid] for grid in base)
++        # Symmetric inputs may produce duplicate variants; names do not matter.
++        return variants
++
++    candidates = set()
++    for transform in range(8):
++        mapping = {}
++        reverse_mapping = {}
++        fits = True
++        for pair in train:
++            src, target = pair.get("input"), pair.get("output")
++            if not _valid(src) or not _valid(target):
++                fits = False
++                break
++            oriented = orientations(src)[transform]
++            if len(oriented) != len(target) or len(oriented[0]) != len(target[0]):
++                fits = False
++                break
++            for source_row, target_row in zip(oriented, target):
++                for source_color, target_color in zip(source_row, target_row):
++                    if (source_color in mapping and mapping[source_color] != target_color) or (
++                        target_color in reverse_mapping and reverse_mapping[target_color] != source_color
++                    ):
++                        fits = False
++                        break
++                    mapping[source_color] = target_color
++                    reverse_mapping[target_color] = source_color
++                if not fits:
++                    break
++            if not fits:
++                break
++        if not fits:
++            continue
++        oriented_test = orientations(test)[transform]
++        if any(color not in mapping for row in oriented_test for color in row):
++            continue
++        candidates.add(tuple(tuple(mapping[color] for color in row) for row in oriented_test))
++
++    if len(candidates) != 1:
++        return None
++    return [list(row) for row in next(iter(candidates))]
++
++
+ def _parse_block(s):
+     s = s.strip()
+     try:
+@@ -164,9 +227,14 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        # Keep both attempts independent so the second answer can provide useful
+-        # diversity, while using a more systematic grid-comparison checklist.
+-        for attempt_number, independent_attempt in enumerate((False, True), start=1):
++        # Reserve one candidate slot for an exact solver when the demonstrations
++        # identify a shared symmetry/color transform unambiguously. Keep one model
++        # attempt as a fallback; otherwise use both calls for independent attempts.
++        rule_candidate = infer_exact_grid_transform(inputs)
++        attempts = (True,) if rule_candidate is not None else (False, True)
++        if rule_candidate is not None:
++            answers.append(rule_candidate)
++        for attempt_number, independent_attempt in enumerate(attempts, start=1):
+             try:
+                 g = self.solve_once(inputs, independent_attempt=independent_attempt)
+             except Exception as e:
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..bb6fdce
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

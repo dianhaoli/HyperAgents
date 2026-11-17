@@ -1,0 +1,39 @@
+diff --git a/task_agent.py b/task_agent.py
+index 613c1ca..49f80a5 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -81,19 +81,23 @@ def build_prompt(inputs):
+     return "\n".join(parts)
+ 
+ 
+-def build_review_prompt(inputs, previous_candidate):
+-    """Ask the second attempt to audit, rather than repeat, the first attempt."""
++def build_review_prompt(inputs, previous_candidate=None):
++    """Build an unanchored second solve from the demonstrations alone.
++
++    The argument is retained for compatibility with callers, but deliberately is not
++    included in the prompt: showing a plausible-looking first guess can make the model
++    repeat it instead of producing a useful alternative.
++    """
+     return (
+         build_prompt(inputs)
+-        + "\n\n## Audit of the first attempt\n"
+-        + "The first attempt proposed this test output (JSON):\n"
+-        + json.dumps(previous_candidate)
+-        + "\nIndependently infer the transformation again from ALL training pairs. Check whether this "
+-        + "candidate follows the rule in every region; do not copy it without checking. In particular, "
+-        + "verify the output dimensions, object and color roles, directions or symmetry, boundaries, "
+-        + "and cells that should remain unchanged. If the candidate is inconsistent with the examples, "
+-        + "correct it. If it is consistent, return it. Return only your best complete grid inside "
+-        + "<answer></answer> tags, with valid JSON rows."
++        + "\n\n## Independent second attempt\n"
++        + "Solve this puzzle from scratch using only the training input/output pairs and "
++        + "the test input above. Do not assume any earlier proposed answer is correct. "
++        + "As a fresh check, identify the objects and their colors and positions, compare "
++        + "their changes across every example, and verify the inferred rule against each "
++        + "pair before applying it to the test. Check output dimensions, boundaries, and "
++        + "unchanged cells. Return your best complete grid inside <answer></answer> tags, "
++        + "with valid JSON rows."
+     )
+ 
+ 

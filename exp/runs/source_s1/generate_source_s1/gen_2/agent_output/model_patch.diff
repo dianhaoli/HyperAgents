@@ -1,0 +1,51 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..2ed1436 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -137,9 +137,25 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
++    def solve_once(self, inputs, candidate=None):
++        """One direct model response -> one parsed grid (or None).
++
++        When a candidate is supplied, use this call to verify it against every
++        demonstration before answering, rather than spending the call on an
++        unrelated guess.
++        """
+         prompt = build_prompt(inputs)
++        if candidate is not None:
++            prompt += (
++                "\n\nIndependent verification of a previous candidate: "
++                f"{json.dumps(candidate)}\n"
++                "First infer the transformation from the demonstrations and check that it "
++                "accounts for every input/output pair. Compare the candidate with the test "
++                "input and that inferred rule; do not copy a demonstration output or accept "
++                "the candidate merely because it looks plausible. If the candidate fails "
++                "any check, correct it. Return the verified test grid in the required "
++                "<answer> tags, with nothing else inside the tags."
++            )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,9 +169,12 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Spend the existing second-call budget on checking and, if needed,
++                # correcting the first candidate against all training examples.
++                candidate = answers[0] if attempt == 1 and answers else None
++                g = self.solve_once(inputs, candidate=candidate)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..3e71cd7
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

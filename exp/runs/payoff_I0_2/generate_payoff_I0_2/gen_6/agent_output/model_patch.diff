@@ -1,0 +1,71 @@
+diff --git a/task_agent.py b/task_agent.py
+index 20638a8..f2a9e25 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,7 +50,7 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs, candidate=None):
++def build_prompt(inputs, candidate=None, approach="direct"):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs share one hidden transformation rule. "
+@@ -62,6 +62,14 @@ def build_prompt(inputs, candidate=None):
+         "because it appears only once.",
+         "",
+     ]
++    if approach == "systematic":
++        parts[:0] = [
++            "Use a fresh, independent analysis; do not rely on another proposed answer. First inventory "
++            "the objects, colors, repetitions, and spatial relationships in each input/output pair. "
++            "Infer the smallest rule that explains every pair, then apply it and verify the result "
++            "cell by cell, including any changes to grid size. Avoid guessing from a single example.",
++            "",
++        ]
+     for i, pair in enumerate(inputs["train"], 1):
+         parts.append(f"## Example {i}")
+         h, w = len(pair["input"]), len(pair["input"][0])
+@@ -169,21 +177,17 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        first = None
+-        try:
+-            first = self.solve_once(inputs)
+-        except Exception as e:
+-            self.log(f"Error on first attempt: {e}")
+-        if first is not None:
+-            answers.append(first)
+-
+-        # Spend the second and final allowed call checking the first answer against the
+-        # demonstrations, instead of making an unrelated duplicate guess.
+-        try:
+-            second = self.solve_once(inputs, candidate=first)
+-        except Exception as e:
+-            self.log(f"Error on review attempt: {e}")
+-            second = None
+-        if second is not None and second not in answers:
+-            answers.append(second)
++        # Use the two-call budget for complementary proposals. In prior evaluations a
++        # candidate-anchored review did not reliably beat independent attempts; it can
++        # reinforce the first attempt's mistaken rule. The second prompt instead asks
++        # for a fresh, systematic object-and-relation analysis without showing the first
++        # answer, preserving the chance of returning two distinct candidates.
++        for attempt, approach in enumerate(("direct", "systematic"), start=1):
++            try:
++                answer = self.solve_once(inputs, approach=approach)
++            except Exception as e:
++                self.log(f"Error on attempt {attempt}: {e}")
++                continue
++            if answer is not None and answer not in answers:
++                answers.append(answer)
+         return answers[:2], []
+diff --git a/__pycache__/meta_agent.cpython-313.pyc b/__pycache__/meta_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..19e8a98
+Binary files /dev/null and b/__pycache__/meta_agent.cpython-313.pyc differ
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..5d397b8
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

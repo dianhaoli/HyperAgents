@@ -1,0 +1,131 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index ee6b15e..005e888 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -1,24 +1,113 @@
+ # Copyright (c) Meta Platforms, Inc. and affiliates.
+ 
++import glob
++import json
++import os
++
+ from agent.base_agent import AgentSystem
+ from agent.llm_withtools import chat_with_agent
+ 
++
+ class MetaAgent(AgentSystem):
++    """A meta agent that uses previous evaluation artifacts to guide improvements."""
++
++    @staticmethod
++    def _read_tail(path, limit=1400):
++        """Read bounded beginning and ending excerpts from an evaluation log."""
++        try:
++            with open(path, "rb") as f:
++                f.seek(0, os.SEEK_END)
++                size = f.tell()
++                if size <= limit * 2:
++                    f.seek(0)
++                    return f.read().decode("utf-8", errors="replace").strip()
++                f.seek(0)
++                beginning = f.read(limit).decode("utf-8", errors="replace")
++                f.seek(-limit, os.SEEK_END)
++                ending = f.read(limit).decode("utf-8", errors="replace")
++                return (beginning.rstrip() + "\n\n[... middle of log omitted ...]\n\n" + ending.lstrip()).strip()
++        except OSError:
++            return ""
++
++    @classmethod
++    def _evaluation_context(cls, eval_path):
++        """Summarize reports and a few failed-task traces for the improvement prompt."""
++        if not os.path.isdir(eval_path):
++            return "No readable evaluation directory was found."
++
++        reports = []
++        for root, dirs, files in os.walk(eval_path):
++            # Generated evaluation folders can contain large prediction dumps; do not
++            # descend into those, and cap the amount of report discovery work.
++            dirs[:] = [d for d in dirs if d not in {"predictions", "agent_evals"}]
++            if "report.json" in files:
++                path = os.path.join(root, "report.json")
++                try:
++                    with open(path, encoding="utf-8") as f:
++                        report = json.load(f)
++                    if isinstance(report, dict):
++                        reports.append((os.path.getmtime(path), path, report))
++                except (OSError, ValueError):
++                    continue
++            if len(reports) >= 50:
++                break
++
++        if not reports:
++            return "No report.json evaluation summaries were found; inspect the supplied evaluation directory directly."
++
++        reports.sort(key=lambda item: item[0], reverse=True)
++        sections = []
++        # Latest report is the most relevant; extra reports provide a little history.
++        for _, path, report in reports[:3]:
++            failed = report.get("question_ids_failed")
++            scores = report.get("per_task_score")
++            if not isinstance(failed, list) and isinstance(scores, dict):
++                failed = [qid for qid, score in scores.items() if score == 0]
++            if not isinstance(failed, list):
++                failed = []
++            accuracy = report.get("overall_accuracy", "unknown")
++            total = report.get("total", "unknown")
++            sections.append(
++                f"Report: {os.path.relpath(path, eval_path)}; accuracy={accuracy}; "
++                f"scored_tasks={total}; failed_ids={', '.join(map(str, failed[:20])) or 'none reported'}"
++            )
++
++            # Include a small number of actual failure traces so the agent can identify
++            # whether the weakness was reasoning, output formatting, or tool reliability.
++            trace_count = 0
++            for qid in failed:
++                if trace_count >= 4:
++                    break
++                pattern = os.path.join(os.path.dirname(path), "agent_evals", f"chat_history_{qid}_*.md")
++                for history_path in sorted(glob.glob(pattern)):
++                    excerpt = cls._read_tail(history_path)
++                    if excerpt:
++                        sections.append(f"Failure trace ({qid}, tail of {os.path.basename(history_path)}):\n{excerpt}")
++                        trace_count += 1
++                    break
++
++        return "\n\n".join(sections)
++
+     def forward(self, repo_path, eval_path, iterations_left=None):
+-        """
+-        A meta agent that recursively self-improves.
+-
+-        Args:
+-            repo_path (str): The path to the repository.
+-            eval_path (str): The path to previously generated agents and their evaluation results.
+-            iterations_left (int, optional): The number of remaining iterations in which the meta agent will be invoked in future. Defaults to None.
+-        """
++        """Inspect prior performance and make a focused, evidence-driven code change."""
++        evaluation_context = self._evaluation_context(eval_path)
+         instruction = f"Modify any part of the codebase at `{repo_path}`."
+-        # [experiment adaptation, see DECISIONS.md] gpt-6-luna otherwise asks for clarification and never edits.
+         instruction += (
+             f"\n\nThe repository's README.md describes the goal. Previously generated agents and their evaluation results are at `{eval_path}`. "
+-            "Work autonomously: nobody will answer questions, so do not ask for clarification. "
+-            "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
++            "Use the evaluation summary and failure traces below as evidence: identify a concrete recurring weakness, "
++            "inspect the relevant implementation, and make a focused improvement to the agent-generation or agent-solving "
++            "mechanism. Do not hard-code answers to evaluation task IDs or modify evaluation data. Preserve existing APIs "
++            "and respect any task/model call budgets. Validate your change with available tests or a lightweight check. "
++            "Work autonomously: nobody will answer questions, so do not ask for clarification.\n\n"
++            "Evaluation evidence:\n"
++            f"{evaluation_context}\n\n"
++            "Use tools to inspect the code and make your changes; a response without a tool call ends the session, "
++            "so only reply without one when you are done."
++        )
++        return chat_with_agent(
++            instruction,
++            model=self.model,
++            msg_history=[],
++            logging=self.log,
++            tools_available="all",
+         )
+-
+-        new_msg_history = chat_with_agent(instruction, model=self.model, msg_history=[], logging=self.log, tools_available='all')
