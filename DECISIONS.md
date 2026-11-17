@@ -135,3 +135,8 @@ The user allowed deviations from the prompt's design where clearly better; each 
     cleanly on the hardened infrastructure, instead of after the pilot gate. Source runs do not depend
     on the pilot. If the pilot gate fails, they are stopped and their spend is reported as wasted. No result
     is used to choose anything in another phase.
+23. **Crash: pilot runs payoff_I0_1/2 (rng seeds 1001/1002).** A harness bug (my sandbox-start marker leaked into
+    command output, which `apply_diffs_container` parses) failed every generation before the meta step.
+    No meta agent ran and no pay-off result existed. Both were moved to `exp/crashed/` and rerun with new seeds
+    (1101/1102). A new guard now raises InfraAbort (run stops, resumable) whenever a generation ends without
+    its meta step having run, so harness failures can no longer burn generations.

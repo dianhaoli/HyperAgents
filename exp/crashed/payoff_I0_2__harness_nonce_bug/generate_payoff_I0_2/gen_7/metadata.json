@@ -1,0 +1,14 @@
+{
+    "gen_output_dir": "/home/user/HyperAgents/exp/runs/payoff_I0_2/generate_payoff_I0_2/gen_7",
+    "current_genid": 7,
+    "parent_genid": "initial",
+    "run_baseline": null,
+    "prev_patch_files": [],
+    "curr_patch_files": [],
+    "parent_agent_success": false,
+    "optimize_option": "only_agent",
+    "agent_archive_path": null,
+    "can_select_next_parent": true,
+    "run_eval": false,
+    "valid_parent": false
+}

@@ -1,0 +1,18 @@
+{
+  "phase": "payoff",
+  "arm": "I0",
+  "seed": "r2",
+  "task_set": "payoff",
+  "max_generation": 8,
+  "template_dir": "agent_template",
+  "freeze_paths": [
+    "meta_agent.py",
+    "run_meta_agent.py",
+    "agent",
+    "utils"
+  ],
+  "rng_seed": 1102,
+  "workers": 16,
+  "name": "payoff_I0_2",
+  "root_commit": "f72ea94c57446d01cd1fdb2eae9a8fa37ca7e8b5"
+}

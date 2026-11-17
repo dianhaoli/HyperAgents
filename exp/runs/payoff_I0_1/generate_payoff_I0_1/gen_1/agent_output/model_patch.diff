@@ -1,0 +1,64 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..3b53f4e 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -79,6 +79,19 @@ def build_prompt(inputs):
+     return "\n".join(parts)
+ 
+ 
++def build_verification_prompt(inputs, candidate):
++    """Ask the remaining model call to audit a candidate against all demonstrations."""
++    return build_prompt(inputs) + (
++        "\n\nINDEPENDENT VERIFICATION (do not assume the candidate is correct):\n"
++        f"The first attempt proposed this test output: {json.dumps(candidate)}\n"
++        "Infer the transformation again from the training pairs. Check that the proposed rule "
++        "accounts for every changed cell in every example, and apply that rule to the test grid. "
++        "If the candidate is fully consistent, return it; otherwise return the corrected grid. "
++        "Check the output dimensions and every row before responding. End with exactly one grid "
++        "inside <answer></answer> tags as a JSON list of rows, with nothing else inside the tags."
++    )
++
++
+ def _valid(g):
+     return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
+             and len({len(r) for r in g}) == 1
+@@ -152,13 +165,31 @@ class TaskAgent:
+         Returns:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
++        # The evaluation budget is two model calls. Use the first to solve and the
++        # second to check the proposed answer against every demonstration, rather
++        # than spending both calls on identical independent prompts.
+         answers = []
+-        for _ in range(2):
+-            try:
+-                g = self.solve_once(inputs)
+-            except Exception as e:
+-                self.log(f"Error: {e}")
+-                g = None
+-            if g is not None:
+-                answers.append(g)
++        try:
++            first = self.solve_once(inputs)
++        except Exception as e:
++            self.log(f"Error on initial attempt: {e}")
++            first = None
++        if first is not None:
++            answers.append(first)
++
++        try:
++            if first is None:
++                # No candidate to audit (for example, a transient gateway failure).
++                second = self.solve_once(inputs)
++            else:
++                prompt = build_verification_prompt(inputs, first)
++                self.log(f"Verification input: {prompt}")
++                text = call_model(prompt)
++                self.log(f"Verification output: {text}")
++                second = parse_grid(text)
++        except Exception as e:
++            self.log(f"Error on verification attempt: {e}")
++            second = None
++        if second is not None:
++            answers.append(second)
+         return answers, []

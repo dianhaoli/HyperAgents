@@ -12,18 +12,25 @@
 DESIGN.md, splits.json and analysis.py were committed at `f577cc77d8fac1125623c6a85e9ad3ad86ca2964` (before any pay-off result).
 
 ## In progress
-- Step 3 checks: screen (100 tasks x 3), B0 x3 on held-out, xhigh pass (all running as background jobs).
+- Step 3 checks (hardened code): B0 reps 0-2 and the xhigh pass on held-out (jobs b0_rep0..2, xhigh).
+  Screen done (splits.json stage 2 done: 25 source + 25 pay-off tasks).
+- Step 5 sanity pilot: payoff_I0_1, payoff_I0_2 (8 iterations each, freeze mode).
 
 ## Next
-- `python -m arcexp.make_splits stage2 --set_size 25`, check the B0 gate, commit DESIGN.md + splits.json + analysis.py
-  (step 4), then the sanity pilot (2 I_0 pay-off runs).
+- Once a pilot run completes one generation cleanly: `python -m arcexp.orchestrate source` (6 source runs, 12 gens).
+- Pilot gate after both pilot runs finish: `python -m arcexp.phases final --run payoff_I0_1` (and _2).
+- Then `python -m arcexp.evolved select`, `transplant`, `python -m arcexp.orchestrate trial`, then `payoff`, then
+  `final` for every pay-off run, then `python analysis.py`.
 
 ## Resume (after a VM rebuild or worker restart)
 ```bash
 cd /home/user/HyperAgents && bash arcexp/setup_env.sh && bash arcexp/start_gateway.sh
-bash arcexp/run_bg.sh screen python3 -m arcexp.phases screen
-bash arcexp/run_bg.sh b0 python3 -m arcexp.phases b0 --reps 3
+rm -rf exp/stage/*            # only when no job is running
+for r in 0 1 2; do bash arcexp/run_bg.sh b0_rep$r python3 -m arcexp.phases b0 --only $r; done
 bash arcexp/run_bg.sh xhigh python3 -m arcexp.phases xhigh
+python3 -m arcexp.orchestrate pilot     # relaunches unfinished pilot runs (resumable)
+python3 -m arcexp.orchestrate source    # once started: relaunches unfinished source runs
+python3 -m arcexp.orchestrate status
 ```
 Every job is resumable: finished (phase, arm, seed, iteration, task, test input) keys with matching code hash are skipped.
 After a VM rebuild, restore each run's agent repo from `exp/runs/<run>/agent_repo.bundle` into

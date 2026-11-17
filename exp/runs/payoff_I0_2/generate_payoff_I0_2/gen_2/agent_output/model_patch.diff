@@ -1,0 +1,89 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..20638a8 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,11 +50,16 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, candidate=None):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+-        "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "(each integer is a color). The demonstration pairs share one hidden transformation rule. "
++        "Infer a precise rule from all of the demonstrations, then apply it to the test input.",
++        "",
++        "Reason carefully about what changes and what stays fixed. Check that your proposed rule "
++        "reproduces every training output, including colors, positions, shapes, and grid dimensions, "
++        "before applying it to the test. Do not assume that a pattern or color is irrelevant just "
++        "because it appears only once.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -71,9 +76,20 @@ def build_prompt(inputs):
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+     parts.append(grid_to_text(t))
+     parts.append("")
++    if candidate is not None:
++        parts.extend([
++            "## Candidate from the first attempt",
++            "The first attempt proposed this grid:",
++            json.dumps(candidate, separators=(",", ":")),
++            "Review it rather than copying it automatically. Re-check the rule against every "
++            "training pair and inspect the test grid for missed, misplaced, or extra changes. "
++            "Return the candidate if it is correct; otherwise return your corrected grid.",
++            "",
++        ])
+     parts.append(
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+-        "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
++        "tags as a JSON list of rows, for example:\n"
++        "<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+         "Put nothing else inside the tags."
+     )
+     return "\n".join(parts)
+@@ -137,9 +153,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
++    def solve_once(self, inputs, candidate=None):
+         """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++        prompt = build_prompt(inputs, candidate=candidate)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,12 +169,21 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
+-            try:
+-                g = self.solve_once(inputs)
+-            except Exception as e:
+-                self.log(f"Error: {e}")
+-                g = None
+-            if g is not None:
+-                answers.append(g)
+-        return answers, []
++        first = None
++        try:
++            first = self.solve_once(inputs)
++        except Exception as e:
++            self.log(f"Error on first attempt: {e}")
++        if first is not None:
++            answers.append(first)
++
++        # Spend the second and final allowed call checking the first answer against the
++        # demonstrations, instead of making an unrelated duplicate guess.
++        try:
++            second = self.solve_once(inputs, candidate=first)
++        except Exception as e:
++            self.log(f"Error on review attempt: {e}")
++            second = None
++        if second is not None and second not in answers:
++            answers.append(second)
++        return answers[:2], []

@@ -1,0 +1,12 @@
+{
+  "phase": "source",
+  "arm": "I0src",
+  "seed": 4,
+  "task_set": "source",
+  "max_generation": 12,
+  "template_dir": "agent_template",
+  "freeze_paths": [],
+  "rng_seed": 4,
+  "workers": 12,
+  "name": "source_s4"
+}

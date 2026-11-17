@@ -26,7 +26,7 @@ from arcexp import arc_data
 from arcexp.arc_eval import evaluate_set
 from arcexp.common import EXP, REPO, AGENT_UID, AGENT_GID, append_jsonl, chown_agent, gw_status, register_token, revoke_token
 from arcexp.safeio import extract_snapshot, inside, lchown_tree, safe_copyfile, safe_copytree, snapshot_tree
-from arcexp.sandbox import run_sandboxed
+from arcexp.sandbox import SANDBOX_STARTED, run_sandboxed
 
 os.chdir(REPO)
 sys.path.insert(0, REPO)
@@ -249,9 +249,14 @@ class LocalContainer:
             if CTX.get("freeze_paths") and _frozen_hash(self.workspace) != _frozen_hash(self.root_dir):
                 raise InfraAbort("FROZEN META FILES DIFFER FROM I_g BEFORE THE META STEP (patch sanitizer bypass?)")
             t0 = time.time()
+            CTX["meta_ran"] = True
         try:
             rc, out = run_sandboxed(cmd, binds=[(self.workspace, "/hyperagents", False)], cwd=workdir,
                                     env_extra=env, timeout=3 * 3600, ro_paths=ro, tmp_host=self.tmp)
+            if SANDBOX_STARTED.encode() not in out:
+                raise InfraAbort(f"sandbox failed to start for {cmd[:3]}: {out.decode(errors='replace')[-500:]}")
+            # the start marker is ours, not the command's: remove it so generate_loop parses real output
+            out = out.replace(SANDBOX_STARTED.encode() + b"\n", b"", 1)
         finally:
             if tok:
                 try:
@@ -414,7 +419,12 @@ def arc_generate(*a, **kw):
         raise InfraAbort(f"gateway down before generation {CTX['current_genid']}: {e}")
     if st["spent"] + st.get("reserved", 0) >= 150.0:
         raise InfraAbort("global budget exhausted")
-    return _orig_generate(*a, **kw)
+    CTX["meta_ran"] = False
+    md = _orig_generate(*a, **kw)
+    if not CTX["meta_ran"]:
+        # the meta agent never started: a harness failure, not an outcome of the improvement step
+        raise InfraAbort(f"generation {CTX['current_genid']} failed before the meta step (harness failure)")
+    return md
 
 
 def patch_all():
