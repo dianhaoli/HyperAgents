@@ -1,0 +1,71 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..7eabc00 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,11 +50,17 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, candidate=None):
++    """Build a prompt that emphasizes rule induction and checks the rule on examples."""
+     parts = [
+-        "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+-        "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "Solve this ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9. "
++        "The training input/output pairs demonstrate one transformation rule; apply that same "
++        "rule to the test input.",
++        "",
++        "Work carefully: compare each input with its output, including grid dimensions, "
++        "objects, positions, colors, repetitions, and symmetries. Infer a single rule and "
++        "check that it explains every training pair before applying it. Do not assume that "
++        "the test output has the same dimensions as its input.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -71,9 +77,18 @@ def build_prompt(inputs):
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+     parts.append(grid_to_text(t))
+     parts.append("")
++    if candidate is not None:
++        parts.extend([
++            "## Candidate from an earlier attempt (possibly wrong)",
++            json.dumps(candidate),
++            "Independently derive the rule from the examples. Check this candidate against "
++            "the rule and correct it if needed; do not copy it without verification.",
++            "",
++        ])
+     parts.append(
+-        "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+-        "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
++        "Return the output grid for the test input. End your response with the grid inside "
++        "<answer></answer> tags as a JSON list of rows, for example:\n"
++        "<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+         "Put nothing else inside the tags."
+     )
+     return "\n".join(parts)
+@@ -153,12 +168,17 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        first = None
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Make the second budgeted call useful: it verifies (and may repair) the
++                # first candidate instead of repeating the exact same request.
++                g = self.solve_once(inputs, candidate=first if attempt == 1 else None)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+             if g is not None:
+                 answers.append(g)
++                if attempt == 0:
++                    first = g
+         return answers, []
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..beff5e2
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

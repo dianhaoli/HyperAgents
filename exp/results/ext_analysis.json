@@ -1,0 +1,22 @@
+{
+ "label": "EXTENSION (DESIGN_v2.md) - not part of the pre-registered analysis",
+ "points": [],
+ "per_generation": {},
+ "B0": 0.29259259259259257,
+ "xhigh": 0.3986,
+ "paired_changes": {
+  "12->20": {
+   "per_seed": {},
+   "mean": null
+  },
+  "20->40": {
+   "per_seed": {},
+   "mean": null
+  }
+ },
+ "picks_changed_code": {
+  "gen12 (part A rule)": "5 of 6 seeds",
+  "extension picks": {},
+  "extension picks with changed coach code": "0 of 0"
+ }
+}

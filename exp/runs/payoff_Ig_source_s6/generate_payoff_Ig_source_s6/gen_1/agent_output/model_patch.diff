@@ -1,0 +1,87 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..75dfeda 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,31 +50,40 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, previous_candidate=None):
++    """Build a careful ARC prompt, optionally asking for an independent audit."""
+     parts = [
+-        "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+-        "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "Solve this ARC-AGI puzzle. The training pairs demonstrate one exact grid transformation. ",
++        "Infer a rule that explains every pair, then apply it to the test grid. Do not assume the ",
++        "output has the same dimensions as the input: some rules crop, tile, rearrange, or enlarge grids.",
++        "\nReason carefully before answering:",
++        "1. Identify the relevant objects, colors, repeating patterns, borders, and grid structure.",
++        "2. Compare each input with its output and state what changes and what stays unchanged.",
++        "3. Check that the proposed rule accounts for every training pair, not just one example.",
++        "4. Apply the rule to the test input and check the result's dimensions and every row.",
++        "Do not invent details unsupported by the examples. Return one complete rectangular grid of integers 0-9.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+-        parts.append(f"## Example {i}")
+-        h, w = len(pair["input"]), len(pair["input"][0])
+-        parts.append(f"Input ({h}x{w}):")
+-        parts.append(grid_to_text(pair["input"]))
+-        h, w = len(pair["output"]), len(pair["output"][0])
+-        parts.append(f"Output ({h}x{w}):")
+-        parts.append(grid_to_text(pair["output"]))
++        parts.append(f"## Training pair {i}")
++        for name, grid in (("Input", pair["input"]), ("Output", pair["output"])):
++            parts.append(f"{name} ({len(grid)}x{len(grid[0])}):")
++            parts.append(grid_to_text(grid))
+         parts.append("")
+-    t = inputs["test_input"]
+-    parts.append("## Test")
+-    parts.append(f"Input ({len(t)}x{len(t[0])}):")
+-    parts.append(grid_to_text(t))
+-    parts.append("")
++    test = inputs["test_input"]
++    parts.extend(["## Test input", f"({len(test)}x{len(test[0])}):", grid_to_text(test), ""])
++    if previous_candidate is not None:
++        parts.extend([
++            "A first independent attempt proposed this test output:",
++            json.dumps(previous_candidate),
++            "Do not simply copy it. Re-derive the rule from the training pairs, compare the candidate ",
++            "against the test grid cell by cell, and correct it if the examples do not support it.",
++            "If the candidate is consistent, you may return it.",
++            "",
++        ])
+     parts.append(
+-        "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+-        "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+-        "Put nothing else inside the tags."
++        "End your response with the output grid inside <answer></answer> tags as valid JSON, "
++        "for example <answer>[[0, 1], [2, 3]]</answer>. Put nothing else inside the tags."
+     )
+     return "\n".join(parts)
+ 
+@@ -153,12 +162,18 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        # Spend the two-call budget on complementary attempts rather than submitting the
++        # same prompt twice. The second call audits the first against all demonstrations.
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                prompt = build_prompt(inputs, answers[0] if attempt and answers else None)
++                self.log(f"Input: {prompt}")
++                text = call_model(prompt)
++                self.log(f"Output: {text}")
++                g = parse_grid(text)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+-            if g is not None:
++            if g is not None and g not in answers:
+                 answers.append(g)
+-        return answers, []
++        return answers[:2], []

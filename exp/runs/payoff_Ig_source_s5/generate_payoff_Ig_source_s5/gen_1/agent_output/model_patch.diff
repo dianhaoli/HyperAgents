@@ -1,0 +1,51 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..53417d1 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -137,9 +137,19 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
++    def solve_once(self, inputs, previous_answer=None):
++        """Make one model attempt, optionally asking it to review the first candidate."""
+         prompt = build_prompt(inputs)
++        if previous_answer is not None:
++            prompt += (
++                "\n\nA first attempt proposed this test output:\n"
++                f"{json.dumps(previous_answer)}\n\n"
++                "Make a fresh, critical check of the inferred rule against every training pair. "
++                "Do not assume the proposed output is correct: identify any contradiction between "
++                "its implied rule and the examples, and revise the output if needed. If the rule and "
++                "grid are consistent, you may return the same output. Give your best single candidate "
++                "in the required <answer> tags."
++            )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,12 +163,18 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        first_answer = None
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                g = self.solve_once(
++                    inputs,
++                    previous_answer=first_answer if attempt == 1 else None,
++                )
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+             if g is not None:
+                 answers.append(g)
++                if first_answer is None:
++                    first_answer = g
+         return answers, []
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..582629e
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

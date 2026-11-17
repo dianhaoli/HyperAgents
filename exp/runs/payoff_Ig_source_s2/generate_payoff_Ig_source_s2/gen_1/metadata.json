@@ -1,0 +1,16 @@
+{
+    "gen_output_dir": "/home/user/HyperAgents/exp/runs/payoff_Ig_source_s2/generate_payoff_Ig_source_s2/gen_1",
+    "current_genid": 1,
+    "parent_genid": "initial",
+    "run_baseline": null,
+    "prev_patch_files": [],
+    "curr_patch_files": [
+        "/home/user/HyperAgents/exp/runs/payoff_Ig_source_s2/generate_payoff_Ig_source_s2/gen_1/agent_output/model_patch.diff"
+    ],
+    "parent_agent_success": true,
+    "optimize_option": "only_agent",
+    "agent_archive_path": null,
+    "can_select_next_parent": true,
+    "run_eval": false,
+    "valid_parent": false
+}
