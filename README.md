@@ -18,6 +18,42 @@
 
 </div>
 
+## ARC-AGI-2 improver experiment (branch `arc2-improver`)
+
+Pre-registered experiment: does a self-evolved meta agent improve a fresh task agent more than the original
+meta agent does, given equal pay-off compute? See `DESIGN.md` (pre-registration), `DECISIONS.md` (every choice
+and deviation), `STATUS.md` (progress and resume), and `RESULTS.md`.
+
+Layout: `arcexp/` holds the experiment infrastructure (root-only, never visible to agents). It contains
+`gateway.py` (budget gateway and the only route to the model), `sandbox.py`, `run_loop.py` (the repo's
+`generate_loop.py` without Docker), `arc_eval.py`, `phases.py`, `evolved.py` (I_g selection and transplant),
+`orchestrate.py` and `isolation_check.py`. The rest: `agent_template/` (A_0 + I_0), `domains/arc/`, `analysis.py`,
+`exp/` (all logs, results JSONL, ledger, runs) and `splits.json`.
+
+Exact commands, in order (each is resumable; long ones run detached via `arcexp/run_bg.sh`):
+
+```bash
+bash arcexp/setup_env.sh                      # once per VM: deps, agent user, private ARC data, sysctls
+bash arcexp/start_gateway.sh                  # budget gateway (idempotent)
+python3 -m arcexp.isolation_check <phase>     # answer-isolation check; run before each phase
+python3 -m arcexp.make_splits stage1          # held-out / screen / smoke ids
+python3 -m arcexp.run_loop --config exp/runs/smoke/config.json            # step 1 smoke test
+python3 -m arcexp.phases screen               # step 3: 100 training tasks x 3 single calls
+python3 -m arcexp.make_splits stage2 --set_size 25                        # source / pay-off sets
+for r in 0 1 2; do python3 -m arcexp.phases b0 --only $r; done            # step 3: B0 x3
+python3 -m arcexp.phases xhigh                # step 3: one held-out pass at xhigh
+python3 -m arcexp.orchestrate pilot           # step 5: 2 I_0 pay-off runs
+python3 -m arcexp.phases final --run payoff_I0_1; python3 -m arcexp.phases final --run payoff_I0_2
+python3 -m arcexp.orchestrate source          # step 6: 6 source runs x 12 generations
+python3 -m arcexp.evolved select              # step 6: choose I_g per seed
+python3 -m arcexp.evolved transplant          # transplant each I_g's meta code onto A_0
+python3 -m arcexp.orchestrate trial           # step 7: one trial iteration per I_g
+python3 -m arcexp.orchestrate payoff          # step 8: I_g pay-off runs + remaining I_0 runs (freeze mode)
+python3 -m arcexp.phases final --run <run>    # step 9: per pay-off run
+python3 -m arcexp.evolved stats               # self-edit statistics
+python3 analysis.py                           # results
+```
+
 ## Setup
 ```bash
 # API keys, put these into .env file

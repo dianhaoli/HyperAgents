@@ -8,5 +8,6 @@
   "freeze_paths": [],
   "rng_seed": 1,
   "workers": 12,
-  "name": "source_s1"
+  "name": "source_s1",
+  "root_commit": "e14eebc9bed3f43b2114864d07d9aeef94ad1460"
 }

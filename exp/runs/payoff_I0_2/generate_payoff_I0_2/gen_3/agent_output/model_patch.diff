@@ -1,0 +1,41 @@
+diff --git a/task_agent.py b/task_agent.py
+index 20638a8..856e4c1 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -169,21 +169,15 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        first = None
+-        try:
+-            first = self.solve_once(inputs)
+-        except Exception as e:
+-            self.log(f"Error on first attempt: {e}")
+-        if first is not None:
+-            answers.append(first)
+-
+-        # Spend the second and final allowed call checking the first answer against the
+-        # demonstrations, instead of making an unrelated duplicate guess.
+-        try:
+-            second = self.solve_once(inputs, candidate=first)
+-        except Exception as e:
+-            self.log(f"Error on review attempt: {e}")
+-            second = None
+-        if second is not None and second not in answers:
+-            answers.append(second)
++        # Treat the two-call budget as two independent attempts. A review of the first
++        # answer can anchor the model on an incorrect hypothesis, while independent
++        # proposals give the evaluator two distinct chances to include the right grid.
++        for attempt in range(2):
++            try:
++                answer = self.solve_once(inputs)
++            except Exception as e:
++                self.log(f"Error on attempt {attempt + 1}: {e}")
++                continue
++            if answer is not None and answer not in answers:
++                answers.append(answer)
+         return answers[:2], []
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..6fa04d5
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ
