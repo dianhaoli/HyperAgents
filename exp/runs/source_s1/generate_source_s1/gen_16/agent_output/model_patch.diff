@@ -1,0 +1,28 @@
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+index e69de29..9afa62d 100644
+Binary files a/__pycache__/task_agent.cpython-313.pyc and b/__pycache__/task_agent.cpython-313.pyc differ
+diff --git a/task_agent.py b/task_agent.py
+index 6a3fe74..3f0eb6f 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -185,9 +185,17 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                # A fresh second derivation avoids anchoring on a plausible-but-wrong
+-                # first grid, while preserving the two-call/two-answer budget.
+-                g = self.solve_once(inputs, independent=(attempt == 1))
++                if attempt == 1 and answers:
++                    # The second attempt is a verification opportunity, not just a
++                    # duplicate independent solve. ARC failures often come from a
++                    # plausible rule that misses a demonstrated change or unchanged
++                    # cell. Expose the first grid so the model must check it against
++                    # every pair, and retain its corrected grid as the second answer.
++                    g = self.solve_once(inputs, candidate=answers[0])
++                else:
++                    # If the first response did not contain a parseable grid, there
++                    # is no candidate to check; use the second call for a fresh solve.
++                    g = self.solve_once(inputs, independent=(attempt == 1))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

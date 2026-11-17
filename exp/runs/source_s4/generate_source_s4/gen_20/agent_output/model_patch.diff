@@ -1,0 +1,28 @@
+diff --git a/task_agent.py b/task_agent.py
+index f9c5aaa..4303a1d 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -142,15 +142,14 @@ class TaskAgent:
+         prompt = build_prompt(inputs)
+         if previous_candidate is not None:
+             prompt += (
+-                "\n\nA first attempt proposed this candidate test output:\n"
+-                f"{json.dumps(previous_candidate)}\n"
+-                "Do not assume that candidate is correct. Independently infer and re-check the rule "
+-                "against every training input-output pair, then compare the rule's result with the "
+-                "candidate. The first candidate will also be kept as an answer, so use this call to "
+-                "maximize the chance of a second exact match: if the examples support a plausible "
+-                "different interpretation, return the test grid for that alternative; otherwise "
+-                "confirm the original candidate. Do not invent an unsupported alternative. Return "
+-                "one grid in the required <answer> tags."
++                "\n\nFor this verification call, first derive the test output independently "
++                "from the demonstrations, without consulting the candidate shown below. Check that "
++                "your inferred rule reproduces every training output exactly. Only after deriving "
++                "your own test grid, compare it with the first attempt; do not copy that candidate "
++                "unless your independently checked rule supports it. Return the grid supported by "
++                "the demonstrations in the required <answer> tags.\n\n"
++                "First-attempt candidate (for comparison only after your derivation):\n"
++                f"{json.dumps(previous_candidate)}"
+             )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)

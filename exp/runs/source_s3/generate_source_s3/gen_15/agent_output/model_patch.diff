@@ -1,0 +1,44 @@
+diff --git a/task_agent.py b/task_agent.py
+index cd2ca6e..fdd0927 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -142,9 +142,22 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
++    def solve_once(self, inputs, review_candidate=None):
++        """Make one model call and parse its grid; optionally use it to review a prior answer."""
+         prompt = build_prompt(inputs)
++        if review_candidate is not None:
++            prompt += (
++                "\n\n## Independent verification of a first-pass answer\n"
++                "A first-pass candidate is included below. Treat it as a hypothesis, not as ground truth. "
++                "Independently derive the rule from all demonstrations, then check the candidate against it "
++                "at the cell and object level. Pay particular attention to cells left unchanged: infer from "
++                "the examples the exact conditions under which a cell changes, rather than assuming that "
++                "all background cells, an entire region, or a familiar pattern should be altered. Consider "
++                "boundaries, barriers, and connectivity only when the examples support them. Correct any "
++                "part of the candidate that the demonstrated rule contradicts; do not merely repeat it. "
++                "Return your final grid in the required <answer> JSON tags.\n"
++                "First-pass candidate: " + json.dumps(review_candidate)
++            )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -158,9 +171,12 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Spend the existing second-call budget on checking the first answer rather
++                # than issuing the same prompt independently a second time.
++                candidate = answers[0] if attempt == 1 and answers else None
++                g = self.solve_once(inputs, review_candidate=candidate)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
