@@ -11,3 +11,4 @@ generate_loop: generation 17 completed, parent 10
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s4/generate_source_s4/gen_18', 'current_genid': 18, 'parent_genid': 10, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
 generate_loop: generation 18 completed, parent 11
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s4/generate_source_s4/gen_19', 'current_genid': 19, 'parent_genid': 11, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+INFRA ABORT (resumable): gateway restarted or global budget refusal during meta step

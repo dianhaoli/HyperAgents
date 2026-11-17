@@ -11,3 +11,8 @@ IMPORT_OK
 pick source_s4:g6: source_s4 g6 -> (6, 0, None) | no changed coach with >=3 descendants (and scored children): most descendants
    transplant check: True __ARC_SANDBOX_STARTED__
 IMPORT_OK 
+launched final exam for payoff_I0_3
+launched final exam for payoff_I0_5
+launched final exam for payoff_Ig_source_s2
+resumed source_s2 (infra aborts so far: 1)
+resumed source_s3 (infra aborts so far: 2)
