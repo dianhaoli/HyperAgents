@@ -1,0 +1,49 @@
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+index e69de29..fc3f749 100644
+Binary files a/__pycache__/task_agent.cpython-313.pyc and b/__pycache__/task_agent.cpython-313.pyc differ
+diff --git a/task_agent.py b/task_agent.py
+index 2ed1436..9042dfd 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -146,15 +146,22 @@ class TaskAgent:
+         """
+         prompt = build_prompt(inputs)
+         if candidate is not None:
++            # Derive before showing the previous answer to reduce anchoring on a
++            # plausible but incorrect first-pass grid.
+             prompt += (
+-                "\n\nIndependent verification of a previous candidate: "
++                "\n\nSECOND-PASS CHECK (use this order):\n"
++                "1. Ignore any earlier proposed answer. Infer a concrete transformation "
++                "from the training pairs alone, and check that it reproduces every "
++                "demonstration.\n"
++                "2. Apply that transformation from scratch to the test input. Check the "
++                "result's dimensions, color mapping, object placement, and every changed "
++                "region against the rule. Do not copy a demonstration output.\n"
++                "3. Only after deriving your own test grid, compare it cell by cell with "
++                "this previous candidate (which may be wrong): "
+                 f"{json.dumps(candidate)}\n"
+-                "First infer the transformation from the demonstrations and check that it "
+-                "accounts for every input/output pair. Compare the candidate with the test "
+-                "input and that inferred rule; do not copy a demonstration output or accept "
+-                "the candidate merely because it looks plausible. If the candidate fails "
+-                "any check, correct it. Return the verified test grid in the required "
+-                "<answer> tags, with nothing else inside the tags."
++                "If they differ, resolve the discrepancy using the rule and demonstrations, "
++                "not by favoring either grid. Return the independently verified test grid "
++                "inside <answer> tags, with nothing else inside the tags."
+             )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+@@ -171,8 +178,9 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                # Spend the existing second-call budget on checking and, if needed,
+-                # correcting the first candidate against all training examples.
++                # Use the existing second-call budget to independently derive the
++                # rule first, then compare with the first grid. The evaluator accepts
++                # either answer, so preserve both parsed candidates.
+                 candidate = answers[0] if attempt == 1 and answers else None
+                 g = self.solve_once(inputs, candidate=candidate)
+             except Exception as e:

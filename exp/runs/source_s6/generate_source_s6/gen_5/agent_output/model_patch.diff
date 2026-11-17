@@ -1,0 +1,95 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..764d73a 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -5,9 +5,8 @@ import socket
+ import http.client
+ import time
+ 
+-# Starting task agent (A_0) for the ARC-AGI-2 domain: one direct model response per attempt.
+-# forward() makes two independent plain attempts (the budget is 2 model calls and 2 answers per
+-# test input) and returns both parsed grids.
++# ARC task agent: use the first call to infer a rule and the second to independently
++# verify/refine it. Both calls remain within the per-input model-call budget.
+ 
+ 
+ class _UnixConn(http.client.HTTPConnection):
+@@ -50,11 +49,16 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, previous_response=None):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "Analyze the demonstrations systematically: identify the background and the distinct objects; "
++        "compare their colors, shapes, sizes, positions, counts, and input/output dimensions; then state "
++        "a single rule that explains every pair. Check the rule against each demonstration before applying "
++        "it. Do not assume the output has the same dimensions as the input; reproduce the complete grid "
++        "with exact row lengths and only colors justified by the pattern.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -71,6 +75,16 @@ def build_prompt(inputs):
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+     parts.append(grid_to_text(t))
+     parts.append("")
++    if previous_response is not None:
++        parts.extend([
++            "## Candidate from the first attempt",
++            "The response below is only a hypothesis and may contain a wrong rule or grid. Solve the "
++            "puzzle again from the demonstrations before consulting it; then compare it with your result. "
++            "Keep it only if it follows from a rule that explains every example. Correct any error, and "
++            "return your independently checked result.",
++            previous_response,
++            "",
++        ])
+     parts.append(
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+@@ -129,6 +143,7 @@ class TaskAgent:
+     def __init__(self, model="gpt-6-luna", chat_history_file="./chat_history.md"):
+         self.model = model
+         self.chat_history_file = chat_history_file
++        self._last_response = None
+ 
+     def log(self, msg):
+         try:
+@@ -137,11 +152,12 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def solve_once(self, inputs, previous_response=None):
++        """Make one model call and return its parsed grid (or None)."""
++        prompt = build_prompt(inputs, previous_response=previous_response)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
++        self._last_response = text
+         self.log(f"Output: {text}")
+         return parse_grid(text)
+ 
+@@ -153,12 +169,18 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
++        previous_response = None
+         for _ in range(2):
++            self._last_response = None
+             try:
+-                g = self.solve_once(inputs)
++                g = self.solve_once(inputs, previous_response=previous_response)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
++            # Pass the raw reasoning/answer forward even if parsing failed, so the
++            # verification call can still diagnose a malformed first response.
++            if self._last_response is not None:
++                previous_response = self._last_response
+             if g is not None:
+                 answers.append(g)
+         return answers, []

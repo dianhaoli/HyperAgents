@@ -1,0 +1,36 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4a3b03e..7b5306e 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -6,8 +6,7 @@ import http.client
+ import time
+ 
+ # Starting task agent (A_0) for the ARC-AGI-2 domain: one direct model response per attempt.
+-# forward() makes two independent plain attempts (the budget is 2 model calls and 2 answers per
+-# test input) and returns both parsed grids.
++# forward() uses at most 2 model calls and returns up to 2 parsed candidate grids per test input.
+ 
+ 
+ class _UnixConn(http.client.HTTPConnection):
+@@ -81,11 +80,12 @@ def build_prompt(inputs, prior_guess=None):
+             "\n## Independent verification of the first attempt",
+             "A previous attempt proposed this test output (it may be wrong):",
+             json.dumps(prior_guess),
+-            "Re-derive the transformation from the demonstrations rather than trusting this guess. "
+-            "Check the spatial regions and boundaries carefully: determine which zeros change to 4, "
+-            "which remain 0, and whether the grid edge closes a shape. Apply that rule cell by cell "
+-            "to the test input. Keep the proposed grid only if every detail follows from the examples; "
+-            "otherwise correct it.",
++            "Independently re-derive the transformation from every demonstration rather than trusting "
++            "the previous guess. Identify the objects and invariant features, then check each candidate "
++            "rule against all input-output pairs before applying it to the test. Verify the proposed "
++            "grid cell by cell, including dimensions, boundaries, and unchanged cells. Keep the prior "
++            "grid only if it follows from the examples; otherwise correct it. Do not assume a particular "
++            "color, shape, or boundary behavior unless the demonstrations support it.",
+         ])
+     parts.append(
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..7b8523c
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

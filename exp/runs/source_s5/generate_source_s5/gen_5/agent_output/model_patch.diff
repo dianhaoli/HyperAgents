@@ -1,0 +1,178 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index ee6b15e..73c42bc 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -1,24 +1,159 @@
+ # Copyright (c) Meta Platforms, Inc. and affiliates.
+ 
++import json
++import math
++import re
++from pathlib import Path
++
+ from agent.base_agent import AgentSystem
+ from agent.llm_withtools import chat_with_agent
+ 
++
++def summarize_evaluations(eval_path, max_reports=40, max_failures=12):
++    """Build a compact, read-only comparison of generation evaluation reports.
++
++    Keep this summary limited to reported metrics and task IDs: it does not inspect
++    predictions or expose any withheld test outputs to the meta-agent.
++    """
++    root = Path(eval_path)
++    if not root.is_dir():
++        return f"No evaluation directory found at {eval_path}."
++
++    reports = {}
++    for generation_dir in root.glob("gen_*"):
++        match = re.fullmatch(r"gen_(initial|[0-9]+)", generation_dir.name)
++        if not match or not generation_dir.is_dir():
++            continue
++        genid = match.group(1)
++        metadata = {}
++        metadata_path = generation_dir / "metadata.json"
++        try:
++            metadata = json.loads(metadata_path.read_text())
++        except (OSError, ValueError):
++            pass
++        parent = metadata.get("parent_genid")
++
++        for report_path in generation_dir.rglob("report.json"):
++            try:
++                report = json.loads(report_path.read_text())
++            except (OSError, ValueError):
++                continue
++
++            score = next(
++                (report[key] for key in (
++                    "overall_accuracy", "accuracy_score", "points_percentage",
++                    "average_progress", "average_fitness",
++                ) if isinstance(report.get(key), (int, float)) and math.isfinite(report[key])),
++                None,
++            )
++            if score is None:
++                continue
++
++            report_dir = report_path.parent.name
++            if "_eval_" in report_dir:
++                domain, split = report_dir.rsplit("_eval_", 1)
++            elif report_dir.endswith("_eval"):
++                domain, split = report_dir[:-5], "train"
++            else:
++                domain, split = report_dir, "unknown"
++
++            task_scores = report.get("per_task_score", {})
++            if not isinstance(task_scores, dict):
++                task_scores = {}
++            failed = report.get("question_ids_failed", [])
++            if not isinstance(failed, list):
++                failed = []
++            failed = {str(task_id) for task_id in failed}
++            failed.update(
++                str(task_id) for task_id, task_score in task_scores.items()
++                if isinstance(task_score, (int, float)) and task_score < 1
++            )
++            reports[(str(genid), domain, split)] = {
++                "path": report_path.relative_to(root).as_posix(),
++                "score": float(score),
++                "total": report.get("total"),
++                "failed": failed,
++                "task_scores": task_scores,
++                "parent": str(parent) if parent is not None else None,
++            }
++
++    if not reports:
++        return f"No readable evaluation reports found under {eval_path}."
++
++    def generation_order(genid):
++        return (-1 if genid == "initial" else int(genid))
++
++    lines = []
++    ordered = sorted(
++        reports.items(),
++        key=lambda item: (generation_order(item[0][0]), item[0][1], item[0][2]),
++    )
++    for (genid, domain, split), result in ordered[:max_reports]:
++        total = result["total"]
++        description = (
++            f"gen_{genid}/{result['path']} [{split}]: score={result['score']:.3f}"
++        )
++        if isinstance(total, int):
++            description += f" (reported total={total})"
++
++        parent = result["parent"]
++        parent_result = reports.get((parent, domain, split)) if parent else None
++        if parent_result is not None:
++            delta = result["score"] - parent_result["score"]
++            description += f"; vs parent gen_{parent} {delta:+.3f}"
++            old_scores = parent_result["task_scores"]
++            new_scores = result["task_scores"]
++            newly_passed = sorted(
++                str(task_id) for task_id, score in new_scores.items()
++                if isinstance(score, (int, float)) and score >= 1
++                and isinstance(old_scores.get(task_id), (int, float))
++                and old_scores[task_id] < 1
++            )
++            newly_failed = sorted(
++                str(task_id) for task_id, score in old_scores.items()
++                if isinstance(score, (int, float)) and score >= 1
++                and isinstance(new_scores.get(task_id), (int, float))
++                and new_scores[task_id] < 1
++            )
++            if newly_passed:
++                description += f"; newly passed: {', '.join(newly_passed[:8])}"
++            if newly_failed:
++                description += f"; newly failed: {', '.join(newly_failed[:8])}"
++
++        failed = sorted(result["failed"])
++        if failed:
++            shown = failed[:max_failures]
++            description += f"; failed IDs ({len(failed)}): {', '.join(shown)}"
++            if len(failed) > len(shown):
++                description += f", and {len(failed) - len(shown)} more"
++        lines.append("- " + description)
++
++    if len(ordered) > max_reports:
++        lines.append(f"- ({len(ordered) - max_reports} additional report(s) omitted.)")
++    return "\n".join(lines)
++
++
+ class MetaAgent(AgentSystem):
+     def forward(self, repo_path, eval_path, iterations_left=None):
+-        """
+-        A meta agent that recursively self-improves.
+-
+-        Args:
+-            repo_path (str): The path to the repository.
+-            eval_path (str): The path to previously generated agents and their evaluation results.
+-            iterations_left (int, optional): The number of remaining iterations in which the meta agent will be invoked in future. Defaults to None.
+-        """
+-        instruction = f"Modify any part of the codebase at `{repo_path}`."
+-        # [experiment adaptation, see DECISIONS.md] gpt-6-luna otherwise asks for clarification and never edits.
++        """Recursively improve the agent-generation system using prior evaluations."""
++        evaluation_summary = summarize_evaluations(eval_path)
++        instruction = f"Improve the agent-generation system in `{repo_path}`."
+         instruction += (
+-            f"\n\nThe repository's README.md describes the goal. Previously generated agents and their evaluation results are at `{eval_path}`. "
+-            "Work autonomously: nobody will answer questions, so do not ask for clarification. "
+-            "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
++            f"\n\nRead `{repo_path}/README.md` and inspect previous generations and evaluation results under `{eval_path}`. "
++            "Here is a concise summary computed from the available report files (it contains metrics and task IDs, not predictions):\n"
++            f"{evaluation_summary}\n\n"
++            "Compare reports for the same domain and split, and use parent comparisons where available. Inspect the relevant patches and logs before attributing a score change to a code change. "
++            "Treat small evaluations as noisy evidence, not proof of causation. Identify one specific weakness and prefer a focused, reversible change; avoid repeating a change associated with a regression without a materially different, evidence-based approach. "
++            "Do not modify prior evaluation artifacts. Run relevant tests or lightweight validation after editing, and report what was and was not verified. "
++            "Work autonomously; nobody will answer questions, so do not ask for clarification. Use the tools to inspect and edit the repository, and only finish after making the change."
+         )
++        if iterations_left is not None:
++            instruction += f"\nThere are {iterations_left} future self-improvement iterations available; favor changes that can be evaluated in a later iteration."
+ 
+-        new_msg_history = chat_with_agent(instruction, model=self.model, msg_history=[], logging=self.log, tools_available='all')
++        return chat_with_agent(
++            instruction,
++            model=self.model,
++            msg_history=[],
++            logging=self.log,
++            tools_available="all",
++        )

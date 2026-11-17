@@ -1,0 +1,14 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index ee6b15e..5777147 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -18,6 +18,9 @@ class MetaAgent(AgentSystem):
+         instruction += (
+             f"\n\nThe repository's README.md describes the goal. Previously generated agents and their evaluation results are at `{eval_path}`. "
+             "Work autonomously: nobody will answer questions, so do not ask for clarification. "
++            "Before editing, inspect the evaluation reports and metadata for the latest generations and their parents. Compare overall scores only when the evaluations cover the same tasks, and use per-task results to distinguish persistent failures from regressions. "
++            "For failed tasks, inspect available predictions and agent chat logs to find a concrete failure pattern; use the strongest comparable generation as evidence, not as proof that its approach is universally better. "
++            "Make a focused change to the agent or generation mechanism that addresses the observed failure pattern. Do not edit evaluation outputs or add caches/bytecode. Run lightweight checks for your change and report when evidence is incomplete rather than claiming an untested improvement. "
+             "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
+         )
+ 

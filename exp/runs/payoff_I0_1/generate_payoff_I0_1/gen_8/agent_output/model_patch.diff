@@ -1,0 +1,43 @@
+diff --git a/generate_loop.py b/generate_loop.py
+index d8fdcd7..8bfff97 100644
+--- a/generate_loop.py
++++ b/generate_loop.py
+@@ -462,6 +462,8 @@ def generate(
+         "optimize_option": optimize_option,
+         "agent_archive_path": agent_archive_path,
+         "can_select_next_parent": True,
++        "generation_error": None,
++        "evaluation_status": "not_started",
+     }
+     run_eval = not run_meta_agent  # always run eval if not running meta agent
+     metadata["run_eval"] = run_eval
+@@ -613,12 +615,14 @@ def generate(
+             metadata["curr_patch_files"].append(local_patch_file)
+             run_eval = file_exist_and_not_empty(local_patch_file)
+             metadata["run_eval"] = run_eval
++            metadata["evaluation_status"] = "pending" if run_eval else "no_patch"
+ 
+             # Run commands to check if the agents are compilable
+             run_commands_to_check_compilation(container, run_baseline=run_baseline, edit_select_parent=edit_select_parent)
+ 
+         # Evaluate the produced agent
+         if run_eval and "agent" in optimize_option:
++            metadata["evaluation_status"] = "pending"
+             log_path = os.path.join(gen_output_dir, "generate.log")
+ 
+             def eval_agent_worker(domain, eval_subset, eval_n):
+@@ -682,9 +686,14 @@ def generate(
+                                 future.cancel()
+                         raise
+                 metadata["run_full_eval"] = True
++                metadata["evaluation_status"] = "completed"
++            else:
++                metadata["evaluation_status"] = "staged_rejected"
+ 
+     except Exception as e:
+         safe_log(f"Error in generate: {e}")
++        metadata["generation_error"] = f"{type(e).__name__}: {e}"
++        metadata["evaluation_status"] = "error"
+         metadata["run_eval"] = False
+ 
+     # Even on errors or KeyboardInterrupt

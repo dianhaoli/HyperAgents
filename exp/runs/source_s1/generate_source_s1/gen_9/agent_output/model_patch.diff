@@ -1,0 +1,56 @@
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+index e69de29..ea778bf 100644
+Binary files a/__pycache__/task_agent.cpython-313.pyc and b/__pycache__/task_agent.cpython-313.pyc differ
+diff --git a/task_agent.py b/task_agent.py
+index 9042dfd..69c5c32 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -137,12 +137,11 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs, candidate=None):
+-        """One direct model response -> one parsed grid (or None).
++    def solve_once(self, inputs, candidate=None, independent=False):
++        """One model response -> one parsed grid (or None).
+ 
+-        When a candidate is supplied, use this call to verify it against every
+-        demonstration before answering, rather than spending the call on an
+-        unrelated guess.
++        A supplied candidate requests verification; ``independent`` requests a
++        second derivation that does not expose the first answer.
+         """
+         prompt = build_prompt(inputs)
+         if candidate is not None:
+@@ -163,6 +162,15 @@ class TaskAgent:
+                 "not by favoring either grid. Return the independently verified test grid "
+                 "inside <answer> tags, with nothing else inside the tags."
+             )
++        elif independent:
++            prompt += (
++                "\n\nSolve this independently, without relying on or guessing any prior answer. "
++                "First identify the objects, colors, and spatial relationships that change in "
++                "the demonstrations. State a concrete rule that reproduces every training "
++                "output, then apply it from scratch to the test grid. Check the dimensions "
++                "and every changed region before returning the grid in <answer> tags, with "
++                "nothing else inside the tags."
++            )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -178,11 +186,10 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                # Use the existing second-call budget to independently derive the
+-                # rule first, then compare with the first grid. The evaluator accepts
+-                # either answer, so preserve both parsed candidates.
+-                candidate = answers[0] if attempt == 1 and answers else None
+-                g = self.solve_once(inputs, candidate=candidate)
++                # Both returned grids count as candidates. Failure traces show the
++                # candidate-aware second call often repeats the first wrong grid;
++                # spend the same budget on a blind, differently structured derivation.
++                g = self.solve_once(inputs, independent=(attempt == 1))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
