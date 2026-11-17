@@ -66,6 +66,121 @@ def filter_frozen(patch_str, frozen):
     return "\n".join(out) + ("\n" if out else ""), removed
 
 
+_EXT_HDR = ("index ", "new file mode ", "deleted file mode ", "old mode ", "new mode ", "similarity index ",
+            "dissimilarity index ", "rename from ", "rename to ", "copy from ", "copy to ", "Binary files ")
+
+
+def _bad_path(p):
+    parts = p.split("/")
+    return (not p or p.startswith("/") or ".." in parts or any(x == ".git" or x.startswith(".git") for x in parts)
+            or any(c in p for c in "\\\"\t"))
+
+
+def sanitize_patch(patch_str, frozen):
+    """Strict parse of a `git diff` patch. Hunks are consumed by their @@ line counts, so content lines are
+    never mistaken for headers. Blocks touching frozen paths are dropped. Any structural anomaly (unknown
+    header, quoted or non a/ b/ names, a ---/+++ naming another file, paths in .git, absolute or .. paths)
+    rejects the WHOLE patch. Returns (clean_patch, dropped_frozen_paths, problems)."""
+    lines = patch_str.splitlines()
+    i, n = 0, len(lines)
+    blocks, problems, dropped = [], [], []
+    while i < n and not lines[i].startswith("diff --git "):
+        if lines[i].strip():
+            problems.append(f"text before first block: {lines[i][:80]}")
+        i += 1
+    while i < n:
+        m = re.match(r"^diff --git a/(\S+) b/(\S+)$", lines[i])
+        if not m:
+            problems.append(f"bad block header: {lines[i][:120]}")
+            break
+        pa, pb = m.group(1), m.group(2)
+        if _bad_path(pa) or _bad_path(pb):
+            problems.append(f"forbidden path {pa} {pb}")
+        blk = [lines[i]]
+        i += 1
+        while i < n and not lines[i].startswith("@@") and not lines[i].startswith("diff --git "):
+        	# extended headers
+            L = lines[i]
+            if L.startswith("--- "):
+                if L[4:] not in (f"a/{pa}", "/dev/null"):
+                    problems.append(f"--- names another file: {L[:120]}")
+            elif L.startswith("+++ "):
+                if L[4:] not in (f"b/{pb}", "/dev/null"):
+                    problems.append(f"+++ names another file: {L[:120]}")
+            elif L.startswith(("rename from ", "copy from ")):
+                if L.split(" ", 2)[2] != pa:
+                    problems.append(f"rename/copy source mismatch: {L[:120]}")
+            elif L.startswith(("rename to ", "copy to ")):
+                if L.split(" ", 2)[2] != pb:
+                    problems.append(f"rename/copy target mismatch: {L[:120]}")
+            elif not L.startswith(_EXT_HDR):
+                problems.append(f"unknown header line: {L[:120]}")
+            blk.append(L)
+            i += 1
+        while i < n and lines[i].startswith("@@"):
+            h = re.match(r"^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@", lines[i])
+            if not h:
+                problems.append(f"bad hunk header: {lines[i][:120]}")
+                i = n
+                break
+            old_n = int(h.group(2)) if h.group(2) is not None else 1
+            new_n = int(h.group(4)) if h.group(4) is not None else 1
+            blk.append(lines[i])
+            i += 1
+            while (old_n > 0 or new_n > 0) and i < n:
+                L = lines[i]
+                if L.startswith("\\"):
+                    blk.append(L); i += 1; continue
+                if L.startswith(" ") or L == "":
+                    old_n -= 1; new_n -= 1
+                elif L.startswith("-"):
+                    old_n -= 1
+                elif L.startswith("+"):
+                    new_n -= 1
+                else:
+                    problems.append(f"bad hunk line: {L[:80]}")
+                    break
+                blk.append(L)
+                i += 1
+            while i < n and lines[i].startswith("\\"):
+                blk.append(lines[i]); i += 1
+            if old_n != 0 or new_n != 0:
+                problems.append("hunk length mismatch")
+                break
+        if i < n and not lines[i].startswith("diff --git ") and not lines[i].startswith("@@"):
+            problems.append(f"unexpected line after hunks: {lines[i][:120]}")
+            break
+        if problems:
+            break
+        fz = any(p == f.rstrip("/") or p.startswith(f.rstrip("/") + "/") for p in (pa, pb) for f in frozen)
+        if fz:
+            dropped.append(pb)
+        else:
+            blocks.append("\n".join(blk))
+    if problems:
+        return "", dropped, problems
+    return ("\n".join(blocks) + "\n") if blocks else "", dropped, []
+
+
+def _frozen_hash(base):
+    from arcexp.common import tree_hash
+    import hashlib
+    h = hashlib.sha256()
+    for p in sorted(CTX.get("freeze_paths", [])):
+        fp = os.path.join(base, p)
+        if not os.path.lexists(fp):
+            h.update(f"{p}:missing".encode())
+        elif os.path.islink(fp):
+            h.update(f"{p}:symlink".encode())
+        elif os.path.isdir(fp):
+            h.update(f"{p}:{tree_hash(fp)}".encode())
+        else:
+            from arcexp.safeio import safe_read_bytes
+            b = safe_read_bytes(fp)
+            h.update(f"{p}:".encode() + (hashlib.sha256(b).digest() if b is not None else b"special"))
+    return h.hexdigest()
+
+
 def _set_frozen_owner(ws):
     for p in CTX.get("freeze_paths", []):
         fp = os.path.join(ws, p)
@@ -90,6 +205,7 @@ class LocalContainer:
         self.base = base
         self.tmp = os.path.join(base, "tmp")
         self.workspace = os.path.join(base, "ws")
+        self.root_dir = root_dir
         os.makedirs(self.tmp)
         os.chmod(self.tmp, 0o1777)
         # fresh workspace from the root-owned pristine repo (root never runs git in agent-owned repos)
@@ -130,6 +246,8 @@ class LocalContainer:
                 raise InfraAbort(f"gateway unavailable for meta step: {e}")
             env["GW_TOKEN"] = tok
             ro = ["/hyperagents/" + p for p in CTX.get("freeze_paths", [])]
+            if CTX.get("freeze_paths") and _frozen_hash(self.workspace) != _frozen_hash(self.root_dir):
+                raise InfraAbort("FROZEN META FILES DIFFER FROM I_g BEFORE THE META STEP (patch sanitizer bypass?)")
             t0 = time.time()
         try:
             rc, out = run_sandboxed(cmd, binds=[(self.workspace, "/hyperagents", False)], cwd=workdir,
@@ -138,15 +256,19 @@ class LocalContainer:
             if tok:
                 try:
                     info = revoke_token(tok)
-                except Exception:
-                    info = {}
+                except Exception as e:
+                    raise InfraAbort(f"could not revoke meta token: {e}")
         if is_meta:
             append_jsonl(os.path.join(CTX["run_dir"], "meta_steps.jsonl"),
                          {"iteration": CTX.get("current_genid"), "rc": rc, "dur": time.time() - t0, "token": tok,
                           "meta_calls": info.get("calls"), "meta_tokens": info.get("tokens_used"),
                           "upstream_errors": info.get("upstream_errors"), "tail": out.decode(errors="replace")[-3000:]})
-            if info.get("refused_after_restart") or info.get("refused_global"):
+            if info.get("refused_after_restart") or info.get("refused_global") or info.get("restart_revoked"):
                 raise InfraAbort("gateway restarted or global budget refusal during meta step")
+            pf = os.path.join(self.tmp, "agent_output", "model_patch.diff")
+            produced = os.path.isfile(pf) and not os.path.islink(pf) and os.path.getsize(pf) > 0
+            if info.get("upstream_errors", 0) and (rc != 0 or not produced):
+                raise InfraAbort(f"upstream errors during meta step (rc={rc}, patch={produced})")
         return _Res(rc, out)
 
 
@@ -168,12 +290,24 @@ def copy_to_container(container, source_path, dest_path, verbose=True):
     if not inside(os.path.dirname(dst), base):
         raise RuntimeError(f"unsafe destination {dest_path}")
     os.makedirs(os.path.dirname(dst), exist_ok=True)
-    if os.path.isdir(source_path):  # source is always root-controlled (output dir / patch files)
-        shutil.copytree(source_path, dst, dirs_exist_ok=True, symlinks=True)
-        chown_agent(dst)
-    else:
-        shutil.copyfile(source_path, dst, follow_symlinks=False)
-        os.lchown(dst, AGENT_UID, AGENT_GID)
+    import tempfile
+    # never write into anything an agent process may have created: build in a fresh root-made dir, then
+    # replace the destination (an existing link/dir at dst is removed without following it)
+    stage = tempfile.mkdtemp(prefix=".root_stage_", dir=os.path.dirname(dst))
+    try:
+        tmp_target = os.path.join(stage, "x")
+        if os.path.isdir(source_path):  # source is always root-controlled (output dir / patch files)
+            shutil.copytree(source_path, tmp_target, symlinks=True)
+        else:
+            shutil.copyfile(source_path, tmp_target, follow_symlinks=False)
+        chown_agent(tmp_target) if os.path.isdir(tmp_target) else os.lchown(tmp_target, AGENT_UID, AGENT_GID)
+        if os.path.islink(dst) or (os.path.lexists(dst) and not os.path.isdir(dst)):
+            os.unlink(dst)
+        elif os.path.isdir(dst):
+            shutil.rmtree(dst)
+        os.rename(tmp_target, dst)
+    finally:
+        shutil.rmtree(stage, ignore_errors=True)
 
 
 def copy_from_container(container, source_path, dest_path, verbose=True):
@@ -189,15 +323,15 @@ def copy_from_container(container, source_path, dest_path, verbose=True):
             append_jsonl(os.path.join(CTX["run_dir"], "unsafe_skipped.jsonl"), {"src": source_path, "skipped": skipped[:50]})
     else:
         safe_copyfile(src, dest_path, base)
-    # freeze mode: any edit to meta-agent files is dropped from the recorded patch
+    # every recorded patch is sanitized; in freeze mode edits to meta-agent files are dropped (reset)
     pf = os.path.join(dest_path, "model_patch.diff") if os.path.isdir(dest_path) else None
-    if CTX.get("freeze_paths") and pf and os.path.exists(pf):
-        s = open(pf).read()
-        f, removed = filter_frozen(s, CTX["freeze_paths"])
-        if removed:
-            open(pf, "w").write(f if f.strip() else "")
-            append_jsonl(os.path.join(CTX["run_dir"], "freeze_resets.jsonl"),
-                         {"iteration": CTX.get("current_genid"), "removed_paths": removed})
+    if pf and os.path.exists(pf):
+        s = open(pf, errors="replace").read()
+        f, removed, problems = sanitize_patch(s, CTX.get("freeze_paths", []))
+        if removed or problems:
+            open(pf, "w").write(f)
+            append_jsonl(os.path.join(CTX["run_dir"], "patch_sanitizer.jsonl"),
+                         {"iteration": CTX.get("current_genid"), "removed_frozen_paths": removed, "problems": problems[:20]})
 
 
 class _DummyDocker:
@@ -267,6 +401,13 @@ def arc_setup_initial_gen(output_dir, domains, copy_root_dir=None, subsets=[], r
 
 def arc_generate(*a, **kw):
     CTX["current_genid"] = kw["current_genid"] if "current_genid" in kw else a[4]
+    out_dir = kw["output_dir"] if "output_dir" in kw else a[2]
+    gdir = os.path.join(out_dir, f"gen_{CTX['current_genid']}")
+    if os.path.exists(gdir) and not GLU.is_starting_node(CTX["current_genid"]):
+        # a generation that did not reach the archive (aborted attempt): start it from scratch
+        arch = GLU.load_archive_data(os.path.join(out_dir, "archive.jsonl"), last_only=True)["archive"]
+        if CTX["current_genid"] not in arch:
+            shutil.move(gdir, gdir + f".aborted_{int(time.time())}")
     try:
         st = gw_status()
     except Exception as e:

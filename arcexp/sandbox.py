@@ -17,6 +17,7 @@ import subprocess
 from arcexp.common import AGENT_GID, AGENT_UID, GW_SOCK, RUNNER_DIR
 
 
+SANDBOX_STARTED = "__ARC_SANDBOX_STARTED__"
 SHARED_WRITABLE = ["/dev/shm", "/var/tmp", "/run/lock", "/var/lib/php/sessions", "/dev/mqueue"]
 
 
@@ -58,12 +59,16 @@ def run_sandboxed(cmd, binds, cwd="/tmp", env_extra=None, timeout=3600, ro_paths
         env.update(env_extra)
     env_args = " ".join(shlex.quote(f"{k}={v}") for k, v in env.items())
     lines.append(f"cd {shlex.quote(cwd)}")
+    lines.append(f"echo {SANDBOX_STARTED}")
     lines.append(
         f"exec setpriv --reuid={AGENT_UID} --regid={AGENT_GID} --clear-groups --inh-caps=-all "
         f"--bounding-set=-all --no-new-privs env -i {env_args} " + " ".join(shlex.quote(c) for c in cmd)
     )
     script = "\n".join(lines)
-    full = ["unshare", "-m", "-n", "-p", "-f", "--mount-proc", "--propagation", "private", "bash", "-c", script]
+    # -i/-u: private IPC (SysV shm/msg, POSIX mqueue) and UTS namespaces; --kill-child: if unshare dies, the
+    # namespace's pid1 is SIGKILLed, which tears down every process in the namespace (no survivors).
+    full = ["unshare", "-m", "-n", "-p", "-i", "-u", "-f", "--kill-child", "--mount-proc", "--propagation", "private",
+            "bash", "-c", script]
     p = subprocess.Popen(full, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                          stdin=subprocess.PIPE if stdin_data is not None else subprocess.DEVNULL,
                          start_new_session=True)

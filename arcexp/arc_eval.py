@@ -16,7 +16,7 @@ from concurrent.futures import ThreadPoolExecutor
 from arcexp import arc_data
 from arcexp.common import EXP, RUNNER_DIR, append_jsonl, chown_agent, gw_status, read_jsonl, register_token, revoke_token, tree_hash
 from arcexp.safeio import safe_read_text
-from arcexp.sandbox import run_sandboxed
+from arcexp.sandbox import SANDBOX_STARTED, run_sandboxed
 
 STAGE = os.path.join(EXP, "stage")
 TEST_INPUT_TIMEOUT = 1800  # whole forward() for one test input (two high-effort calls); code exec has its own 30 s budget
@@ -92,9 +92,13 @@ def run_test_input(workspace, scope, tid, ti, code_hash, single=False, effort_ro
     shutil.rmtree(stage, ignore_errors=True)
     calls = info.get("calls", 0)
     billed_ok = calls - info.get("possibly_billed_failures", 0)
-    # infrastructure failure = gateway-side facts only (never agent-controlled text or exit codes)
-    infra = bool(info.get("upstream_errors", 0) or info.get("refused_global", 0) or info.get("refused_after_restart", 0)) \
-        and billed_ok < (1 if single else 2)
+    started = SANDBOX_STARTED.encode() in out
+    # infrastructure failure = host/gateway facts only (never agent-controlled text or exit codes):
+    # the sandbox never reached the agent, or the gateway saw server-side/network errors, a global-budget
+    # refusal or a restart while this input still had unused calls.
+    gw_trouble = bool(info.get("upstream_errors", 0) or info.get("refused_global", 0)
+                      or info.get("refused_after_restart", 0) or info.get("restart_revoked"))
+    infra = (not started) or (gw_trouble and billed_ok < (1 if single else 2))
     err = res.get("error") or ""
     answers = [a for a in (res.get("answers") or []) if arc_data.valid_grid(a)][:2]
     truth = arc_data.truth(tid, ti)
@@ -122,6 +126,18 @@ def evaluate_set(workspace, task_ids, scope, workers=16, single=False, effort_ro
         return (phase, scope["arm"], str(scope["seed"]), str(scope["iteration"]), tid, ti)
 
     for attempt_round in range(retries + 1):
+        done = load_done(phase, code_hash)
+        infra_counts = {}
+        for r in read_jsonl(path):
+            if r.get("infra_error") and r.get("attempt") == 1 and r.get("code_hash") == code_hash:
+                infra_counts[_key(r)] = infra_counts.get(_key(r), 0) + 1
+        for tid, ti in jobs:
+            k = key_of(tid, ti)
+            if k not in done and infra_counts.get(k, 0) >= 5:
+                for a in range(2):  # give up: count as unsolved, visibly flagged
+                    append_jsonl(path, dict(scope, task=tid, test_input=ti, attempt=a + 1, code_hash=code_hash, pred=None,
+                                            correct=False, n_answers=0, infra_error=False, infra_gave_up=True,
+                                            agent_error="infrastructure failed 5 times; recorded as unsolved", ts=time.time()))
         done = load_done(phase, code_hash)
         todo = [(tid, ti) for tid, ti in jobs if key_of(tid, ti) not in done]
         if not todo:
@@ -206,14 +222,23 @@ def write_visible(visible_dir, task_ids, per_task, per_ti, done, key_of, chats):
             solved = bool(per_ti.get((tid, ti)))
             item = {"task_id": tid, "test_input": ti, "solved": solved,
                     "n_answers_returned": rs[0].get("n_answers") if rs else None,
-                    "agent_error": withhold((rs[0].get("agent_error") or None), truths) if rs else "not evaluated"}
+                    "agent_error": (rs[0].get("agent_error") or None) if rs else "not evaluated"}
             if not solved:
-                item["wrong_answers"] = [r["pred"] if not contains_truth(json.dumps(r["pred"]), truths) else "[withheld]"
-                                         for r in rs if r.get("pred") is not None and r["pred"] not in truths]
-                chat = chats.get((tid, ti))
-                if chat:
-                    with open(os.path.join(visible_dir, "agent_evals", f"chat_history_{tid}_{ti}.md"), "w") as f:
-                        f.write(withhold(chat, truths))
+                chat = chats.get((tid, ti)) or ""
+                wrong = [r["pred"] for r in rs if r.get("pred") is not None and r["pred"] not in truths]
+                err = (rs[0].get("agent_error") or "") if rs else ""
+                # all-or-nothing per test input: if ANY agent-produced field contains a true output (any
+                # serialization, as a digit sequence), show none of them for this input
+                if any(contains_truth(x, truths) for x in [chat, err] + [json.dumps(w) for w in wrong]):
+                    item["agent_error"] = None
+                    item["withheld"] = "agent output for this test input withheld (it contained a true output)"
+                else:
+                    item["wrong_answers"] = wrong
+                    if chat:
+                        with open(os.path.join(visible_dir, "agent_evals", f"chat_history_{tid}_{ti}.md"), "w") as f:
+                            f.write(chat)
+            else:
+                item["agent_error"] = None
             details.append(item)
     report = {"overall_accuracy": sum(per_task.values()) / max(1, len(per_task)),
               "total": len(per_task), "total_test_inputs": len(details),

@@ -109,3 +109,29 @@ The user allowed deviations from the prompt's design where clearly better; each 
     shadow, so `analysis/__init__.py` was added.
 18. Splits: 38 screened tasks were solved once or twice (24 twice, 14 once), 54 always and 8 never. Each set has
     19 intermediate tasks + 3 always-solved + 3 never-solved (identical composition), drawn with seed 20261118.
+19. **Second adversarial review** (31 agents; 14 verified findings) of the hardened code. All fixed before the pilot:
+    - `unshare -i -u --kill-child`: private IPC/UTS namespaces, and the whole pid namespace dies with the sandbox.
+    - Root copies into agent-reachable dirs only via a fresh root-made staging dir plus rename.
+    - A strict, hunk-aware **patch sanitizer**. It rejects the whole patch on any forged/odd header, `.git` path,
+      absolute or `..` path, or a `---`/`+++` that names another file, and drops frozen-path blocks. A host
+      hash check verifies frozen meta files before every meta step.
+    - Agent-triggerable 4xx upstream errors consume the call slot and are not infra. A sandbox-start nonce
+      separates "never started" (infra) from agent failure. Infra retries are capped at 5 per key.
+    - Withholding is all-or-nothing per test input.
+    - Meta-step upstream outages, a failed revoke, or a restart raise InfraAbort.
+    - A stale gen dir from an aborted attempt is moved aside before the generation re-runs.
+    - Admin calls check HTTP status and retry. The gateway listen backlog is 256 (the old default of 5 gave
+      EAGAIN under load; those rows were classified infra and re-run).
+20. **Check-phase rows from before the hardening** were reconciled (`arcexp/reconcile.py`). A row with
+    fewer answers than expected is kept only if the ledger shows all its model calls completed or it timed out.
+    No row needed invalidating. The old-code jobs were stopped mid-way and resumed on the new code;
+    unfinished keys simply ran later.
+21. **xhigh pass:** the same 30-minute per-test-input wall-clock limit applies. At xhigh, many test inputs
+    hit it (14 of the first 80), so the xhigh score partly measures speed. It is reported as such.
+22. **DEVIATION (timing only): overlapping phases.** Held-out calls take about 3 minutes each, so the
+    strictly sequential procedure would take more than a day. (a) The sanity pilot starts once B0 rep 0 is
+    complete and well inside the gate (the gate is still checked on the 3-rep mean when available; if it
+    fails, everything stops). (b) The 6 source runs start once the pilot runs have completed one generation
+    cleanly on the hardened infrastructure, instead of after the pilot gate. Source runs do not depend
+    on the pilot. If the pilot gate fails, they are stopped and their spend is reported as wasted. No result
+    is used to choose anything in another phase.

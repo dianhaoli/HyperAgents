@@ -43,8 +43,25 @@ def unix_request(path, method, url, body=None, timeout=3600):
     return r.status, json.loads(out or b"{}")
 
 
+def _admin(method, url, body=None, tries=6):
+    import time as _t
+    last = None
+    for i in range(tries):
+        try:
+            st, d = unix_request(ADMIN_SOCK, method, url, body, timeout=60)
+            if st == 200:
+                return d
+            last = f"HTTP {st}: {d}"
+        except Exception as e:
+            last = f"{type(e).__name__}: {e}"
+        _t.sleep(min(30, 2 ** i))
+    raise RuntimeError(f"gateway admin {url} failed: {last}")
+
+
 def revoke_token(tok):
-    st, d = unix_request(ADMIN_SOCK, "POST", "/revoke", {"token": tok}, timeout=60)
+    d = _admin("POST", "/revoke", {"token": tok})
+    if "calls" not in d or not d.get("revoked"):
+        raise RuntimeError(f"revoke did not confirm: {d}")
     return d
 
 
@@ -53,20 +70,16 @@ def register_token(role, scope, effort_role=None):
     body = {"token": tok, "role": role, "scope": scope}
     if effort_role:
         body["effort_role"] = effort_role
-    st, _ = unix_request(ADMIN_SOCK, "POST", "/register", body, timeout=30)
-    if st != 200:
-        raise RuntimeError(f"token registration failed: {st}")
+    _admin("POST", "/register", body)
     return tok
 
 
 def token_info(tok):
-    st, d = unix_request(ADMIN_SOCK, "GET", f"/token/{tok}", timeout=30)
-    return d
+    return _admin("GET", f"/token/{tok}")
 
 
 def gw_status():
-    st, d = unix_request(ADMIN_SOCK, "GET", "/status", timeout=30)
-    return d
+    return _admin("GET", "/status", tries=2)
 
 
 def append_jsonl(path, rec):

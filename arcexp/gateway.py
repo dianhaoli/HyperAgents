@@ -84,6 +84,10 @@ def load_state():
                     continue
                 t = state["tokens"].setdefault(tok, new_tok())
                 if r.get("error"):
+                    if r.get("client_error"):
+                        t["calls"] += 1
+                        t["client_errors"] = t.get("client_errors", 0) + 1
+                        continue
                     t["upstream_errors"] += 1
                     if r.get("possibly_billed"):
                         t["calls"] += 1
@@ -104,9 +108,12 @@ def ledger_write(rec):
 
 
 class UpstreamError(Exception):
-    def __init__(self, msg, possibly_billed=False):
+    """client=True: a 4xx the caller's own request caused (e.g. prompt too long, flagged). It consumes the
+    call slot and is NOT an infrastructure failure. Otherwise (5xx, network, timeout) it is infrastructure."""
+    def __init__(self, msg, possibly_billed=False, client=False):
         super().__init__(msg)
         self.possibly_billed = possibly_billed
+        self.client = client
 
 
 def call_openai(messages, effort, max_out):
@@ -143,7 +150,7 @@ def call_openai(messages, effort, max_out):
         if r.status_code in (400, 401, 403, 404):
             # sporadic false-positive "flagged" 400s: retry those twice, everything else is final
             if not (r.status_code == 400 and "flagged" in r.text and attempt < 2):
-                raise UpstreamError(last_err)
+                raise UpstreamError(last_err, client=(r.status_code == 400))
         time.sleep(min(60, 2 ** attempt * 2))
     raise UpstreamError(f"upstream failed after retries: {last_err}")
 
@@ -262,16 +269,20 @@ class AgentHandler(http.server.BaseHTTPRequestHandler):
             with lock:
                 t["busy"] = False
                 state["reserved"] -= worst
-                t["upstream_errors"] += 1
                 c = worst if e.possibly_billed else 0.0  # charge worst case if the call may have been billed
-                if e.possibly_billed:
-                    t["possibly_billed_failures"] += 1
+                if e.client:
+                    t["client_errors"] = t.get("client_errors", 0) + 1  # agent-caused: slot consumed, not infra
                 else:
-                    t["calls"] -= 1  # infra failure that was certainly not billed does not consume a slot
+                    t["upstream_errors"] += 1
+                    if e.possibly_billed:
+                        t["possibly_billed_failures"] += 1
+                    else:
+                        t["calls"] -= 1  # infra failure that was certainly not billed does not consume a slot
                 state["spent"] += c
                 state["by_role"][role] = state["by_role"].get(role, 0.0) + c
                 ledger_write({"ts": time.time(), "token": tok, "role": role, "scope": t.get("scope", {}),
-                              "error": str(e)[:500], "possibly_billed": e.possibly_billed, "cost": c, "total_tokens": 0})
+                              "error": str(e)[:500], "possibly_billed": e.possibly_billed, "client_error": e.client,
+                              "cost": c, "total_tokens": 0})
             return self._send(502, {"error": f"upstream error: {e}"})
         usage = d.get("usage") or {}
         c = cost_of(usage)
