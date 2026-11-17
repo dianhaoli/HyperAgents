@@ -50,43 +50,15 @@ def grid_to_text(grid):
     return "\n".join(" ".join(str(v) for v in row) for row in grid)
 
 
-def _training_delta_line(input_grid, output_grid, remaining_budget, max_cells=80):
-    """Return a bounded, exhaustive positional diff for same-sized training grids."""
-    if (not input_grid or not output_grid
-            or len(input_grid) != len(output_grid)
-            or any(len(a) != len(b) for a, b in zip(input_grid, output_grid))):
-        return "Cellwise delta audit: unavailable because input/output dimensions differ.", 0
-
-    changes = [
-        (r, c, before, after)
-        for r, (in_row, out_row) in enumerate(zip(input_grid, output_grid))
-        for c, (before, after) in enumerate(zip(in_row, out_row))
-        if before != after
-    ]
-    if len(changes) > max_cells or len(changes) > remaining_budget:
-        return (f"Cellwise delta audit: omitted ({len(changes)} changed cells exceed the audit limit or remaining prompt budget); "
-                "use the grids above."), 0
-    if not changes:
-        return "Cellwise delta audit (exhaustive; 0-based row,column): no cells differ.", 0
-    entries = "; ".join(f"({r},{c}) {before}->{after}" for r, c, before, after in changes)
-    return (f"Cellwise delta audit (exhaustive; 0-based row,column; input->output): {entries}",
-            len(changes))
-
-
-def build_prompt(inputs, previous_candidate=None):
+def build_prompt(inputs):
     parts = [
         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
-        "Before answering, state the rule to yourself as concrete grid operations (including any crop, "
-        "reordering, or repetition), and check by applying it to every training input that it reproduces "
-        "the corresponding output exactly. Pay careful attention to row/column positions and output "
-        "dimensions; do not infer the test output from color counts alone. Treat each exhaustive "
-        "cellwise delta list below as a positional constraint: account for every listed change and "
-        "do not claim a training check passed if any listed coordinate or value disagrees.",
+        "that maps each input grid to its output grid. Infer the rule and apply it to the test input. "
+        "Use every demonstration to check the rule: mentally apply it to each example and reject any "
+        "interpretation that fails to reproduce an example exactly.",
         "",
     ]
-    delta_budget = 180
     for i, pair in enumerate(inputs["train"], 1):
         parts.append(f"## Example {i}")
         h, w = len(pair["input"]), len(pair["input"][0])
@@ -95,36 +67,34 @@ def build_prompt(inputs, previous_candidate=None):
         h, w = len(pair["output"]), len(pair["output"][0])
         parts.append(f"Output ({h}x{w}):")
         parts.append(grid_to_text(pair["output"]))
-        delta_line, used = _training_delta_line(
-            pair["input"], pair["output"], delta_budget
-        )
-        parts.append(delta_line)
-        delta_budget -= used
         parts.append("")
     t = inputs["test_input"]
     parts.append("## Test")
     parts.append(f"Input ({len(t)}x{len(t[0])}):")
     parts.append(grid_to_text(t))
     parts.append("")
-    if previous_candidate is not None:
-        parts.extend([
-            "## Candidate from the first attempt (unverified)",
-            json.dumps(previous_candidate),
-            "This candidate may be wrong. First derive the rule independently from the demonstrations; "
-            "do not use the candidate to infer the rule. Make a positional audit: state which input "
-            "rows/columns produce each output row/column, including any crop, reordering, or repetition. "
-            "Apply that exact operation to every training input and check dimensions and cell positions "
-            "against its output. Only after those checks, apply it to the test input and compare the "
-            "result cell by cell with the candidate. Correct the candidate if any row, column, or value "
-            "does not match. In particular, do not assume rows with equal sort keys can be reordered.",
-            "",
-        ])
     parts.append(
         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
         "Put nothing else inside the tags."
     )
     return "\n".join(parts)
+
+
+def build_review_prompt(inputs, previous_candidate):
+    """Ask the second attempt to audit, rather than repeat, the first attempt."""
+    return (
+        build_prompt(inputs)
+        + "\n\n## Audit of the first attempt\n"
+        + "The first attempt proposed this test output (JSON):\n"
+        + json.dumps(previous_candidate)
+        + "\nIndependently infer the transformation again from ALL training pairs. Check whether this "
+        + "candidate follows the rule in every region; do not copy it without checking. In particular, "
+        + "verify the output dimensions, object and color roles, directions or symmetry, boundaries, "
+        + "and cells that should remain unchanged. If the candidate is inconsistent with the examples, "
+        + "correct it. If it is consistent, return it. Return only your best complete grid inside "
+        + "<answer></answer> tags, with valid JSON rows."
+    )
 
 
 def _valid(g):
@@ -186,8 +156,12 @@ class TaskAgent:
             pass
 
     def solve_once(self, inputs, previous_candidate=None):
-        """One model response -> one parsed grid (or None); optionally verify a prior candidate."""
-        prompt = build_prompt(inputs, previous_candidate=previous_candidate)
+        """One model response -> one parsed grid (or None), optionally auditing a prior answer."""
+        prompt = (
+            build_prompt(inputs)
+            if previous_candidate is None
+            else build_review_prompt(inputs, previous_candidate)
+        )
         self.log(f"Input: {prompt}")
         text = call_model(prompt)
         self.log(f"Output: {text}")
@@ -201,15 +175,21 @@ class TaskAgent:
             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
         """
         answers = []
-        for attempt in range(2):
-            try:
-                # Spend the existing second call on checking/correcting the first candidate,
-                # rather than issuing the same unconditioned prompt twice.
-                prior = answers[0] if attempt == 1 and answers else None
-                g = self.solve_once(inputs, previous_candidate=prior)
-            except Exception as e:
-                self.log(f"Error: {e}")
-                g = None
-            if g is not None:
-                answers.append(g)
+        # Preserve the first candidate as a fallback. The second call gets a different task:
+        # independently derive and audit the first answer against all demonstrations.
+        try:
+            first = self.solve_once(inputs)
+        except Exception as e:
+            self.log(f"Error: {e}")
+            first = None
+        if first is not None:
+            answers.append(first)
+
+        try:
+            second = self.solve_once(inputs, previous_candidate=first)
+        except Exception as e:
+            self.log(f"Error: {e}")
+            second = None
+        if second is not None and second not in answers:
+            answers.append(second)
         return answers, []

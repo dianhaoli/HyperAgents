@@ -23,5 +23,6 @@
   "rng_seed": 2001,
   "workers": 12,
   "name": "payoff_Ig_source_s1",
-  "root_commit": "7f11ceda72096d89eafb71f112c44cf9a4aaeb71"
+  "root_commit": "7f11ceda72096d89eafb71f112c44cf9a4aaeb71",
+  "done": true
 }

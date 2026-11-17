@@ -16,3 +16,8 @@ IMPORT_OK
 23:08:07 launched final exam for payoff_Ig_source_s2
 23:08:08 resumed source_s2 (infra aborts so far: 1)
 23:08:08 resumed source_s3 (infra aborts so far: 2)
+23:13:14 launched final exam for payoff_Ig_source_s1
+23:13:14 resumed payoff_I0_4 (infra aborts so far: 1)
+23:13:15 resumed payoff_I0_6 (infra aborts so far: 1)
+23:13:15 resumed payoff_Ig_source_s6 (infra aborts so far: 1)
+23:13:16 resumed source_s4 (infra aborts so far: 1)

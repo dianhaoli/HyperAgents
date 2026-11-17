@@ -1,1 +1,3 @@
 [eval] {'phase': 'rescore', 'arm': 'I0', 'seed': 'r3', 'iteration': 3} round 0: 26 test inputs to run (0 cached)
+payoff_I0_3 cand gen_3: loop score 0.700 rescore 0.620 combined 0.660
+[eval] {'phase': 'rescore', 'arm': 'I0', 'seed': 'r3', 'iteration': 5} round 0: 26 test inputs to run (0 cached)

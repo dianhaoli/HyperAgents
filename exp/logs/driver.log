@@ -16,3 +16,8 @@ launched final exam for payoff_I0_5
 launched final exam for payoff_Ig_source_s2
 resumed source_s2 (infra aborts so far: 1)
 resumed source_s3 (infra aborts so far: 2)
+launched final exam for payoff_Ig_source_s1
+resumed payoff_I0_4 (infra aborts so far: 1)
+resumed payoff_I0_6 (infra aborts so far: 1)
+resumed payoff_Ig_source_s6 (infra aborts so far: 1)
+resumed source_s4 (infra aborts so far: 1)
