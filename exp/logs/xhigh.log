@@ -6,3 +6,4 @@ xhigh pass: 0.3986 missing=0
 [eval] {'phase': 'xhigh', 'arm': 'A0', 'seed': '-', 'iteration': 0} round 2: 12 test inputs to run (155 cached)
 [eval] {'phase': 'xhigh', 'arm': 'A0', 'seed': '-', 'iteration': 0} round 0: 9 test inputs to run (158 cached)
 [eval] {'phase': 'xhigh', 'arm': 'A0', 'seed': '-', 'iteration': 0} round 0: 9 test inputs to run (158 cached)
+[eval] {'phase': 'xhigh', 'arm': 'A0', 'seed': '-', 'iteration': 0} round 1: 8 test inputs to run (159 cached)

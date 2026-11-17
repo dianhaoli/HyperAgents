@@ -1,0 +1,19 @@
+diff --git a/task_agent.py b/task_agent.py
+index 1ec3abb..917e141 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -85,6 +85,10 @@ def build_prompt(inputs, candidate=None):
+             "Check that the output has the appropriate dimensions and follows the demonstrated rule."
+         )
+     parts.append(
++        "Before finalizing, infer a rule that reproduces every training output, and check it against "
++        "each training pair rather than relying on a single example. Treat color numbers as labels, "
++        "not quantities, unless the examples demonstrate otherwise. Apply the verified rule to the "
++        "test input and check the output dimensions and unchanged regions. "
+         "End your response with the output grid inside <answer></answer> tags as a JSON list of rows, "
+         "for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+         "Put nothing else inside the tags."
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..552b191
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ
