@@ -20,5 +20,16 @@ class MetaAgent(AgentSystem):
             "Work autonomously: nobody will answer questions, so do not ask for clarification. "
             "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
         )
+        instruction += (
+            "\n\nTreat evaluation results as evidence, not as a reason to make an arbitrary edit. "
+            "Inspect the available generation reports and metadata, compare each candidate's score with its parent and the initial agent, "
+            "and examine wrong-answer details or chat logs for the failures before proposing a change. "
+            "Do not assume the newest generation is best: in the supplied source_s3 results, gen_1 scored 0.96, "
+            "while gen_2 scored 0.84 and the initial agent scored 0.72. Preserve the strongest general behavior unless you can "
+            "identify a specific, plausible cause of failure and a change that addresses it without undermining solved cases. "
+            "Avoid unsupported task-specific hints (for example, hardcoded colors, shapes, or grid dimensions); prefer general "
+            "improvements supported by multiple examples or repeated failure evidence. Keep the task-agent interface and enforced "
+            "model-call/answer budgets intact. Make a focused change, and do not claim an improvement unless evaluation demonstrates it."
+        )
 
         new_msg_history = chat_with_agent(instruction, model=self.model, msg_history=[], logging=self.log, tools_available='all')

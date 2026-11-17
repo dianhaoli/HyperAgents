@@ -18,11 +18,6 @@ class MetaAgent(AgentSystem):
         instruction += (
             f"\n\nThe repository's README.md describes the goal. Previously generated agents and their evaluation results are at `{eval_path}`. "
             "Work autonomously: nobody will answer questions, so do not ask for clarification. "
-            "Inspect the latest generations' metadata and evaluation reports before editing. When reports or prediction/chat artifacts exist, "
-            "use them to identify concrete failure modes and target your change at the mechanism that caused them; do not assume a candidate "
-            "without an evaluation report is an improvement. Keep changes focused on the agent or generation/evaluation mechanisms, and do not "
-            "edit generated evaluation outputs. Avoid adding bytecode, caches, or other runtime artifacts to the repository. Run appropriate lightweight "
-            "checks for your changes and preserve existing behavior outside the intended improvement. "
             "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
         )
 

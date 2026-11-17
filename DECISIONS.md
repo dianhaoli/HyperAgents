@@ -156,3 +156,8 @@ The user allowed deviations from the prompt's design where clearly better; each 
     to `<phase>.invalidated.jsonl` and re-run under the new limit, so B0 and every final agent are scored
     under the same rule. The single timed-out source-loop input stays as recorded; it only affected the
     loop's own node score. All runs were restarted (resumable) to pick up the change.
+27. **Observation (not changed): I_0 often ends an iteration without an edit** (11 of the first 31 iterations; 6 of 8 in
+    source_s4). The causes are I_0's text tool-call scaffold with gpt-6-luna: an empty first reply, a malformed or
+    unparsed tool call, or the model answering the nudge with "DONE". I_0 is pre-registered (commit f577cc7) and
+    is the same starting point for both arms, so it is not changed mid-experiment. An evolved improver may
+    legitimately repair this. That is part of what Delta measures, and RESULTS.md reports it.

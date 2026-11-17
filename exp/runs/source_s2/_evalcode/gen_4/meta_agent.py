@@ -1,151 +1,24 @@
 # Copyright (c) Meta Platforms, Inc. and affiliates.
 
-import json
-import os
-import re
-
 from agent.base_agent import AgentSystem
 from agent.llm_withtools import chat_with_agent
 
-
-def _generation_from_path(path):
-    """Return a sortable generation number and display name from a report path."""
-    for part in path.split(os.sep):
-        match = re.match(r"^gen_(initial|\d+)(?:\.|$)", part)
-        if match:
-            name = match.group(1)
-            return (-1 if name == "initial" else int(name), name)
-    return None, None
-
-
-def summarize_evaluations(eval_path, max_generations=8):
-    """Summarize comparable historical reports for the self-improvement prompt.
-
-    Evaluation folders contain different report formats, so this only relies on common
-    accuracy/count fields and the optional per-task score mapping. Malformed or unrelated
-    JSON reports are ignored rather than preventing the meta-agent from running.
-    """
-    if not eval_path or not os.path.isdir(eval_path):
-        return "No readable evaluation-history directory was provided."
-
-    groups = {}
-    try:
-        paths = []
-        for root, dirs, files in os.walk(eval_path):
-            dirs.sort()
-            if "report.json" in files:
-                paths.append(os.path.join(root, "report.json"))
-    except OSError:
-        return "Evaluation history could not be enumerated."
-
-    for path in paths:
-        generation, label = _generation_from_path(os.path.relpath(path, eval_path))
-        if generation is None:
-            continue
-        try:
-            with open(path, encoding="utf-8") as stream:
-                report = json.load(stream)
-        except (OSError, ValueError, TypeError):
-            continue
-        if not isinstance(report, dict):
-            continue
-
-        relative = os.path.relpath(path, eval_path).split(os.sep)
-        gen_index = next((i for i, part in enumerate(relative)
-                          if re.match(r"^gen_(?:initial|\d+)(?:\.|$)", part)), None)
-        kind = "/".join(relative[gen_index + 1:]) if gen_index is not None else "report.json"
-        accuracy = report.get("overall_accuracy", report.get("accuracy"))
-        try:
-            accuracy = float(accuracy) if accuracy is not None else None
-        except (TypeError, ValueError):
-            accuracy = None
-        scores = report.get("per_task_score", {})
-        if not isinstance(scores, dict):
-            scores = {}
-        clean_scores = {}
-        for task, score in scores.items():
-            try:
-                clean_scores[str(task)] = float(score)
-            except (TypeError, ValueError):
-                continue
-        groups.setdefault(kind, []).append({
-            "generation": generation,
-            "label": label,
-            "accuracy": accuracy,
-            "total": report.get("total"),
-            "correct": report.get("total_correct"),
-            "scores": clean_scores,
-        })
-
-    if not groups:
-        return "No generation-tagged evaluation reports with usable metrics were found."
-
-    lines = []
-    for kind in sorted(groups):
-        reports = sorted(groups[kind], key=lambda item: item["generation"])
-        # Keep the recent trajectory readable even when the archive is large.
-        generations = sorted({item["generation"] for item in reports})
-        keep = set(generations[-max_generations:])
-        reports = [item for item in reports if item["generation"] in keep]
-        trajectory = []
-        for item in reports:
-            score_text = f"{item['accuracy']:.3f}" if item["accuracy"] is not None else "accuracy n/a"
-            count_text = ""
-            if item["correct"] is not None and item["total"] is not None:
-                count_text = f", {item['correct']}/{item['total']}"
-            elif item["total"] is not None:
-                count_text = f", n={item['total']}"
-            trajectory.append(f"gen_{item['label']} {score_text}{count_text}")
-        lines.append(f"- {kind}: " + " -> ".join(trajectory))
-
-        latest = reports[-1]
-        comparable = [item for item in reports if item["accuracy"] is not None]
-        if comparable:
-            best = max(comparable, key=lambda item: item["accuracy"])
-            if best["generation"] != latest["generation"]:
-                lines.append(
-                    f"  Latest is gen_{latest['label']}; historical best is gen_{best['label']} "
-                    f"({best['accuracy']:.3f})."
-                )
-        if len(reports) > 1 and latest["scores"]:
-            previous = next((item for item in reversed(reports[:-1]) if item["scores"]), None)
-            if previous:
-                common = set(previous["scores"]) & set(latest["scores"])
-                improved = sorted(task for task in common
-                                  if latest["scores"][task] > previous["scores"][task])
-                regressed = sorted(task for task in common
-                                   if latest["scores"][task] < previous["scores"][task])
-                if improved:
-                    lines.append("  Improved task scores vs previous report: " + ", ".join(improved[:12]))
-                if regressed:
-                    lines.append("  Regressed task scores vs previous report: " + ", ".join(regressed[:12]))
-                if not improved and not regressed and common:
-                    lines.append("  Per-task scores are unchanged vs previous report.")
-                if not common:
-                    lines.append("  No overlapping per-task IDs with the previous report; compare totals cautiously.")
-
-    return "Evaluation history (use as evidence, not as a reason to overfit):\n" + "\n".join(lines)
-
-
 class MetaAgent(AgentSystem):
     def forward(self, repo_path, eval_path, iterations_left=None):
-        """Inspect the repository and prior results, then make a focused improvement."""
+        """
+        A meta agent that recursively self-improves.
+
+        Args:
+            repo_path (str): The path to the repository.
+            eval_path (str): The path to previously generated agents and their evaluation results.
+            iterations_left (int, optional): The number of remaining iterations in which the meta agent will be invoked in future. Defaults to None.
+        """
         instruction = f"Modify any part of the codebase at `{repo_path}`."
-        # Give the editing agent a compact, reproducible view of prior outcomes instead
-        # of relying on it to find and interpret nested reports unaided.
-        history = summarize_evaluations(eval_path)
+        # [experiment adaptation, see DECISIONS.md] gpt-6-luna otherwise asks for clarification and never edits.
         instruction += (
-            f"\n\nThe repository's README.md describes the goal. Previously generated agents "
-            f"and their evaluation results are at `{eval_path}`.\n\n{history}\n\n"
-            "Inspect the relevant source, prior generation patches, and evaluation reports before editing. "
-            "Use the trajectory and any task-level regressions to identify a concrete failure mode; prefer "
-            "a focused, testable improvement that preserves existing successful behavior over a wholesale "
-            "rewrite or a change tuned to one task ID. Treat scores from different sample sizes or report "
-            "types as non-comparable. Do not edit archived generations as a substitute for improving the "
-            "current code. Work autonomously: nobody will answer questions, so do not ask for clarification. "
-            "Use the tools to inspect the code and make your changes; a response without a tool call ends the "
-            "session, so only reply without one when you are done."
+            f"\n\nThe repository's README.md describes the goal. Previously generated agents and their evaluation results are at `{eval_path}`. "
+            "Work autonomously: nobody will answer questions, so do not ask for clarification. "
+            "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
         )
-        return chat_with_agent(
-            instruction, model=self.model, msg_history=[], logging=self.log, tools_available="all"
-        )
+
+        new_msg_history = chat_with_agent(instruction, model=self.model, msg_history=[], logging=self.log, tools_available='all')

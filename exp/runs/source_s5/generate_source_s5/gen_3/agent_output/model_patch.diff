@@ -1,0 +1,26 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index ee6b15e..63403d7 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -13,12 +13,18 @@ class MetaAgent(AgentSystem):
+             eval_path (str): The path to previously generated agents and their evaluation results.
+             iterations_left (int, optional): The number of remaining iterations in which the meta agent will be invoked in future. Defaults to None.
+         """
+-        instruction = f"Modify any part of the codebase at `{repo_path}`."
+-        # [experiment adaptation, see DECISIONS.md] gpt-6-luna otherwise asks for clarification and never edits.
++        instruction = f"Improve the agent-generation system in `{repo_path}`."
+         instruction += (
+-            f"\n\nThe repository's README.md describes the goal. Previously generated agents and their evaluation results are at `{eval_path}`. "
++            f"\n\nRead the repository's README.md and inspect the previous generations and evaluation results at `{eval_path}` before choosing a change. "
++            "Compare scores and failure cases across generations, and inspect the corresponding patches or agent logs when available. "
++            "Use this evidence to identify a specific weakness; do not claim a change helped unless the evaluation results support that conclusion, "
++            "and account for noisy or incomplete evaluations. Prefer one focused, reversible improvement over broad speculative edits. "
++            "Make the change in the repository, then run relevant tests or lightweight validation and report what was and was not verified. "
++            "Do not modify prior evaluation artifacts to make results appear better. "
+             "Work autonomously: nobody will answer questions, so do not ask for clarification. "
+             "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
+         )
++        if iterations_left is not None:
++            instruction += f"\nThere are {iterations_left} future self-improvement iterations available; favor changes whose effects can be evaluated and learned from."
+ 
+         new_msg_history = chat_with_agent(instruction, model=self.model, msg_history=[], logging=self.log, tools_available='all')

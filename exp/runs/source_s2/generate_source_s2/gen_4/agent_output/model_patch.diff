@@ -1,0 +1,138 @@
+diff --git a/task_agent.py b/task_agent.py
+index 49f80a5..c7267a4 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -128,6 +128,72 @@ def _parse_block(s):
+     return rows if _valid(rows) else None
+ 
+ 
++def _dihedral_grids(grid):
++    """Return the four rotations of a grid and of its horizontal reflection."""
++    variants = []
++    for base in (grid, [row[::-1] for row in grid]):
++        current = [list(row) for row in base]
++        for _ in range(4):
++            variants.append(current)
++            # One clockwise quarter-turn; works for rectangular grids too.
++            current = [list(row) for row in zip(*current[::-1])]
++    return variants
++
++
++def _infer_geometric_solution(inputs):
++    """Infer an unambiguous D4 transform plus global color remapping from demonstrations.
++
++    This deliberately handles only a narrow, exactly verifiable class of rules. A
++    hypothesis is considered only when it reproduces every demonstration cell-for-cell.
++    If multiple hypotheses imply different test grids, defer to the model instead of
++    arbitrarily choosing one.
++    """
++    train = inputs.get("train") or []
++    test_grid = inputs.get("test_input")
++    if not train or not _valid(test_grid):
++        return None
++
++    possible_outputs = set()
++
++    for orientation_index in range(8):
++        color_map = {}
++        hypothesis_valid = True
++        for pair in train:
++            source = pair.get("input")
++            target = pair.get("output")
++            if not _valid(source) or not _valid(target):
++                hypothesis_valid = False
++                break
++            oriented = _dihedral_grids(source)[orientation_index]
++            if len(oriented) != len(target) or len(oriented[0]) != len(target[0]):
++                hypothesis_valid = False
++                break
++            for source_row, target_row in zip(oriented, target):
++                for source_color, target_color in zip(source_row, target_row):
++                    previous = color_map.setdefault(source_color, target_color)
++                    if previous != target_color:
++                        hypothesis_valid = False
++                        break
++                if not hypothesis_valid:
++                    break
++            if not hypothesis_valid:
++                break
++        if not hypothesis_valid:
++            continue
++
++        # A color absent from all demonstrations has no observed mapping. Do not
++        # silently assume it is unchanged and turn an underdetermined rule into an answer.
++        if any(color not in color_map for row in test_grid for color in row):
++            continue
++        oriented_test = _dihedral_grids(test_grid)[orientation_index]
++        prediction = [[color_map[color] for color in row] for row in oriented_test]
++        possible_outputs.add(tuple(tuple(row) for row in prediction))
++
++    if len(possible_outputs) != 1:
++        return None
++    return [list(row) for row in next(iter(possible_outputs))]
++
++
+ def parse_grid(text):
+     """Extract the answer grid from a model response; None if no valid grid is found."""
+     if not text:
+@@ -178,6 +244,13 @@ class TaskAgent:
+         Returns:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
++        # First apply a small, exact local solver for geometric symmetries and global
++        # color substitutions. It is used only when all demonstrations agree and every
++        # consistent geometric hypothesis yields the same test grid.
++        local_solution = _infer_geometric_solution(inputs)
++        if local_solution is not None:
++            return [local_solution], []
++
+         answers = []
+         # Preserve the first candidate as a fallback. The second call gets a different task:
+         # independently derive and audit the first answer against all demonstrations.
+diff --git a/tests/test_task_agent.py b/tests/test_task_agent.py
+new file mode 100644
+index 0000000..e7d1ad5
+--- /dev/null
++++ b/tests/test_task_agent.py
+@@ -0,0 +1,41 @@
++import unittest
++
++from task_agent import _infer_geometric_solution
++
++
++class GeometricSolverTests(unittest.TestCase):
++    def test_rotation_and_color_mapping(self):
++        # The training transform is clockwise rotation followed by 1->2, 2->3.
++        inputs = {
++            "train": [{
++                "input": [[1, 2, 1], [2, 2, 1]],
++                "output": [[3, 2], [3, 3], [2, 2]],
++            }],
++            "test_input": [[1, 1], [2, 1]],
++        }
++        self.assertEqual(_infer_geometric_solution(inputs), [[3, 2], [2, 2]])
++
++    def test_disagreeing_geometric_hypotheses_fall_back(self):
++        inputs = {
++            "train": [{"input": [[1, 2]], "output": [[1, 2]]}],
++            "test_input": [[3, 4], [5, 6]],
++        }
++        self.assertIsNone(_infer_geometric_solution(inputs))
++
++    def test_unseen_test_colors_fall_back(self):
++        inputs = {
++            "train": [{"input": [[1, 0]], "output": [[1, 0]]}],
++            "test_input": [[2, 0]],
++        }
++        self.assertIsNone(_infer_geometric_solution(inputs))
++
++    def test_non_geometric_rule_falls_back(self):
++        inputs = {
++            "train": [{"input": [[1, 0], [0, 0]], "output": [[1, 1], [0, 0]]}],
++            "test_input": [[2, 0], [0, 0]],
++        }
++        self.assertIsNone(_infer_geometric_solution(inputs))
++
++
++if __name__ == "__main__":
++    unittest.main()

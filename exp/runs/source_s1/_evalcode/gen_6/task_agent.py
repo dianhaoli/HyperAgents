@@ -72,11 +72,6 @@ def build_prompt(inputs):
     parts.append(grid_to_text(t))
     parts.append("")
     parts.append(
-        "Infer one compact transformation rule from the demonstrations and check that it explains every "
-        "training pair, including object shapes, colors, positions, and grid dimensions. Apply that rule to "
-        "the test grid; do not assume its output has the same dimensions or layout as the input. Before "
-        "answering, check the proposed grid cell-by-cell and ensure it follows the rule. If multiple rules "
-        "fit, choose the simplest rule that explains all examples.\n\n"
         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
         "Put nothing else inside the tags."
@@ -142,9 +137,33 @@ class TaskAgent:
         except Exception:
             pass
 
-    def solve_once(self, inputs):
-        """One direct model response -> one parsed grid (or None)."""
+    def solve_once(self, inputs, candidate=None, independent=False):
+        """One direct model response -> one parsed grid (or None).
+
+        ``independent`` requests a fresh derivation without exposing an earlier
+        answer. ``candidate`` remains supported for callers that explicitly need
+        candidate verification.
+        """
         prompt = build_prompt(inputs)
+        if candidate is not None:
+            prompt += (
+                "\n\nIndependent verification of a previous candidate: "
+                f"{json.dumps(candidate)}\n"
+                "First infer the transformation from the demonstrations and check that it "
+                "accounts for every input/output pair. Compare the candidate with the test "
+                "input and that inferred rule; do not copy a demonstration output or accept "
+                "the candidate merely because it looks plausible. If the candidate fails "
+                "any check, correct it. Return the verified test grid in the required "
+                "<answer> tags, with nothing else inside the tags."
+            )
+        elif independent:
+            prompt += (
+                "\n\nSolve this independently; do not rely on or guess any previous "
+                "answer. Infer one concrete rule from the demonstrations and check that it "
+                "reproduces every output. Apply that rule from scratch to the test input, "
+                "checking the output dimensions and each region that changes. Return the "
+                "result in the required <answer> tags, with nothing else inside the tags."
+            )
         self.log(f"Input: {prompt}")
         text = call_model(prompt)
         self.log(f"Output: {text}")
@@ -158,9 +177,12 @@ class TaskAgent:
             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
         """
         answers = []
-        for _ in range(2):
+        for attempt in range(2):
             try:
-                g = self.solve_once(inputs)
+                # The second call is deliberately blind to the first grid: exposing
+                # it repeatedly anchored the model to wrong candidates in prior runs.
+                # Keep the same two-call budget while obtaining an independent answer.
+                g = self.solve_once(inputs, independent=(attempt == 1))
             except Exception as e:
                 self.log(f"Error: {e}")
                 g = None
