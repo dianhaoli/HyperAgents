@@ -14,5 +14,6 @@
   "rng_seed": 1103,
   "workers": 12,
   "name": "payoff_I0_3",
-  "root_commit": "0177d8534c3b48fda83af93e5afc8ac537a1327e"
+  "root_commit": "0177d8534c3b48fda83af93e5afc8ac537a1327e",
+  "done": true
 }

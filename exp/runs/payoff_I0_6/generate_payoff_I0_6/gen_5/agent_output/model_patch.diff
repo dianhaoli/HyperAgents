@@ -1,0 +1,84 @@
+diff --git a/task_agent.py b/task_agent.py
+index a486c9a..52182db 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,16 +50,30 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, alternate_strategy=False):
++    """Build a self-contained prompt, optionally using a distinct analysis strategy."""
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs share one rule mapping input grids to output grids. "
+-        "Infer the precise rule and apply it to the test input. First compare the examples carefully: note grid "
+-        "dimensions, object shapes and positions, colors, symmetry, and any repeated or unusual features. "
+-        "Check that your proposed rule reproduces every demonstration exactly before applying it. Do not assume "
+-        "the output has the same dimensions as the input; follow the examples. Avoid changing unrelated cells.",
++        "Infer the precise rule and apply it to the test input. Check that your proposed rule reproduces every "
++        "demonstration exactly before applying it. Do not assume the output has the same dimensions as the input; "
++        "follow the examples and avoid changing unrelated cells.",
+         "",
+     ]
++    if alternate_strategy:
++        parts.extend([
++            "Analyze this puzzle independently using a structural approach: identify the background, objects or "
++            "repeated regions, their colors and positions, and exactly what changes from input to output in each "
++            "example. Compare those changes across all examples, separate the shared rule from incidental details, "
++            "and check whether the output is assembled, expanded, or rearranged.",
++            "",
++        ])
++    else:
++        parts.extend([
++            "Compare the examples carefully: note grid dimensions, object shapes and positions, colors, symmetry, "
++            "and repeated or unusual features. Test the proposed rule against every example.",
++            "",
++        ])
+     for i, pair in enumerate(inputs["train"], 1):
+         parts.append(f"## Example {i}")
+         h, w = len(pair["input"]), len(pair["input"][0])
+@@ -83,7 +97,9 @@ def build_prompt(inputs):
+ 
+ 
+ def _valid(g):
+-    return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
++    # ARC-AGI-2 grids have at most 30 rows and 30 columns.
++    return (isinstance(g, list) and 0 < len(g) <= 30
++            and all(isinstance(r, list) and 0 < len(r) <= 30 for r in g)
+             and len({len(r) for r in g}) == 1
+             and all(isinstance(v, int) and not isinstance(v, bool) and 0 <= v <= 9 for r in g for v in r))
+ 
+@@ -140,17 +156,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs, previous_candidate=None):
+-        """Make one model attempt, optionally asking it to check an earlier candidate."""
+-        prompt = build_prompt(inputs)
+-        if previous_candidate is not None:
+-            prompt += (
+-                "\n\nA previous attempt proposed this candidate grid: "
+-                f"{json.dumps(previous_candidate)}\n"
+-                "Solve the puzzle independently from the demonstrations before judging that candidate. "
+-                "Check whether it follows the same rule as every example and has the correct dimensions. "
+-                "If it is wrong, correct it; if it is right, return it. Return your final grid using the required tags."
+-            )
++    def solve_once(self, inputs, alternate_strategy=False):
++        """Make an independent model attempt using the selected analysis strategy."""
++        prompt = build_prompt(inputs, alternate_strategy=alternate_strategy)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -166,9 +174,8 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                # Use the second allowed call to verify/refine the first answer rather than
+-                # spending both calls on identical prompts. Keep distinct candidates only.
+-                g = self.solve_once(inputs, previous_candidate=answers[0] if attempt and answers else None)
++                # Keep attempts independent to avoid anchoring, while varying the analysis strategy.
++                g = self.solve_once(inputs, alternate_strategy=bool(attempt))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

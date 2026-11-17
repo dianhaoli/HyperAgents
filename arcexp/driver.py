@@ -65,6 +65,20 @@ def tick():
         sh("bash", "arcexp/run_bg.sh", j, "python3", "-m", "arcexp.phases", "final", "--run", name, env=env)
         log(f"launched final exam for {name}")
         acted = True
+    # resume runs that stopped on an infrastructure abort (resumable), at most 15 times each
+    for name in sorted(os.listdir(runs)):
+        p = os.path.join(runs, name, "config.json")
+        if not os.path.exists(p) or name == "smoke":
+            continue
+        c = json.load(open(p))
+        if c.get("done") or job_alive(f"run_{name}"):
+            continue
+        n_abort = len(read_jsonl(os.path.join(runs, name, "infra_aborts.jsonl")))
+        if n_abort >= 15:
+            continue
+        sh("python3", "-c", f"from arcexp.orchestrate import launch; launch({name!r})")
+        log(f"resumed {name} (infra aborts so far: {n_abort})")
+        acted = True
     picks_p = os.path.join(EXP, "results", "ext_picks.json")
     for run in EXT_RUNS:
         out_dir = os.path.join(runs, run, f"generate_{run}")

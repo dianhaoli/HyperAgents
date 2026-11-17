@@ -2,3 +2,4 @@
 {"iteration": "3", "score": 0.7, "missing": 0, "infra_error_rows": 1, "n_test_inputs": 26, "code_hash": "f38b9f9ad5a32784", "format_failures": 1, "snapshot_skipped": []}
 {"iteration": "4", "score": 0.62, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "b845cf093feccdf7", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "5", "score": 0.64, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "40ad2a1c0271dd0d", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "8", "score": 0.62, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "5b73d6c474988b55", "format_failures": 0, "snapshot_skipped": []}

@@ -136,6 +136,7 @@ def call_openai(messages, effort, max_out):
     last_err = None
     for attempt in range(7):
         started = False
+        flagged_retry = False
         try:
             with requests.post("https://api.openai.com/v1/responses", json=body, stream=True,
                                timeout=(30, 300)) as r:  # read timeout = max silence between events
@@ -160,8 +161,19 @@ def call_openai(messages, effort, max_out):
                         return ev["response"]
                     if et in ("response.failed", "error"):
                         err = ev.get("response", {}).get("error") or ev.get("error") or ev
+                        code = err.get("code") if isinstance(err, dict) else None
+                        if code == "invalid_prompt" or "flagged" in str(err):
+                            # content refusal (as a non-streamed 400 before): retry twice, then the caller's own failure
+                            if attempt < 2:
+                                flagged_retry = True
+                                break
+                            raise UpstreamError(f"stream failure: {str(err)[:400]}", client=True)
                         raise UpstreamError(f"stream failure: {str(err)[:400]}", possibly_billed=True)
-                raise UpstreamError("stream ended without completion", possibly_billed=started)
+                else:
+                    raise UpstreamError("stream ended without completion", possibly_billed=started)
+                if flagged_retry:
+                    time.sleep(2)
+                    continue
         except UpstreamError:
             raise
         except Exception as e:

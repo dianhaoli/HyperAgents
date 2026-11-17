@@ -7,3 +7,6 @@ generate_loop: generation 15 completed, parent 15
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_16', 'current_genid': 16, 'parent_genid': 15, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
 generate_loop: generation 16 completed, parent 9
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_17', 'current_genid': 17, 'parent_genid': 9, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 17 completed, parent 5
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_18', 'current_genid': 18, 'parent_genid': 5, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+INFRA ABORT (resumable): upstream errors during meta step (rc=0, patch=False)
