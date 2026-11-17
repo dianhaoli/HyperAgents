@@ -1,0 +1,89 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..613c1ca 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -54,7 +54,9 @@ def build_prompt(inputs):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "that maps each input grid to its output grid. Infer the rule and apply it to the test input. "
++        "Use every demonstration to check the rule: mentally apply it to each example and reject any "
++        "interpretation that fails to reproduce an example exactly.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -79,6 +81,22 @@ def build_prompt(inputs):
+     return "\n".join(parts)
+ 
+ 
++def build_review_prompt(inputs, previous_candidate):
++    """Ask the second attempt to audit, rather than repeat, the first attempt."""
++    return (
++        build_prompt(inputs)
++        + "\n\n## Audit of the first attempt\n"
++        + "The first attempt proposed this test output (JSON):\n"
++        + json.dumps(previous_candidate)
++        + "\nIndependently infer the transformation again from ALL training pairs. Check whether this "
++        + "candidate follows the rule in every region; do not copy it without checking. In particular, "
++        + "verify the output dimensions, object and color roles, directions or symmetry, boundaries, "
++        + "and cells that should remain unchanged. If the candidate is inconsistent with the examples, "
++        + "correct it. If it is consistent, return it. Return only your best complete grid inside "
++        + "<answer></answer> tags, with valid JSON rows."
++    )
++
++
+ def _valid(g):
+     return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
+             and len({len(r) for r in g}) == 1
+@@ -137,9 +155,13 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def solve_once(self, inputs, previous_candidate=None):
++        """One model response -> one parsed grid (or None), optionally auditing a prior answer."""
++        prompt = (
++            build_prompt(inputs)
++            if previous_candidate is None
++            else build_review_prompt(inputs, previous_candidate)
++        )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,12 +175,21 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
+-            try:
+-                g = self.solve_once(inputs)
+-            except Exception as e:
+-                self.log(f"Error: {e}")
+-                g = None
+-            if g is not None:
+-                answers.append(g)
++        # Preserve the first candidate as a fallback. The second call gets a different task:
++        # independently derive and audit the first answer against all demonstrations.
++        try:
++            first = self.solve_once(inputs)
++        except Exception as e:
++            self.log(f"Error: {e}")
++            first = None
++        if first is not None:
++            answers.append(first)
++
++        try:
++            second = self.solve_once(inputs, previous_candidate=first)
++        except Exception as e:
++            self.log(f"Error: {e}")
++            second = None
++        if second is not None and second not in answers:
++            answers.append(second)
+         return answers, []
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..663f0ea
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

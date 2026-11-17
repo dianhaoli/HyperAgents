@@ -1,0 +1,44 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..3300fa4 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -137,9 +137,18 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
++    def solve_once(self, inputs, previous_candidate=None):
++        """Make one model call and parse its grid response, if any."""
+         prompt = build_prompt(inputs)
++        if previous_candidate is not None:
++            prompt += (
++                "\n\nA first attempt proposed this candidate test output:\n"
++                f"{json.dumps(previous_candidate)}\n"
++                "Do not assume that candidate is correct. Independently re-check the inferred rule "
++                "against every training input-output pair, then compare the rule's result with the "
++                "candidate. Correct any mismatch and return your best final grid in the required "
++                "<answer> tags."
++            )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,9 +162,12 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                # Spend the second call on explicit rule verification when the first
++                # call produced a parseable candidate; otherwise make another attempt.
++                previous = answers[0] if attempt == 1 and answers else None
++                g = self.solve_once(inputs, previous_candidate=previous)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..e0340e1
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

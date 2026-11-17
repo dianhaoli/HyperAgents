@@ -1,0 +1,60 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..73e0eed 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,13 +50,24 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, independent_attempt=False):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
+         "",
+     ]
++    if independent_attempt:
++        parts.extend([
++            "Solve this independently using a deliberate grid comparison, not a guess based on one example.",
++            "First determine whether the output dimensions change. Compare each training input and output "
++            "cell by cell (using row and column positions), noting what stays fixed and what changes. "
++            "Look for one simple operation that explains every example, including object shapes, positions, "
++            "colors, repetition, symmetry, and boundaries where relevant. Check the operation against all "
++            "training pairs before applying it to the test; do not assume unchanged background cells or "
++            "the input dimensions without checking.",
++            "",
++        ])
+     for i, pair in enumerate(inputs["train"], 1):
+         parts.append(f"## Example {i}")
+         h, w = len(pair["input"]), len(pair["input"][0])
+@@ -137,9 +148,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def solve_once(self, inputs, independent_attempt=False):
++        """One model response -> one parsed grid (or None)."""
++        prompt = build_prompt(inputs, independent_attempt=independent_attempt)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,11 +164,13 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        # Keep both attempts independent so the second answer can provide useful
++        # diversity, while using a more systematic grid-comparison checklist.
++        for attempt_number, independent_attempt in enumerate((False, True), start=1):
+             try:
+-                g = self.solve_once(inputs)
++                g = self.solve_once(inputs, independent_attempt=independent_attempt)
+             except Exception as e:
+-                self.log(f"Error: {e}")
++                self.log(f"Error on attempt {attempt_number}: {e}")
+                 g = None
+             if g is not None:
+                 answers.append(g)

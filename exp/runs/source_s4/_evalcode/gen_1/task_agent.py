@@ -50,16 +50,11 @@ def grid_to_text(grid):
     return "\n".join(" ".join(str(v) for v in row) for row in grid)
 
 
-def build_prompt(inputs, candidate=None):
+def build_prompt(inputs):
     parts = [
         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
-        "(each integer is a color). The demonstration pairs share one hidden transformation rule. "
-        "Infer a precise rule from all of the demonstrations, then apply it to the test input.",
-        "",
-        "Reason carefully about what changes and what stays fixed. Check that your proposed rule "
-        "reproduces every training output, including colors, positions, shapes, and grid dimensions, "
-        "before applying it to the test. Do not assume that a pattern or color is irrelevant just "
-        "because it appears only once.",
+        "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
         "",
     ]
     for i, pair in enumerate(inputs["train"], 1):
@@ -76,20 +71,9 @@ def build_prompt(inputs, candidate=None):
     parts.append(f"Input ({len(t)}x{len(t[0])}):")
     parts.append(grid_to_text(t))
     parts.append("")
-    if candidate is not None:
-        parts.extend([
-            "## Candidate from the first attempt",
-            "The first attempt proposed this grid:",
-            json.dumps(candidate, separators=(",", ":")),
-            "Review it rather than copying it automatically. Re-check the rule against every "
-            "training pair and inspect the test grid for missed, misplaced, or extra changes. "
-            "Return the candidate if it is correct; otherwise return your corrected grid.",
-            "",
-        ])
     parts.append(
         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
-        "tags as a JSON list of rows, for example:\n"
-        "<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+        "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
         "Put nothing else inside the tags."
     )
     return "\n".join(parts)
@@ -153,9 +137,18 @@ class TaskAgent:
         except Exception:
             pass
 
-    def solve_once(self, inputs, candidate=None):
-        """One direct model response -> one parsed grid (or None)."""
-        prompt = build_prompt(inputs, candidate=candidate)
+    def solve_once(self, inputs, previous_candidate=None):
+        """Make one model call and parse its grid response, if any."""
+        prompt = build_prompt(inputs)
+        if previous_candidate is not None:
+            prompt += (
+                "\n\nA first attempt proposed this candidate test output:\n"
+                f"{json.dumps(previous_candidate)}\n"
+                "Do not assume that candidate is correct. Independently re-check the inferred rule "
+                "against every training input-output pair, then compare the rule's result with the "
+                "candidate. Correct any mismatch and return your best final grid in the required "
+                "<answer> tags."
+            )
         self.log(f"Input: {prompt}")
         text = call_model(prompt)
         self.log(f"Output: {text}")
@@ -169,15 +162,15 @@ class TaskAgent:
             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
         """
         answers = []
-        # Treat the two-call budget as two independent attempts. A review of the first
-        # answer can anchor the model on an incorrect hypothesis, while independent
-        # proposals give the evaluator two distinct chances to include the right grid.
         for attempt in range(2):
             try:
-                answer = self.solve_once(inputs)
+                # Spend the second call on explicit rule verification when the first
+                # call produced a parseable candidate; otherwise make another attempt.
+                previous = answers[0] if attempt == 1 and answers else None
+                g = self.solve_once(inputs, previous_candidate=previous)
             except Exception as e:
-                self.log(f"Error on attempt {attempt + 1}: {e}")
-                continue
-            if answer is not None and answer not in answers:
-                answers.append(answer)
-        return answers[:2], []
+                self.log(f"Error: {e}")
+                g = None
+            if g is not None:
+                answers.append(g)
+        return answers, []
