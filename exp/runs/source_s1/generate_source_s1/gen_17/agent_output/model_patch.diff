@@ -1,0 +1,24 @@
+diff --git a/task_agent.py b/task_agent.py
+index 6a37c90..d471e6a 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -217,9 +217,16 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                # A fresh second derivation avoids anchoring on a plausible-but-wrong
+-                # first grid, while preserving the two-call/two-answer budget.
+-                g = self.solve_once(inputs, independent=(attempt == 1))
++                if attempt == 1 and answers:
++                    # Use the second call to audit a concrete first candidate against
++                    # every demonstration, rather than spending both calls on
++                    # independent derivations. ARC misses often come from a rule that
++                    # sounds plausible but does not reproduce all demonstrated edits.
++                    g = self.solve_once(inputs, candidate=answers[0])
++                else:
++                    # If the first response had no parseable grid, there is no
++                    # candidate to audit; use the remaining call for a fresh solve.
++                    g = self.solve_once(inputs, independent=(attempt == 1))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

@@ -8,3 +8,4 @@
 {"iteration": "15", "score": 0.84, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "2672f0d64eb57ae6", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "18", "score": 0.88, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "0c2d4bb16aca5fd4", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "20", "score": 0.76, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "02200e28f96dad4c", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "21", "score": 0.76, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "dd44cfdd472eda55", "format_failures": 0, "snapshot_skipped": []}

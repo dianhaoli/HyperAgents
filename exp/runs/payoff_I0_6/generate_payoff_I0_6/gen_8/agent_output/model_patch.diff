@@ -1,0 +1,44 @@
+diff --git a/task_agent.py b/task_agent.py
+index c90579c..640a9e6 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -83,7 +83,9 @@ def build_prompt(inputs):
+ 
+ 
+ def _valid(g):
+-    return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
++    # ARC grids are bounded; reject numeric tables from surrounding explanation.
++    return (isinstance(g, list) and 0 < len(g) <= 30
++            and all(isinstance(r, list) and 0 < len(r) <= 30 for r in g)
+             and len({len(r) for r in g}) == 1
+             and all(isinstance(v, int) and not isinstance(v, bool) and 0 <= v <= 9 for r in g for v in r))
+ 
+@@ -125,7 +127,27 @@ def parse_grid(text):
+         g = _parse_block(m)
+         if g is not None:
+             return g
+-    return None
++
++    # Models sometimes omit the requested tags and include their grid in prose.
++    # Decode complete JSON values rather than using a greedy bracket regex, which
++    # can truncate grids or mistake a row for a complete answer. Prefer the last
++    # valid grid, as the explicit-answer paths above do.
++    decoder = json.JSONDecoder()
++    candidate = None
++    i = 0
++    while i < len(text):
++        if text[i] != "[":
++            i += 1
++            continue
++        try:
++            value, end = decoder.raw_decode(text, i)
++        except (json.JSONDecodeError, ValueError):
++            i += 1
++            continue
++        if _valid(value):
++            candidate = value
++        i = max(i + 1, end)
++    return candidate
+ 
+ 
+ class TaskAgent:
