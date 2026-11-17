@@ -1,4 +1,6 @@
 def get_domain_score_key(domain):
+    if domain == "arc":
+        return "overall_accuracy"
     # Human preferences domains
     if domain in ["search_arena", "paper_review", "imo_grading"]:
         return "overall_accuracy"
@@ -17,6 +19,8 @@ def get_domain_score_key(domain):
 
 
 def get_domain_splits(domain, eval_test=False):
+    if domain == "arc":
+        return ["train"]  # the run's task set (source set or pay-off set); held-out is scored outside the loop
     # Human preferences domains
     if domain in ["search_arena", "paper_review", "imo_grading"]:
         splits = ["train", "val"]
@@ -38,6 +42,8 @@ def get_domain_splits(domain, eval_test=False):
 
 
 def can_domain_ensembled(domain):
+    if domain == "arc":
+        return False
     # Human preferences domains
     if domain in ["search_arena", "paper_review"]:
         return True
@@ -59,6 +65,8 @@ def can_domain_ensembled(domain):
 
 
 def get_domain_eval_subset(domain):
+    if domain == "arc":
+        return "_source"
     # Human preferences domains
     if domain in ["search_arena", "paper_review"]:
         return "_filtered_100_train"
@@ -80,6 +88,8 @@ def get_domain_eval_subset(domain):
 
 
 def get_domain_test_subset(domain):
+    if domain == "arc":
+        return ""
     # Human preferences domains
     if domain in ["search_arena", "paper_review"]:
         return "_filtered_100_test"
@@ -101,6 +111,8 @@ def get_domain_test_subset(domain):
 
 
 def get_domain_stagedeval_samples(domain):
+    if domain == "arc":
+        return -1  # staged eval is skipped for arc
     # Human preferences domains
     if domain in ["search_arena", "paper_review"]:
         return 10
@@ -122,6 +134,8 @@ def get_domain_stagedeval_samples(domain):
 
 
 def get_domain_stagedeval_frac(domain):
+    if domain == "arc":
+        return 1.0  # staged eval is skipped for arc; scores are never rescaled
     # NOTE: this is hardcoded wrt get_domain_stagedeval_samples and default domain configs
     # Human preferences domains
     if domain in ["search_arena", "paper_review"]:
@@ -146,6 +160,8 @@ def get_domain_stagedeval_frac(domain):
 
 
 def has_domain_val_subset(domain):
+    if domain == "arc":
+        return False
     # Human preferences domains
     if domain in ["search_arena", "paper_review"]:
         return True

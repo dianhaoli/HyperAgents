@@ -1,0 +1,2 @@
+{"name": "smoke", "phase": "smoke", "arm": "I0", "seed": 0, "task_set": "smoke", "max_generation": 1,
+ "template_dir": "agent_template", "freeze_paths": [], "rng_seed": 1, "workers": 12}

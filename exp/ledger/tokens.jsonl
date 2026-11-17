@@ -1,0 +1,2 @@
+{"token": "cfeb0b1324bb3ea9ad141b25a3c723d1", "role": "probe", "scope": {"phase": "sbtest"}, "effort_role": "probe", "registered_at": 1794895211.2054312}
+{"token": "30d983e24d9bab13d59f35d1257db0e8", "role": "task", "scope": {"phase": "devtest", "arm": "A0", "seed": 0, "iteration": 0, "task": "00576224", "test_input": 0}, "effort_role": "task", "registered_at": 1794895376.7050443}

@@ -1,2 +1,6 @@
 outputs/
 outputs_os/
+exp/stage/
+exp/runs/*/_ctmp/
+__pycache__/
+*.pyc
