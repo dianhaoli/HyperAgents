@@ -1,0 +1,84 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..d642c8e 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -54,7 +54,11 @@ def build_prompt(inputs):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "that maps each input grid to its output grid. Infer the simplest rule that explains every pair, "
++        "then apply it to the test input. Work systematically: compare dimensions, colors and object "
++        "positions; consider rotations/reflections, recoloring, counting, symmetry, and changes to "
++        "individual objects or cells. Check your proposed rule against every example before answering. "
++        "Do not assume the output has the same dimensions as the input.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -72,13 +76,28 @@ def build_prompt(inputs):
+     parts.append(grid_to_text(t))
+     parts.append("")
+     parts.append(
+-        "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+-        "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
++        "Briefly state the inferred rule and why it fits the examples, then give the output grid. "
++        "End your response with the grid inside <answer></answer> tags as a JSON list of rows, "
++        "for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+         "Put nothing else inside the tags."
+     )
+     return "\n".join(parts)
+ 
+ 
++def build_review_prompt(inputs, first_answer):
++    """Use the second budgeted attempt to check and improve the first candidate."""
++    prompt = build_prompt(inputs)
++    candidate = json.dumps(first_answer, separators=(",", ":"))
++    return (
++        prompt
++        + "\n\nA first attempt proposed this candidate output: " + candidate + ".\n"
++        + "Independently infer the rule from the training pairs and verify the candidate cell by cell. "
++        + "If it is consistent with the examples and test input, you may return it. Otherwise correct it. "
++        + "Consider a genuinely different plausible interpretation before deciding. Return your best "
++        + "candidate in the required <answer> tags."
++    )
++
++
+ def _valid(g):
+     return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
+             and len({len(r) for r in g}) == 1
+@@ -137,9 +156,10 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
++    def solve_once(self, inputs, prompt=None):
+         """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++        if prompt is None:
++            prompt = build_prompt(inputs)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,12 +173,19 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        # The second and final permitted call is a review, not a blind duplicate:
++        # it checks the first candidate against all demonstrations and can return
++        # a corrected candidate. If the first call failed to yield a grid, make a
++        # fresh independent attempt instead.
++        for attempt in range(2):
++            prompt = None
++            if attempt == 1 and answers:
++                prompt = build_review_prompt(inputs, answers[0])
+             try:
+-                g = self.solve_once(inputs)
++                g = self.solve_once(inputs, prompt=prompt)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+-            if g is not None:
++            if g is not None and g not in answers:
+                 answers.append(g)
+         return answers, []

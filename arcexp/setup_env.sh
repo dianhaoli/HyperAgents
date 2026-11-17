@@ -2,7 +2,7 @@
 # One-time (idempotent) VM setup. Re-run after a VM rebuild. Usage: bash arcexp/setup_env.sh
 set -e
 cd "$(dirname "$0")/.."
-pip install -q GitPython==3.1.44 backoff docker matplotlib scipy numpy pandas requests 2>&1 | grep -v WARNING || true
+pip install -q GitPython==3.1.44 backoff docker matplotlib scipy numpy pandas requests networkx 2>&1 | grep -v WARNING || true
 id arcagent >/dev/null 2>&1 || useradd -M -u 30033 -d /nonexistent -s /usr/sbin/nologin arcagent
 chmod 700 /home/user /root
 mkdir -p /opt/arc_private && chmod 700 /opt/arc_private

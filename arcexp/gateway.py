@@ -124,7 +124,7 @@ def extract_text(d):
             for c in o.get("content", []) or []:
                 if c.get("type") in ("output_text", "text"):
                     texts.append(c.get("text", ""))
-    return "".join(texts)
+    return "\n".join(t for t in texts if t)
 
 
 class AgentHandler(http.server.BaseHTTPRequestHandler):

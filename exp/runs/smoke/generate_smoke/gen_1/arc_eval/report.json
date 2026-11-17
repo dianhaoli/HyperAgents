@@ -1,0 +1,31 @@
+{
+  "overall_accuracy": 0.75,
+  "total": 10,
+  "total_test_inputs": 13,
+  "per_task_score": {
+    "28e73c20": 0.0,
+    "337b420f": 1.0,
+    "4be741c5": 1.0,
+    "4ff4c9da": 0.0,
+    "57aa92db": 1.0,
+    "59341089": 1.0,
+    "b27ca6d3": 1.0,
+    "d6e50e54": 1.0,
+    "dc433765": 1.0,
+    "fbf15a0b": 0.5
+  },
+  "question_ids_passed": [
+    "337b420f",
+    "4be741c5",
+    "57aa92db",
+    "59341089",
+    "b27ca6d3",
+    "d6e50e54",
+    "dc433765"
+  ],
+  "question_ids_failed": [
+    "28e73c20",
+    "4ff4c9da",
+    "fbf15a0b"
+  ]
+}

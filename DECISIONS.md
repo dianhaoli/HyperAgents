@@ -1,0 +1,75 @@
+# Decisions log
+
+Choices made while running the pre-registered experiment unattended. Newest at the bottom.
+The user allowed deviations from the prompt's design where clearly better; each deviation is marked **DEVIATION**.
+
+## Infrastructure
+1. **Branch.** Work is committed to `arc2-improver` (the branch the user asked for) and mirrored to the
+   session branch `claude/determined-johnson-g5g9yj`.
+2. **OpenAI auth.** `curl https://api.openai.com/v1/models` with no auth header works (proxy-injected). No key is
+   read or stored. `gpt-6-luna` is listed.
+3. **API and effort.** The Chat Completions API rejects `reasoning_effort: "max"` for gpt-6-luna (supports up to
+   `xhigh`). The Responses API accepts `reasoning.effort: "max"` and echoes it back, so the gateway uses the
+   Responses API for every call. The effort the API echoes is logged with each call in `exp/ledger/calls.jsonl`.
+4. **Meta-agent effort = high (user request).** The prompt specified max. Mid-run the user asked for high
+   instead of xhigh/max, so the meta agent runs at `high`. The task agent runs at `high`; the one check pass runs at `xhigh`.
+5. **No Docker.** The Docker daemon is not running, and the repo's image is a CUDA image with GPU and simulator
+   dependencies. This VM is the sandbox instead: every agent process runs through `arcexp/sandbox.py`.
+   That means fresh mount, network and pid namespaces, uid `arcagent` with all capabilities dropped and
+   `no_new_privs`, a clean environment, the agent repo bound at `/hyperagents`, and a private `/tmp`.
+   *Removing the proxy variables alone does not remove network access here*: a direct HTTPS request without
+   them succeeded (HTTP 200 from pypi.org). That is why the sandbox uses an empty network namespace,
+   not just env stripping. The only route out is the gateway's unix socket.
+6. **Budget wrapper = a separate process.** `arcexp/gateway.py` runs as root outside every agent-editable tree and
+   holds the only route to OpenAI. It fixes the model and effort per role, the 2-call cap per test input
+   (one token per test input), the 600k-token cap per meta iteration (one token per iteration), the
+   $150 global refusal, and the ledger by role. Agents' `agent/llm.py` and `task_agent.py` are thin clients.
+   When a meta iteration's 600k tokens run out, the gateway returns a normal reply saying the budget is
+   exhausted, so the iteration ends gracefully and its diff is still collected. It does not return an
+   error, which would crash `run_meta_agent.py`, lose the diff and mark the parent invalid.
+   Infra failures (upstream errors) do not consume a call slot.
+7. **Answer isolation.** Ground truth lives only in `/opt/arc_private` (mode 700, root). The experiment repo
+   `/home/user` (700) holds private logs. Agents see only what is bound into their sandbox. Scoring is
+   host-side. Agent-visible eval output has per-task scores, wrong answers only, and chat logs only for
+   unsolved test inputs, with any grid equal to a true output of that task redacted.
+   `arcexp/isolation_check.py` probes as the agent user, scans every agent-readable file on the filesystem,
+   and scans every agent-visible tree on the host for test outputs (3 serializations) and held-out grids.
+   A planted leak is detected (tested).
+8. **Code sandbox (30 s).** Task agents run model-written code via `arc_sandbox.run_python` (read-only at
+   `/opt/arc_runner`): no network, a fresh temp dir holding only `task.json` (that task's pairs + the test input),
+   and 30 s wall clock per test input in total. The whole `forward()` for one test input runs in its own
+   sandbox with cwd `/tmp/task` holding only that task's pairs and test input. It has a 30-minute limit,
+   because two high-effort calls cannot fit in 30 s.
+9. **Loop adapter.** `arcexp/run_loop.py` runs the repo's `generate_loop.py` unchanged by importing it and
+   swapping only the infrastructure functions. Docker container ops become `LocalContainer`, which runs the same
+   commands in the sandbox. `eval_produced_agent` becomes a host-side ARC evaluator: answers must not
+   enter the agent's environment, so `domains/report.py` cannot score inside it. Plotting is a no-op.
+   Parent selection (`score_child_prop`), archive, lineage patches, the `domains/` reset, compile checks and
+   validity rules are the repo's own. Staged eval is skipped (`--skip_staged_eval`), matching the pre-registered
+   call counts. `stagedeval_frac("arc") = 1`, so scores are never rescaled.
+10. **Agent repo template.** The original copies the host repo (incl. `.git`). Here the agent repo is built from
+    `agent_template/` (repo files + ARC A_0 + gateway client in `agent/llm.py`) with its own fresh git repo.
+    Without that, `git add` walked up and committed into the host repo; the bad commits were reset.
+11. **Crash/resume.** On resume the agent repo is hard-reset to the recorded root commit. The original
+    resumed from whatever HEAD was, which is wrong after a mid-generation crash. Eval results are skipped
+    only if the agent code hash matches, so a re-run iteration with new code is re-evaluated (key + code hash).
+12. **Answer handling.** `forward()` returns up to 2 grids. The runner normalises and validates them. The host
+    keeps the first 2 valid grids. A test input is solved if either equals the truth. JSONL rows are written
+    per attempt (1, 2).
+
+## A_0 / I_0
+13. **A_0** = `agent_template/task_agent.py`. `solve_once` is one direct response: pairs as digit rows, answer
+    as a JSON list of rows in `<answer>` tags, with a tolerant parser (JSON, digit rows, code block, last
+    `[[...]]`). `forward` = two independent `solve_once` attempts, the "two plain attempts" standard budget.
+    It is self-contained (no imports from `agent/`), so a meta-code transplant cannot change A_0.
+14. **DEVIATION: I_0 instruction.** With the verbatim instruction ("Modify any part of the codebase at
+    `/hyperagents/`."), gpt-6-luna asked a clarifying question in 6/6 samples and never edited anything. That is
+    the stop condition "meta agent cannot produce one working code edit", and it would make the experiment
+    degenerate. One sentence is appended: the README describes the goal; earlier agents and results are at
+    `{eval_path}` (an argument `forward` already receives); work autonomously; a reply with no tool call ends
+    the session. No ARC-specific hints. Both arms start from this same I_0.
+15. **DEVIATION: tool-call parsing.** gpt-6-luna emits tool JSON without `<json>` tags in about 25% of replies,
+    and sometimes ends a turn after only announcing a plan. Two adaptations in `agent/llm_withtools.py`:
+    a bare `{"tool_name","tool_input"}` object is accepted when no `<json>` block exists, and a reply with no
+    tool call is nudged at most twice in a row ("make the next tool call, or reply DONE").
+    Same starting point for both arms; evolved agents may change it.

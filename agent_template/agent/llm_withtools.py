@@ -77,6 +77,20 @@ def check_for_tool_uses(response):
         except json.JSONDecodeError:
             continue  # Skip malformed JSON blocks
 
+    # [experiment adaptation, see DECISIONS.md] also accept a bare JSON tool call without <json> tags
+    if not tool_uses:
+        dec = json.JSONDecoder()
+        i = response.find('{')
+        while i != -1:
+            try:
+                obj, end = dec.raw_decode(response, i)
+                if isinstance(obj, dict) and 'tool_name' in obj and 'tool_input' in obj:
+                    tool_uses.append(obj)
+                    break
+            except json.JSONDecodeError:
+                pass
+            i = response.find('{', i + 1)
+
     return tool_uses if tool_uses else None
 
 def process_tool_call(tools_dict, tool_name, tool_input):
@@ -123,7 +137,25 @@ def chat_with_agent(
         # Tool use
         tool_uses = check_for_tool_uses(response)
         retry_tool_use = should_retry_tool_use(response, tool_uses)
-        while tool_uses or retry_tool_use:
+        num_nudges = 0
+        while True:
+            # [experiment adaptation, see DECISIONS.md] gpt-6-luna sometimes ends a turn after only
+            # announcing what it will do; nudge (at most 2 times in a row) before treating it as finished.
+            if not (tool_uses or retry_tool_use):
+                if num_nudges >= 2 or 'DONE' in response or (max_tool_calls > 0 and num_tool_calls >= max_tool_calls):
+                    break
+                num_nudges += 1
+                nudge = ("No tool call was found in your last response. If you are not finished, make the next tool call now, "
+                         "using exactly the <json> format above. If you are finished, reply with the single word DONE.")
+                logging(f"Nudge: {repr(nudge)}")
+                response, new_msg_history, info = get_response_fn(
+                    msg=nudge, model=model, msg_history=new_msg_history,
+                )
+                logging(f"Output: {repr(response)}")
+                tool_uses = check_for_tool_uses(response)
+                retry_tool_use = should_retry_tool_use(response, tool_uses)
+                continue
+            num_nudges = 0
             # Check for max tool calls
             if max_tool_calls > 0 and num_tool_calls >= max_tool_calls:
                 logging("Error: Maximum number of tool calls reached.")

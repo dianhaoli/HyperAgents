@@ -14,5 +14,11 @@ class MetaAgent(AgentSystem):
             iterations_left (int, optional): The number of remaining iterations in which the meta agent will be invoked in future. Defaults to None.
         """
         instruction = f"Modify any part of the codebase at `{repo_path}`."
+        # [experiment adaptation, see DECISIONS.md] gpt-6-luna otherwise asks for clarification and never edits.
+        instruction += (
+            f"\n\nThe repository's README.md describes the goal. Previously generated agents and their evaluation results are at `{eval_path}`. "
+            "Work autonomously: nobody will answer questions, so do not ask for clarification. "
+            "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
+        )
 
         new_msg_history = chat_with_agent(instruction, model=self.model, msg_history=[], logging=self.log, tools_available='all')

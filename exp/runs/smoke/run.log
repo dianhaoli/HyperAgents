@@ -1,0 +1,3 @@
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/smoke/generate_smoke/gen_1', 'current_genid': 1, 'parent_genid': 'initial', 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 1 completed, parent 1
+RUN DONE smoke

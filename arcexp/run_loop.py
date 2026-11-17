@@ -163,13 +163,29 @@ def arc_setup_initial_gen(output_dir, domains, copy_root_dir=None, subsets=[], r
         subprocess.run(["git", "-C", root_dir, "reset", "-q", "--hard", cfg["root_commit"]], check=True)
         subprocess.run(["git", "-C", root_dir, "clean", "-fdq"], check=True)
         return root_dir, cfg["root_commit"]
-    root_dir, _ = _orig_setup(output_dir, domains, copy_root_dir=copy_root_dir, subsets=subsets, resume=False, **kw)
+    # The template has no .git of its own (the original copies the host repo incl. .git); give the
+    # agent repo its own git repo so commits never land in the host repository.
+    root_dir_pre = os.path.abspath(os.path.join(output_dir, "gen_initial/hyperagents"))
+    _orig_commit = GLU.commit_repo
+
+    def _commit_with_init(d, *a2, **k2):
+        if not os.path.isdir(os.path.join(d, ".git")):
+            subprocess.run(["git", "init", "-q", d], check=True)
+        return _orig_commit(d, *a2, **k2)
+    GLU.commit_repo = _commit_with_init
+    try:
+        root_dir, _ = _orig_setup(output_dir, domains, copy_root_dir=copy_root_dir, subsets=subsets, resume=False, **kw)
+    finally:
+        GLU.commit_repo = _orig_commit
+    assert os.path.isdir(os.path.join(root_dir, ".git")) and root_dir == root_dir_pre
     ddir = os.path.join(root_dir, "domains", "arc", "data")
     os.makedirs(ddir, exist_ok=True)
     with open(os.path.join(ddir, "tasks.json"), "w") as f:
         json.dump([arc_data.visible_task(t) for t in CTX["task_ids"]], f)
     from utils.git_utils import commit_repo
     commit = commit_repo(root_dir)
+    top = subprocess.run(["git", "-C", root_dir, "rev-parse", "--show-toplevel"], capture_output=True, text=True).stdout.strip()
+    assert os.path.realpath(top) == os.path.realpath(root_dir), f"agent repo git toplevel is {top}"
     chown_agent(root_dir)
     for p in CTX.get("freeze_paths", []):  # frozen meta files: root-owned, read-only to the agent
         fp = os.path.join(root_dir, p)
@@ -187,7 +203,7 @@ def arc_setup_initial_gen(output_dir, domains, copy_root_dir=None, subsets=[], r
 
 
 def arc_generate(*a, **kw):
-    CTX["current_genid"] = kw.get("current_genid")
+    CTX["current_genid"] = kw["current_genid"] if "current_genid" in kw else a[4]
     return _orig_generate(*a, **kw)
 
 
