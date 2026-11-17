@@ -108,7 +108,9 @@ def call_openai(messages, effort, max_out):
                 return d
             last_err = f"HTTP {r.status_code}: {r.text[:500]}"
             if r.status_code in (400, 401, 403, 404):
-                raise RuntimeError(last_err)
+                # sporadic false-positive "flagged" 400s: retry those twice, everything else is final
+                if not (r.status_code == 400 and "flagged" in r.text and attempt < 2):
+                    raise RuntimeError(last_err)
         except RuntimeError:
             raise
         except Exception as e:

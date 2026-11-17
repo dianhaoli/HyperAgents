@@ -1,0 +1,24 @@
+{
+ "B0_reps": [],
+ "B0": null,
+ "I0_runs": {},
+ "Ig_runs": {},
+ "n_source_seeds": 0,
+ "n_qualifying_Ig": 0,
+ "sd": {
+  "B0": null,
+  "I0": null,
+  "Ig": null
+ },
+ "headline": "Neither improver beat two plain attempts on ARC-AGI-2",
+ "self_edit": {},
+ "self_edit_rate": null,
+ "spend_by_role": {
+  "probe": 9.3e-06,
+  "task": 0.33535101999999994,
+  "meta": 0.04166185000000001
+ },
+ "spend_total": 0.37702216999999993,
+ "tokens_by_arm": {},
+ "final_runs": []
+}
