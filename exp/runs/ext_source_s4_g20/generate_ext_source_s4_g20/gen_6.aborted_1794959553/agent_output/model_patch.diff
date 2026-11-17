@@ -1,0 +1,39 @@
+diff --git a/task_agent.py b/task_agent.py
+index e28f329..7e1bcca 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -162,22 +162,17 @@ class TaskAgent:
+         Returns:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 distinct candidate grids.
+         """
++        # Keep the two budgeted attempts independent. Showing the first answer in the second
++        # prompt anchors the model to its earlier hypothesis; prior evaluation of that strategy
++        # regressed from 0.62 to 0.42 accuracy. A fresh derivation gives the evaluator two
++        # genuinely separate candidates to choose from.
+         answers = []
+-        try:
+-            first = self.solve_once(inputs)
+-        except Exception as e:
+-            self.log(f"Error: {e}")
+-            first = None
+-        if first is not None:
+-            answers.append(first)
+-
+-        # Use the second call as an independent check of the first hypothesis. If the first
+-        # response could not be parsed, it remains a fresh attempt with the original prompt.
+-        try:
+-            second = self.solve_once(inputs, previous_candidate=first)
+-        except Exception as e:
+-            self.log(f"Error: {e}")
+-            second = None
+-        if second is not None and second not in answers:
+-            answers.append(second)
++        for _ in range(2):
++            try:
++                candidate = self.solve_once(inputs)
++            except Exception as e:
++                self.log(f"Error: {e}")
++                candidate = None
++            if candidate is not None and candidate not in answers:
++                answers.append(candidate)
+         return answers, []

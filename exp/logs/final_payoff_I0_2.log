@@ -12,3 +12,7 @@ payoff_I0_2 cand gen_4: loop score 0.740 rescore 0.680 combined 0.710
 [eval] {'phase': 'heldout', 'arm': 'I0', 'seed': 'r2', 'iteration': 4} round 0: 53 test inputs to run (114 cached)
 [eval] {'phase': 'heldout', 'arm': 'I0', 'seed': 'r2', 'iteration': 4} round 1: 15 test inputs to run (152 cached)
 {"run": "payoff_I0_2", "arm": "I0", "seed": "r2", "source_seed": null, "node_scores": {"initial": 0.62, "1": 0.58, "2": 0.56, "3": 0.76, "4": 0.74, "5": 0.62, "6": 0.6, "7": 0.62}, "candidates": ["3", "4"], "combined": {"3": 0.6699999999999999, "4": 0.71}, "final_node": "4", "heldout": 0.29444444444444445, "heldout_missing": 0, "n_accepted": 7}
+payoff_I0_2 cand gen_3: loop score 0.760 rescore 0.580 combined 0.670
+payoff_I0_2 cand gen_4: loop score 0.740 rescore 0.680 combined 0.710
+{"run": "payoff_I0_2", "arm": "I0", "seed": "r2", "source_seed": null, "node_scores": {"initial": 0.62, "1": 0.58, "2": 0.56, "3": 0.76, "4": 0.74, "5": 0.62, "6": 0.6, "7": 0.62}, "candidates": ["3", "4"], "combined": {"3": 0.6699999999999999, "4": 0.71}, "final_node": "4", "heldout": 0.29444444444444445, "heldout_missing": 0, "n_accepted": 7}
+__JOB_DONE__

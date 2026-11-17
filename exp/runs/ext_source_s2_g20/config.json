@@ -23,7 +23,7 @@
     "utils/thread_logger.py"
   ],
   "rng_seed": 5001,
-  "workers": 12,
+  "workers": 10,
   "name": "ext_source_s2_g20",
   "root_commit": "b7a76048292fd0e4491e74a0fd13afd0db48d700"
 }

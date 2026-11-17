@@ -1,1 +1,2 @@
 [eval] {'phase': 'rescore', 'arm': 'I0', 'seed': 'r4', 'iteration': 5} round 0: 26 test inputs to run (0 cached)
+[eval] {'phase': 'rescore', 'arm': 'I0', 'seed': 'r4', 'iteration': 5} round 0: 5 test inputs to run (21 cached)

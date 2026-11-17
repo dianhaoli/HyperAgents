@@ -3,3 +3,27 @@ payoff_Ig_source_s5 cand gen_4: loop score 0.740 rescore 0.520 combined 0.630
 [eval] {'phase': 'rescore', 'arm': 'Ig', 'seed': 5, 'iteration': 3} round 0: 26 test inputs to run (0 cached)
 payoff_Ig_source_s5 cand gen_3: loop score 0.700 rescore 0.700 combined 0.700
 [eval] {'phase': 'heldout', 'arm': 'Ig', 'seed': 5, 'iteration': 3} round 0: 167 test inputs to run (0 cached)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/user/HyperAgents/arcexp/phases.py", line 132, in <module>
+    {"screen": cmd_screen, "b0": cmd_b0, "xhigh": cmd_xhigh, "final": cmd_final, "status": cmd_status}[a.cmd](a)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^
+  File "/home/user/HyperAgents/arcexp/phases.py", line 101, in cmd_final
+    d = materialize(run_dir, g, os.path.join(run_dir, "final_agents", f"gen_{g}"))
+  File "/home/user/HyperAgents/arcexp/phases.py", line 36, in materialize
+    shutil.rmtree(dest)
+    ~~~~~~~~~~~~~^^^^^^
+  File "/usr/local/lib/python3.13/shutil.py", line 770, in rmtree
+    _rmtree_safe_fd(stack, onexc)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/shutil.py", line 708, in _rmtree_safe_fd
+    onexc(func, path, err, direntry=orig_entry, dir_fd=parent_fd)
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.13/shutil.py", line 659, in _rmtree_safe_fd
+    os.rmdir(name, dir_fd=dirfd)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+OSError: [Errno 39] Directory not empty: '/home/user/HyperAgents/exp/runs/payoff_Ig_source_s5/final_agents/gen_4'
+payoff_Ig_source_s5 cand gen_4: loop score 0.740 rescore 0.520 combined 0.630
+payoff_Ig_source_s5 cand gen_3: loop score 0.700 rescore 0.700 combined 0.700
+[eval] {'phase': 'heldout', 'arm': 'Ig', 'seed': 5, 'iteration': 3} round 0: 115 test inputs to run (52 cached)

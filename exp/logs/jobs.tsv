@@ -1,7 +1,7 @@
 b0_rep2	16	python3 -m arcexp.phases b0 --only 2
 xhigh	16	python3 -m arcexp.phases xhigh
-final_payoff_I0_1	16	python3 -m arcexp.phases final --run payoff_I0_1
-final_payoff_I0_2	16	python3 -m arcexp.phases final --run payoff_I0_2
+final_payoff_I0_1	10	python3 -m arcexp.phases final --run payoff_I0_1
+final_payoff_I0_2	10	python3 -m arcexp.phases final --run payoff_I0_2
 run_payoff_Ig_source_s1		python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/payoff_Ig_source_s1/config.json > /home/user/HyperAgents/exp/runs/payoff_Ig_source_s1/run.log 2>&1
 run_payoff_Ig_source_s2		python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/payoff_Ig_source_s2/config.json > /home/user/HyperAgents/exp/runs/payoff_Ig_source_s2/run.log 2>&1
 run_payoff_Ig_source_s3		python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/payoff_Ig_source_s3/config.json > /home/user/HyperAgents/exp/runs/payoff_Ig_source_s3/run.log 2>&1
@@ -13,16 +13,17 @@ run_payoff_I0_5		python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/
 run_payoff_I0_6		python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/payoff_I0_6/config.json > /home/user/HyperAgents/exp/runs/payoff_I0_6/run.log 2>&1
 run_source_s3		python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/source_s3/config.json > /home/user/HyperAgents/exp/runs/source_s3/run.log 2>&1
 driver		python3 -m arcexp.driver
-final_payoff_Ig_source_s3	16	python3 -m arcexp.phases final --run payoff_Ig_source_s3
-final_payoff_I0_3	16	python3 -m arcexp.phases final --run payoff_I0_3
-final_payoff_I0_5	16	python3 -m arcexp.phases final --run payoff_I0_5
-final_payoff_Ig_source_s2	16	python3 -m arcexp.phases final --run payoff_Ig_source_s2
+final_payoff_Ig_source_s3	10	python3 -m arcexp.phases final --run payoff_Ig_source_s3
+final_payoff_I0_3	10	python3 -m arcexp.phases final --run payoff_I0_3
+final_payoff_I0_5	10	python3 -m arcexp.phases final --run payoff_I0_5
+final_payoff_Ig_source_s2	10	python3 -m arcexp.phases final --run payoff_Ig_source_s2
 run_source_s2	16	python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/source_s2/config.json > /home/user/HyperAgents/exp/runs/source_s2/run.log 2>&1
-final_payoff_Ig_source_s1	16	python3 -m arcexp.phases final --run payoff_Ig_source_s1
+final_payoff_Ig_source_s1	10	python3 -m arcexp.phases final --run payoff_Ig_source_s1
 run_source_s4	16	python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/source_s4/config.json > /home/user/HyperAgents/exp/runs/source_s4/run.log 2>&1
-final_payoff_Ig_source_s5	16	python3 -m arcexp.phases final --run payoff_Ig_source_s5
-final_payoff_Ig_source_s6	16	python3 -m arcexp.phases final --run payoff_Ig_source_s6
+final_payoff_Ig_source_s5	10	python3 -m arcexp.phases final --run payoff_Ig_source_s5
+final_payoff_Ig_source_s6	10	python3 -m arcexp.phases final --run payoff_Ig_source_s6
 run_ext_source_s4_g20	16	python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/ext_source_s4_g20/config.json > /home/user/HyperAgents/exp/runs/ext_source_s4_g20/run.log 2>&1
-final_payoff_I0_6	16	python3 -m arcexp.phases final --run payoff_I0_6
+final_payoff_I0_6	10	python3 -m arcexp.phases final --run payoff_I0_6
 run_ext_source_s2_g20	16	python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/ext_source_s2_g20/config.json > /home/user/HyperAgents/exp/runs/ext_source_s2_g20/run.log 2>&1
-final_payoff_I0_4	16	python3 -m arcexp.phases final --run payoff_I0_4
+final_payoff_I0_4	10	python3 -m arcexp.phases final --run payoff_I0_4
+run_source_s1		python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/source_s1/config.json > /home/user/HyperAgents/exp/runs/source_s1/run.log 2>&1

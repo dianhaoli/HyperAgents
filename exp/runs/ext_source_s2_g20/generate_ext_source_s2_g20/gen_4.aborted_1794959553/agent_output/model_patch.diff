@@ -1,0 +1,30 @@
+diff --git a/task_agent.py b/task_agent.py
+index d078279..d93f170 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -80,13 +80,17 @@ def build_prompt(inputs):
+ 
+ 
+ def build_verification_prompt(inputs, candidate):
+-    """Ask the second attempt to check the first candidate against the demonstrations."""
++    """Use the second attempt to independently solve, then audit the first candidate."""
+     return (
+         build_prompt(inputs)
+-        + "\n\nA first attempt proposed this test output candidate:\n"
++        + "\n\nFirst attempt candidate (an untrusted guess, not a hint):\n"
+         + json.dumps(candidate)
+-        + "\nIndependently infer the transformation from all demonstration pairs. Check whether this exact candidate follows the rule, including its dimensions and cell values. "
+-        + "If it is wrong, correct it; if it is consistent, return it unchanged. Return only the final grid inside <answer></answer> tags as a JSON list of rows."
++        + "\n\nSolve this puzzle independently rather than copying or minimally editing the candidate. "
++        + "Infer one precise rule from the training pairs, and check that rule against every pair before applying it to the test input. "
++        + "Pay particular attention to object boundaries, colors, symmetry, and whether the output keeps the input dimensions; "
++        + "do not add changes that are not supported by the examples. Then compare your independently derived test grid with the candidate, "
++        + "including every row and cell. Return your independently derived grid (which may equal the candidate if the rule confirms it). "
++        + "Return only the final grid inside <answer></answer> tags as a JSON list of rows."
+     )
+ 
+ 
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..5ecbfc3
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

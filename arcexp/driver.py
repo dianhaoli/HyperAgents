@@ -61,7 +61,7 @@ def tick():
         j = f"final_{name}"
         if job_alive(j) or job_done(j):
             continue
-        env = dict(os.environ, ARC_WORKERS="16")
+        env = dict(os.environ, ARC_WORKERS="10")
         sh("bash", "arcexp/run_bg.sh", j, "python3", "-m", "arcexp.phases", "final", "--run", name, env=env)
         log(f"launched final exam for {name}")
         acted = True
