@@ -1,0 +1,127 @@
+diff --git a/task_agent.py b/task_agent.py
+index cd2ca6e..486eba6 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -84,6 +84,28 @@ def build_prompt(inputs):
+     return "\n".join(parts)
+ 
+ 
++def build_review_prompt(inputs, first_candidate):
++    """Build a second-pass prompt that checks, rather than blindly repeats, attempt one."""
++    prompt = build_prompt(inputs)
++    review = [
++        "## Mandatory second-pass review",
++        "Solve the puzzle again from the demonstrations. The candidate below is an untrusted "
++        "hypothesis from a separate attempt, not an answer key. Do not simply copy it: check its "
++        "rule against every training pair and the test input, and correct it if it does not fit.",
++    ]
++    if _valid(first_candidate):
++        review.append("First-attempt candidate (JSON grid):")
++        review.append(json.dumps(first_candidate))
++    else:
++        review.append(
++            "The first attempt did not produce a valid grid. Solve independently from the examples."
++        )
++    review.append(
++        "Return your best test output in the required <answer> tags, with only a JSON grid inside."
++    )
++    return prompt + "\n\n" + "\n".join(review)
++
++
+ def _valid(g):
+     return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
+             and len({len(r) for r in g}) == 1
+@@ -142,9 +164,13 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def solve_once(self, inputs, first_candidate=None, review=False):
++        """Make one model call and return its parsed grid (or None)."""
++        prompt = (
++            build_review_prompt(inputs, first_candidate)
++            if review
++            else build_prompt(inputs)
++        )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -158,12 +184,19 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        first_candidate = None
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                g = self.solve_once(
++                    inputs,
++                    first_candidate=first_candidate,
++                    review=(attempt == 1),
++                )
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
++            if attempt == 0:
++                first_candidate = g
+             if g is not None:
+                 answers.append(g)
+         return answers, []
+diff --git a/tests/test_task_agent.py b/tests/test_task_agent.py
+new file mode 100644
+index 0000000..f492476
+--- /dev/null
++++ b/tests/test_task_agent.py
+@@ -0,0 +1,49 @@
++import tempfile
++import unittest
++from pathlib import Path
++from unittest.mock import patch
++
++from task_agent import TaskAgent
++
++
++class TaskAgentSecondPassTests(unittest.TestCase):
++    def test_second_call_reviews_first_candidate_and_keeps_both_answers(self):
++        inputs = {
++            "domain": "arc",
++            "train": [{"input": [[0]], "output": [[1]]}],
++            "test_input": [[0]],
++        }
++        responses = [
++            "<answer>[[1]]</answer>",
++            "<answer>[[2]]</answer>",
++        ]
++        with tempfile.TemporaryDirectory() as tmp:
++            agent = TaskAgent(chat_history_file=str(Path(tmp) / "history.md"))
++            with patch("task_agent.call_model", side_effect=responses) as call:
++                answers, _ = agent.forward(inputs)
++
++        self.assertEqual(answers, [[[1]], [[2]]])
++        self.assertEqual(call.call_count, 2)
++        second_prompt = call.call_args_list[1].args[0]
++        self.assertIn('First-attempt candidate (JSON grid):\n[[1]]', second_prompt)
++        self.assertIn("Do not simply copy it", second_prompt)
++        self.assertIn("Input (1x1):", second_prompt)
++
++    def test_second_call_can_solve_when_first_answer_is_invalid(self):
++        inputs = {
++            "domain": "arc",
++            "train": [{"input": [[0]], "output": [[1]]}],
++            "test_input": [[0]],
++        }
++        with tempfile.TemporaryDirectory() as tmp:
++            agent = TaskAgent(chat_history_file=str(Path(tmp) / "history.md"))
++            with patch("task_agent.call_model", side_effect=["no grid", "<answer>[[1]]</answer>"]) as call:
++                answers, _ = agent.forward(inputs)
++
++        self.assertEqual(answers, [[[1]]])
++        self.assertEqual(call.call_count, 2)
++        self.assertIn("first attempt did not produce a valid grid", call.call_args_list[1].args[0])
++
++
++if __name__ == "__main__":
++    unittest.main()

@@ -1,0 +1,62 @@
+diff --git a/task_agent.py b/task_agent.py
+index 366468f..8f0c6dc 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -72,7 +72,7 @@ def _expected_output_shape(inputs):
+     return None
+ 
+ 
+-def build_prompt(inputs, candidate=None):
++def build_prompt(inputs, candidate=None, independent_check=False):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+@@ -115,6 +115,16 @@ def build_prompt(inputs, candidate=None):
+                 "then compare its exact rows and columns with the candidate before returning the result."
+             )
+         parts.append("Previous candidate: " + json.dumps(candidate, separators=(",", ":")))
++    if independent_check:
++        parts.extend([
++            "SECOND-PASS VERIFICATION: Treat the previous candidate as untrusted. First infer the "
++            "transformation afresh from the demonstrations, and check that the same concrete "
++            "operations reproduce every demonstrated output. Derive the test output from the test "
++            "input, then compare it cell by cell with the previous candidate. Keep the candidate "
++            "only if it follows the verified rule exactly; otherwise return your independently "
++            "derived correction. Check dimensions and row/column order before responding.",
++            "",
++        ])
+     parts.append("")
+     parts.append(
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+@@ -182,9 +192,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs, candidate=None):
++    def solve_once(self, inputs, candidate=None, independent_check=False):
+         """One model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs, candidate=candidate)
++        prompt = build_prompt(inputs, candidate=candidate, independent_check=independent_check)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -201,7 +211,14 @@ class TaskAgent:
+         for attempt in range(2):
+             candidate = answers[0] if attempt == 1 and answers else None
+             try:
+-                g = self.solve_once(inputs, candidate=candidate)
++                # Use the second call as both an independent re-derivation and an audit of
++                # the first grid. This preserves diversity while making cell-level errors
++                # and incorrect rules explicit; it does not increase the two-call budget.
++                g = self.solve_once(
++                    inputs,
++                    candidate=candidate,
++                    independent_check=(attempt == 1 and candidate is not None),
++                )
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..4601dc6
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

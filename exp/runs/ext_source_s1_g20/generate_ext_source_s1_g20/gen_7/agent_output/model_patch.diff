@@ -1,0 +1,57 @@
+diff --git a/task_agent.py b/task_agent.py
+index 366468f..fe2afbb 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -72,7 +72,7 @@ def _expected_output_shape(inputs):
+     return None
+ 
+ 
+-def build_prompt(inputs, candidate=None):
++def build_prompt(inputs, candidate=None, independent=False):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+@@ -101,6 +101,13 @@ def build_prompt(inputs, candidate=None):
+             "Use that dimension as a verification constraint; count rows and cells per row "
+             "before finalizing, and only depart from it if the demonstrated rule requires it."
+         )
++    if independent:
++        parts.append(
++            "INDEPENDENT SECOND PASS: Ignore any earlier proposed answer. Infer the rule from "
++            "the demonstrations alone, state the concrete operations internally, and check that "
++            "they reproduce every demonstrated output before applying them to the test. Verify "
++            "the final grid dimensions and cell order."
++        )
+     if candidate is not None:
+         actual_shape = (len(candidate), len(candidate[0]))
+         if expected_shape is not None and actual_shape != expected_shape:
+@@ -182,9 +189,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs, candidate=None):
++    def solve_once(self, inputs, candidate=None, independent=False):
+         """One model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs, candidate=candidate)
++        prompt = build_prompt(inputs, candidate=candidate, independent=independent)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -199,9 +206,11 @@ class TaskAgent:
+         """
+         answers = []
+         for attempt in range(2):
+-            candidate = answers[0] if attempt == 1 and answers else None
++            # Do not expose the first answer to the second call: prior runs show the
++            # model frequently repeats a wrong candidate even when asked to audit it.
++            # A fresh derivation spends the same two-call budget while reducing anchoring.
+             try:
+-                g = self.solve_once(inputs, candidate=candidate)
++                g = self.solve_once(inputs, independent=(attempt == 1))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..173583b
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

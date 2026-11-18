@@ -55,3 +55,6 @@ IMPORT_OK
    transplant check: True __ARC_SANDBOX_STARTED__
 IMPORT_OK 
 00:56:17 launched final exam for ext_source_s3_g20
+01:21:26 pick source_s2:g30: source_s2 g30 -> (9, 9, -0.03999999999999998) | max mean child improvement among changed coaches with >=3 descendants
+   transplant check: True __ARC_SANDBOX_STARTED__
+IMPORT_OK 

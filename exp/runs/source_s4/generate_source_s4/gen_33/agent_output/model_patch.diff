@@ -1,0 +1,15 @@
+diff --git a/task_agent.py b/task_agent.py
+index f9c5aaa..56797fc 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -54,7 +54,9 @@ def build_prompt(inputs):
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule, check that it reproduces every "
+-        "demonstration exactly, and apply it to the test input.",
++        "demonstration exactly, and apply it to the test input. Before finalizing, inventory the "
++        "non-background objects and account for each one in the output: determine whether it is "
++        "preserved, transformed, moved, or removed, and include all parts of any transformed object.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):

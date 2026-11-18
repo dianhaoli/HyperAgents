@@ -1,0 +1,32 @@
+diff --git a/task_agent.py b/task_agent.py
+index 3f0eb6f..cf9aeb3 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -185,17 +185,17 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                if attempt == 1 and answers:
+-                    # The second attempt is a verification opportunity, not just a
+-                    # duplicate independent solve. ARC failures often come from a
+-                    # plausible rule that misses a demonstrated change or unchanged
+-                    # cell. Expose the first grid so the model must check it against
+-                    # every pair, and retain its corrected grid as the second answer.
+-                    g = self.solve_once(inputs, candidate=answers[0])
++                if attempt == 1:
++                    # A candidate-visible verification can anchor the model on its
++                    # first interpretation: repeated ARC failures show the verifier
++                    # sometimes returns the same unsupported edits after being told
++                    # to check them. Spend the existing second-call budget on a blind,
++                    # independent derivation instead. The two grids remain available
++                    # to the evaluator as alternatives, without contaminating the
++                    # second reasoning pass with the first guess.
++                    g = self.solve_once(inputs, independent=True)
+                 else:
+-                    # If the first response did not contain a parseable grid, there
+-                    # is no candidate to check; use the second call for a fresh solve.
+-                    g = self.solve_once(inputs, independent=(attempt == 1))
++                    g = self.solve_once(inputs)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
