@@ -1,0 +1,62 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..adc0a0f 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -145,6 +145,23 @@ class TaskAgent:
+         self.log(f"Output: {text}")
+         return parse_grid(text)
+ 
++    def refine_once(self, inputs, candidate):
++        """Use the second budgeted call to check a candidate against all demonstrations."""
++        prompt = build_prompt(inputs)
++        prompt += (
++            "\n\nA first solver proposed this test output candidate (treat it as untrusted):\n"
++            + json.dumps(candidate)
++            + "\nIndependently infer the transformation from the demonstrations. Check it against "
++              "EVERY input/output pair, including dimensions, row and column ordering, and cell "
++              "values. Compare the resulting rule with the candidate; correct any disagreement, "
++              "then apply the validated rule to the test input. Return the final grid in the required "
++              "<answer> JSON format. Do not merely repeat the candidate without checking it."
++        )
++        self.log(f"Refinement input: {prompt}")
++        text = call_model(prompt)
++        self.log(f"Refinement output: {text}")
++        return parse_grid(text)
++
+     def forward(self, inputs):
+         """
+         Args:
+@@ -153,12 +170,21 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
+-            try:
+-                g = self.solve_once(inputs)
+-            except Exception as e:
+-                self.log(f"Error: {e}")
+-                g = None
+-            if g is not None:
+-                answers.append(g)
++        try:
++            first = self.solve_once(inputs)
++        except Exception as e:
++            self.log(f"Error: {e}")
++            first = None
++        if first is not None:
++            answers.append(first)
++
++        # Spend the existing second-call allowance on verification rather than a fully
++        # independent guess. If the first response could not be parsed, use it for a retry.
++        try:
++            second = self.refine_once(inputs, first) if first is not None else self.solve_once(inputs)
++        except Exception as e:
++            self.log(f"Error: {e}")
++            second = None
++        if second is not None and second != first:
++            answers.append(second)
+         return answers, []
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..3ddf4ce
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

@@ -1,0 +1,51 @@
+diff --git a/task_agent.py b/task_agent.py
+index adc0a0f..4276bf0 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -66,6 +66,46 @@ def build_prompt(inputs):
+         parts.append(f"Output ({h}x{w}):")
+         parts.append(grid_to_text(pair["output"]))
+         parts.append("")
++    # Surface a mechanical diff so the solver has an exact checklist for validating
++    # its inferred rule instead of relying only on visual comparison of large grids.
++    parts.append("Mechanical demonstration audit (zero-based coordinates):")
++    for i, pair in enumerate(inputs["train"], 1):
++        source, target = pair["input"], pair["output"]
++        sh, sw, th, tw = len(source), len(source[0]), len(target), len(target[0])
++        changes = []
++        for r in range(max(sh, th)):
++            for c in range(max(sw, tw)):
++                before = source[r][c] if r < sh and c < sw else None
++                after = target[r][c] if r < th and c < tw else None
++                if before != after:
++                    changes.append((r, c, before, after))
++        parts.append(f"Example {i}: {sh}x{sw} -> {th}x{tw}; {len(changes)} changed cells.")
++        if len(changes) <= 80:
++            parts.append("; ".join(f"({r},{c}) {a if a is not None else 'outside'}->{b if b is not None else 'outside'}" for r, c, a, b in changes) or "No changed cells.")
++        else:
++            # Compress large diffs into contiguous row-runs with a consistent color
++            # transition. This keeps the audit useful for large fills/recolors without
++            # dumping hundreds of individual coordinates into the model prompt.
++            by_row = {}
++            for r, c, before, after in changes:
++                by_row.setdefault(r, []).append((c, before, after))
++            runs = []
++            for r, cells in by_row.items():
++                start = previous = cells[0][0]
++                before, after = cells[0][1:]
++                for c, old_color, new_color in cells[1:]:
++                    if c == previous + 1 and (old_color, new_color) == (before, after):
++                        previous = c
++                        continue
++                    span = str(start) if start == previous else f"{start}-{previous}"
++                    runs.append(f"row {r}, col {span}: {before}->{after}")
++                    start = previous = c
++                    before, after = old_color, new_color
++                span = str(start) if start == previous else f"{start}-{previous}"
++                runs.append(f"row {r}, col {span}: {before}->{after}")
++            parts.append("Compressed changed-cell runs: " + "; ".join(runs))
++    parts.append("Use the audit to check that the inferred rule explains every demonstrated edit and output dimension.")
++    parts.append("")
+     t = inputs["test_input"]
+     parts.append("## Test")
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")

@@ -22532,3 +22532,389 @@
 {"token": "801dfe18b94123ed9983cb1672ca2021", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "50cb2852", "test_input": 0}, "effort_role": "task", "registered_at": 1794978463.8824887}
 {"token": "39ba267095eef95784261cce52cc5a91", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "469497ad", "test_input": 0}, "effort_role": "task", "registered_at": 1794978463.8837903}
 {"token": "3fdacd15cd7bf4097e44c4a38435e005", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "5b37cb25", "test_input": 0}, "effort_role": "task", "registered_at": 1794978463.8840923}
+{"event": "revoke", "token": "801dfe18b94123ed9983cb1672ca2021", "ts": 1794978489.3153367}
+{"token": "bce90e1a22bbc9b9354029d336da83d9", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "6d1d5c90", "test_input": 0}, "effort_role": "task", "registered_at": 1794978489.317728}
+{"event": "revoke", "token": "e9222eed42ecd3a758884f5fefbd100d", "ts": 1794978503.0928643}
+{"token": "b06000aedc29c1cd279520320f97ee25", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "753ea09b", "test_input": 0}, "effort_role": "task", "registered_at": 1794978503.0980124}
+{"event": "revoke", "token": "ea064c0a488420287b9f5307858c8da7", "ts": 1794978503.3572304}
+{"token": "17df59012c8ddec671273361db7cfee5", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "85c4e7cd", "test_input": 0}, "effort_role": "task", "registered_at": 1794978503.360437}
+{"event": "revoke", "token": "17df59012c8ddec671273361db7cfee5", "ts": 1794978528.2294497}
+{"token": "006904dd8c5a33ad97ed359a1f272817", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "97c75046", "test_input": 0}, "effort_role": "task", "registered_at": 1794978528.2319245}
+{"event": "revoke", "token": "9a4e7664b641b46b6b15b64b5c2e525b", "ts": 1794978528.9594893}
+{"token": "ee2f2639567ca12790c7110de7936045", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "9edfc990", "test_input": 0}, "effort_role": "task", "registered_at": 1794978528.963095}
+{"event": "revoke", "token": "6448127ace9ff9d9bc2c21b4179b9065", "ts": 1794978531.3665507}
+{"token": "106d74c24791c5d6f90690f709dbd267", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "a416fc5b", "test_input": 0}, "effort_role": "task", "registered_at": 1794978531.3700547}
+{"event": "revoke", "token": "223e5b81c01fc8a86304926d188ce5b5", "ts": 1794978535.8765483}
+{"token": "25ecf5b14bd05e63c75feec6d837e98b", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "ad173014", "test_input": 0}, "effort_role": "task", "registered_at": 1794978535.8810081}
+{"event": "revoke", "token": "bce90e1a22bbc9b9354029d336da83d9", "ts": 1794978554.7063212}
+{"token": "b5272ceb04b13a2c606c90e0b1d143f5", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "ba9d41b8", "test_input": 0}, "effort_role": "task", "registered_at": 1794978554.7093983}
+{"event": "revoke", "token": "4b496dac2438955ad1fca048778e0f58", "ts": 1794978568.3854315}
+{"token": "a8acccd64f21fbdac1d0c35a406e52b8", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "36a08778", "test_input": 0}, "effort_role": "task", "registered_at": 1794978568.3896785}
+{"event": "revoke", "token": "60208e7381e25899027ed314cd5af8f0", "ts": 1794978582.136436}
+{"token": "6ac224c7562db75841e2f98e0f9073d5", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "36a08778", "test_input": 1}, "effort_role": "task", "registered_at": 1794978582.14083}
+{"event": "revoke", "token": "50cd7f9c8432f0e08641d179789da383", "ts": 1794978585.7415898}
+{"token": "e149cb8aeb9945284611f5de1f846892", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "38007db0", "test_input": 0}, "effort_role": "task", "registered_at": 1794978585.745711}
+{"event": "revoke", "token": "434873abfacc9cf36c4e9b6084b164fe", "ts": 1794978591.6336105}
+{"token": "d0ff3c65094ab812b311430004dc5f47", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "25e02866", "test_input": 0}, "effort_role": "task", "registered_at": 1794978592.0062885}
+{"token": "3f6581691abd46fe7b35bbb52ee28757", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "0f63c0b9", "test_input": 0}, "effort_role": "task", "registered_at": 1794978592.0104797}
+{"token": "d0b00b7431d544d107e22321c202da26", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "18419cfa", "test_input": 0}, "effort_role": "task", "registered_at": 1794978592.012139}
+{"token": "bc50cb971dd48430972ae1bb3802fdae", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "414297c0", "test_input": 0}, "effort_role": "task", "registered_at": 1794978592.0126207}
+{"token": "789ff26dcb4e6f792fa71b77f9740751", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "42f83767", "test_input": 1}, "effort_role": "task", "registered_at": 1794978592.013181}
+{"token": "595697eaab9ac9fe58ec537494658a39", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "4093f84a", "test_input": 0}, "effort_role": "task", "registered_at": 1794978592.0145123}
+{"token": "6a94fcb6c3798990bf84e881cc3b0292", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "6d1d5c90", "test_input": 0}, "effort_role": "task", "registered_at": 1794978592.0240734}
+{"token": "087d9510245f044c848f05404c4dcfb7", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "469497ad", "test_input": 0}, "effort_role": "task", "registered_at": 1794978592.0243676}
+{"token": "16834af7ea7b14e569242d7acb92df1e", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "50cb2852", "test_input": 0}, "effort_role": "task", "registered_at": 1794978592.0284767}
+{"token": "4f59081155c74a7cd96b423c49da48e6", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "753ea09b", "test_input": 0}, "effort_role": "task", "registered_at": 1794978592.029865}
+{"token": "86aea2beb8b5dd3499571af9c14cea96", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "42f83767", "test_input": 0}, "effort_role": "task", "registered_at": 1794978592.0315945}
+{"token": "7dd8f7b99e993894b6aef35437c15a65", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "5b37cb25", "test_input": 0}, "effort_role": "task", "registered_at": 1794978592.0361037}
+{"event": "revoke", "token": "39ba267095eef95784261cce52cc5a91", "ts": 1794978609.0019927}
+{"token": "f7f3ea595f1116f26fe7178806406586", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "beb8660c", "test_input": 0}, "effort_role": "task", "registered_at": 1794978609.0059497}
+{"event": "revoke", "token": "2111c283800c7d78d6ed34859151f019", "ts": 1794978614.372732}
+{"token": "31948f54264469b3cae72892b5a9e351", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "38007db0", "test_input": 1}, "effort_role": "task", "registered_at": 1794978614.3787897}
+{"event": "revoke", "token": "16834af7ea7b14e569242d7acb92df1e", "ts": 1794978614.9720988}
+{"token": "7a2c44c20359107e9da914f8da493c87", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "85c4e7cd", "test_input": 0}, "effort_role": "task", "registered_at": 1794978614.9773242}
+{"event": "revoke", "token": "d0ff3c65094ab812b311430004dc5f47", "ts": 1794978619.544131}
+{"token": "7070f27b289baf9f7ef51d8fe9701b68", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "97c75046", "test_input": 0}, "effort_role": "task", "registered_at": 1794978619.5470648}
+{"event": "revoke", "token": "25ecf5b14bd05e63c75feec6d837e98b", "ts": 1794978621.1361442}
+{"token": "958766c7e85b59b247198b187b0a6296", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "e619ca6e", "test_input": 0}, "effort_role": "task", "registered_at": 1794978621.1438928}
+{"event": "revoke", "token": "59c0117a395a1b8a8809e8fb6447c8fd", "ts": 1794978622.0703127}
+{"token": "3877b299b156ebd6ed7ea6acccfae391", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "e73095fd", "test_input": 0}, "effort_role": "task", "registered_at": 1794978622.0760584}
+{"event": "revoke", "token": "3f6581691abd46fe7b35bbb52ee28757", "ts": 1794978624.8279753}
+{"token": "0f6087a1f7de64c10ba34689497da3fc", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "9edfc990", "test_input": 0}, "effort_role": "task", "registered_at": 1794978624.8326502}
+{"event": "revoke", "token": "f7f3ea595f1116f26fe7178806406586", "ts": 1794978630.665095}
+{"token": "6ed702dbaee38a01ec2e9f19a4b10477", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "e9c9d9a1", "test_input": 0}, "effort_role": "task", "registered_at": 1794978630.6688335}
+{"event": "revoke", "token": "9095ec68fa3719e13837ee3383ee3c14", "ts": 1794978632.296568}
+{"token": "91cfa2906a2ef2cf81ca815649383863", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "eb5a1d5d", "test_input": 0}, "effort_role": "task", "registered_at": 1794978632.3038285}
+{"event": "revoke", "token": "7a2c44c20359107e9da914f8da493c87", "ts": 1794978633.4815476}
+{"token": "65b690e75606402d4e740ce99ab580c9", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "a416fc5b", "test_input": 0}, "effort_role": "task", "registered_at": 1794978633.4852195}
+{"event": "revoke", "token": "b5272ceb04b13a2c606c90e0b1d143f5", "ts": 1794978641.932826}
+{"token": "6fa89445dfe1c466f0798461d3ab93cb", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "f5aa3634", "test_input": 0}, "effort_role": "task", "registered_at": 1794978641.936457}
+{"event": "revoke", "token": "e1653c9b806ccb08110b579c0037a15f", "ts": 1794978642.6324039}
+{"token": "2fefb5818e577896db564c8059e63edc", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "3a25b0d8", "test_input": 0}, "effort_role": "task", "registered_at": 1794978642.6357498}
+{"event": "revoke", "token": "6a94fcb6c3798990bf84e881cc3b0292", "ts": 1794978647.4210255}
+{"token": "a6d18813510b84a4e6a8ce521b978054", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "ad173014", "test_input": 0}, "effort_role": "task", "registered_at": 1794978647.4258208}
+{"event": "revoke", "token": "595697eaab9ac9fe58ec537494658a39", "ts": 1794978660.6119664}
+{"token": "95b80ae3126ea1d675db26279d3f1689", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "ba9d41b8", "test_input": 0}, "effort_role": "task", "registered_at": 1794978660.615785}
+{"event": "revoke", "token": "6ed702dbaee38a01ec2e9f19a4b10477", "ts": 1794978665.488103}
+{"token": "2657616f0059a2fe76b4651db037ba6a", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "f76d97a5", "test_input": 0}, "effort_role": "task", "registered_at": 1794978665.4912584}
+{"event": "revoke", "token": "bc50cb971dd48430972ae1bb3802fdae", "ts": 1794978665.9186285}
+{"token": "613a9a752f5fb360add9a7d54901851d", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "beb8660c", "test_input": 0}, "effort_role": "task", "registered_at": 1794978665.9229343}
+{"event": "revoke", "token": "ca01c592c88108c8bc2aab79ef856350", "ts": 1794978668.3965707}
+{"token": "ae25b675d2d09c534272676f7afff2c9", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "3a25b0d8", "test_input": 1}, "effort_role": "task", "registered_at": 1794978668.4008143}
+{"event": "revoke", "token": "91cfa2906a2ef2cf81ca815649383863", "ts": 1794978669.8101087}
+{"token": "0c0b6e13167c19015fbffd98dd67a683", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 1, "task": "fd096ab6", "test_input": 0}, "effort_role": "task", "registered_at": 1794978669.8144689}
+{"event": "revoke", "token": "2657616f0059a2fe76b4651db037ba6a", "ts": 1794978673.9309804}
+{"event": "revoke", "token": "86aea2beb8b5dd3499571af9c14cea96", "ts": 1794978689.0608041}
+{"token": "26dcec20710822b6879de3ad498f1f7b", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "e619ca6e", "test_input": 0}, "effort_role": "task", "registered_at": 1794978689.06614}
+{"event": "revoke", "token": "613a9a752f5fb360add9a7d54901851d", "ts": 1794978690.4852216}
+{"token": "7c198854f82bc1f48e17eef762191f28", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "e73095fd", "test_input": 0}, "effort_role": "task", "registered_at": 1794978690.4880257}
+{"event": "revoke", "token": "1b6d0c388bfd84e091ae915671e14495", "ts": 1794978692.0741694}
+{"token": "80ba04b21593e45c877fb80f43148830", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "3dc255db", "test_input": 0}, "effort_role": "task", "registered_at": 1794978692.07833}
+{"event": "revoke", "token": "6fa89445dfe1c466f0798461d3ab93cb", "ts": 1794978706.0119195}
+{"event": "revoke", "token": "087d9510245f044c848f05404c4dcfb7", "ts": 1794978721.9212012}
+{"token": "dd7ff045172811edb84df11e5f5761dd", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "e9c9d9a1", "test_input": 0}, "effort_role": "task", "registered_at": 1794978721.9252105}
+{"event": "revoke", "token": "958766c7e85b59b247198b187b0a6296", "ts": 1794978725.2791243}
+{"event": "revoke", "token": "d0b00b7431d544d107e22321c202da26", "ts": 1794978736.5175698}
+{"token": "6cb90247d704ec6df434eca1a164d550", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "eb5a1d5d", "test_input": 0}, "effort_role": "task", "registered_at": 1794978736.5213318}
+{"event": "revoke", "token": "ee2f2639567ca12790c7110de7936045", "ts": 1794978738.9426107}
+{"event": "revoke", "token": "95b80ae3126ea1d675db26279d3f1689", "ts": 1794978739.143774}
+{"token": "9d19cb8d9594e5110dfd2ac685805a18", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "f5aa3634", "test_input": 0}, "effort_role": "task", "registered_at": 1794978739.1485908}
+{"event": "revoke", "token": "4f59081155c74a7cd96b423c49da48e6", "ts": 1794978752.5121336}
+{"token": "d229a74bd38e6f0d1e4ababed9e8a0f9", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "f76d97a5", "test_input": 0}, "effort_role": "task", "registered_at": 1794978752.5171185}
+{"event": "revoke", "token": "6cb90247d704ec6df434eca1a164d550", "ts": 1794978754.6837745}
+{"token": "46f618052adde367aa251a9a0397120e", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "5", "task": "fd096ab6", "test_input": 0}, "effort_role": "task", "registered_at": 1794978754.689476}
+{"event": "revoke", "token": "dd7ff045172811edb84df11e5f5761dd", "ts": 1794978756.805661}
+{"event": "revoke", "token": "a6d18813510b84a4e6a8ce521b978054", "ts": 1794978759.8301153}
+{"event": "revoke", "token": "789ff26dcb4e6f792fa71b77f9740751", "ts": 1794978760.9795263}
+{"event": "revoke", "token": "d229a74bd38e6f0d1e4ababed9e8a0f9", "ts": 1794978768.002393}
+{"event": "revoke", "token": "3877b299b156ebd6ed7ea6acccfae391", "ts": 1794978769.8028018}
+{"event": "revoke", "token": "0f6087a1f7de64c10ba34689497da3fc", "ts": 1794978783.4802148}
+{"event": "revoke", "token": "106d74c24791c5d6f90690f709dbd267", "ts": 1794978784.9730022}
+{"event": "revoke", "token": "006904dd8c5a33ad97ed359a1f272817", "ts": 1794978786.312604}
+{"event": "revoke", "token": "9d19cb8d9594e5110dfd2ac685805a18", "ts": 1794978786.9658527}
+{"event": "revoke", "token": "a8acccd64f21fbdac1d0c35a406e52b8", "ts": 1794978805.2144659}
+{"token": "9b7e2fe6dd967ef23d8dc1b473aac3a9", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "3e6067c3", "test_input": 0}, "effort_role": "task", "registered_at": 1794978805.2185757}
+{"event": "revoke", "token": "26dcec20710822b6879de3ad498f1f7b", "ts": 1794978818.614455}
+{"event": "revoke", "token": "19e9a0118a954dbf5068c3225587720e", "ts": 1794978819.4588296}
+{"token": "1ff38965bd3ce4baa1fab158ea5d607d", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "3e6067c3", "test_input": 1}, "effort_role": "task", "registered_at": 1794978819.4628758}
+{"event": "revoke", "token": "f41a93ee162faca60e861c3cebd57906", "ts": 1794978820.2817237}
+{"token": "8551fd6e46cb2ee5e06ef17f805e5219", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "409aa875", "test_input": 0}, "effort_role": "task", "registered_at": 1794978820.2863965}
+{"event": "revoke", "token": "3fdacd15cd7bf4097e44c4a38435e005", "ts": 1794978823.2577403}
+{"event": "revoke", "token": "65b690e75606402d4e740ce99ab580c9", "ts": 1794978823.564834}
+{"event": "revoke", "token": "e149cb8aeb9945284611f5de1f846892", "ts": 1794978851.0742338}
+{"token": "7b3d94d30e54e5f69b82d82181f78a4b", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "446ef5d2", "test_input": 0}, "effort_role": "task", "registered_at": 1794978851.077895}
+{"event": "revoke", "token": "0c0b6e13167c19015fbffd98dd67a683", "ts": 1794978855.9017105}
+{"event": "revoke", "token": "7c198854f82bc1f48e17eef762191f28", "ts": 1794978856.8501735}
+{"event": "revoke", "token": "2fefb5818e577896db564c8059e63edc", "ts": 1794978857.2663436}
+{"token": "a2f2c1ac53c829a7b4c28ddee127f0a7", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "446ef5d2", "test_input": 1}, "effort_role": "task", "registered_at": 1794978857.270036}
+{"event": "revoke", "token": "415c9b4e87c5428d7f286ce4ce7453fc", "ts": 1794978868.8866816}
+{"token": "2235aa3987823f0c95ce730d0b129b34", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "45a5af55", "test_input": 0}, "effort_role": "task", "registered_at": 1794978868.891657}
+{"event": "revoke", "token": "b06000aedc29c1cd279520320f97ee25", "ts": 1794978870.531863}
+{"token": "74a17c24131e52b0dfa8404619333b6f", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "0f63c0b9", "test_input": 0}, "effort_role": "task", "registered_at": 1794978870.9653437}
+{"token": "12f270085e45ba421ea966b3dab65b6d", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "25e02866", "test_input": 0}, "effort_role": "task", "registered_at": 1794978870.9702623}
+{"token": "206aa6a172645bba5e7895f4a1af093f", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "18419cfa", "test_input": 0}, "effort_role": "task", "registered_at": 1794978870.977351}
+{"token": "b0fcc383bbe310811f24fc7362351341", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "50cb2852", "test_input": 0}, "effort_role": "task", "registered_at": 1794978870.9779732}
+{"token": "c77f9d9419dfb6898e67e72994be4458", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "42f83767", "test_input": 0}, "effort_role": "task", "registered_at": 1794978870.977581}
+{"token": "eeb7b2fff3fa812bee827711a21e481f", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "469497ad", "test_input": 0}, "effort_role": "task", "registered_at": 1794978870.978916}
+{"token": "ee5ec3cb5074930bc363bbc0122b64ef", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "42f83767", "test_input": 1}, "effort_role": "task", "registered_at": 1794978870.9792972}
+{"token": "ff2f3e1e5e9142df70722610b38b07da", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "4093f84a", "test_input": 0}, "effort_role": "task", "registered_at": 1794978870.980089}
+{"token": "3ea6c1533cfff7ab6294b25c35c3d929", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "414297c0", "test_input": 0}, "effort_role": "task", "registered_at": 1794978870.981678}
+{"token": "8ad00b143bf0bb5315fc25b212218ed8", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "5b37cb25", "test_input": 0}, "effort_role": "task", "registered_at": 1794978870.9817667}
+{"event": "revoke", "token": "b0fcc383bbe310811f24fc7362351341", "ts": 1794978900.6411977}
+{"token": "381c99f5bdd2db6198df7df4595fadc8", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "6d1d5c90", "test_input": 0}, "effort_role": "task", "registered_at": 1794978900.6437063}
+{"event": "revoke", "token": "74a17c24131e52b0dfa8404619333b6f", "ts": 1794978904.999825}
+{"token": "fda1d2f48cbaf67cb52ebbc60cd0f986", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "753ea09b", "test_input": 0}, "effort_role": "task", "registered_at": 1794978905.0048115}
+{"event": "revoke", "token": "7dd8f7b99e993894b6aef35437c15a65", "ts": 1794978907.0467627}
+{"event": "revoke", "token": "46f618052adde367aa251a9a0397120e", "ts": 1794978912.8411524}
+{"event": "revoke", "token": "31948f54264469b3cae72892b5a9e351", "ts": 1794978925.5653174}
+{"token": "d0ebd4f5b7027ca0365a84252f3f1314", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "4a21e3da", "test_input": 0}, "effort_role": "task", "registered_at": 1794978925.5691493}
+{"event": "revoke", "token": "7070f27b289baf9f7ef51d8fe9701b68", "ts": 1794978925.8782074}
+{"token": "2bbef71dc0df28d57aa211498bae8b00", "role": "meta", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": 6, "run": "ext_source_s1_g40"}, "effort_role": "meta", "registered_at": 1794978926.6323488}
+{"event": "revoke", "token": "12f270085e45ba421ea966b3dab65b6d", "ts": 1794978941.7202191}
+{"token": "cb68dcce1f6dea1652d2d7dc0092dfd4", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "85c4e7cd", "test_input": 0}, "effort_role": "task", "registered_at": 1794978941.723729}
+{"event": "revoke", "token": "80ba04b21593e45c877fb80f43148830", "ts": 1794978946.738705}
+{"token": "4c2af7f82dafd4aecc991b10a7178a75", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "4c3d4a41", "test_input": 0}, "effort_role": "task", "registered_at": 1794978946.7421002}
+{"event": "revoke", "token": "9b7e2fe6dd967ef23d8dc1b473aac3a9", "ts": 1794978947.2521918}
+{"token": "79f6d3143251451a54a33f3d9d9370cb", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "4c3d4a41", "test_input": 1}, "effort_role": "task", "registered_at": 1794978947.2563787}
+{"event": "revoke", "token": "1ff38965bd3ce4baa1fab158ea5d607d", "ts": 1794978953.082963}
+{"token": "88e62bf0aff507cdb4aebaed2b812b8d", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "4c416de3", "test_input": 0}, "effort_role": "task", "registered_at": 1794978953.0885954}
+{"event": "revoke", "token": "ff2f3e1e5e9142df70722610b38b07da", "ts": 1794978956.2181315}
+{"token": "acc33836e1ecfcb1e4c39ce750da5f7a", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "97c75046", "test_input": 0}, "effort_role": "task", "registered_at": 1794978956.2213233}
+{"event": "revoke", "token": "381c99f5bdd2db6198df7df4595fadc8", "ts": 1794978956.9712338}
+{"token": "8d6354f32adc01cb395979d0ee054e4a", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "9edfc990", "test_input": 0}, "effort_role": "task", "registered_at": 1794978956.9751732}
+{"event": "revoke", "token": "3ea6c1533cfff7ab6294b25c35c3d929", "ts": 1794978963.760415}
+{"token": "c6dd7e43a5f2d44c5d0ac2f0e4801e80", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "a416fc5b", "test_input": 0}, "effort_role": "task", "registered_at": 1794978963.764751}
+{"event": "revoke", "token": "c77f9d9419dfb6898e67e72994be4458", "ts": 1794978968.0441191}
+{"token": "a3936d8b111ae6ea98923736f9eac364", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "ad173014", "test_input": 0}, "effort_role": "task", "registered_at": 1794978968.0491257}
+{"event": "revoke", "token": "cb68dcce1f6dea1652d2d7dc0092dfd4", "ts": 1794978968.125744}
+{"token": "d2caa38fe50a5c7831ed18d8ad234a6a", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "ba9d41b8", "test_input": 0}, "effort_role": "task", "registered_at": 1794978968.128848}
+{"event": "revoke", "token": "2235aa3987823f0c95ce730d0b129b34", "ts": 1794979002.8075302}
+{"token": "e0f0e763431d323da07535101c70a8f5", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "4c7dc4dd", "test_input": 0}, "effort_role": "task", "registered_at": 1794979002.8116693}
+{"event": "revoke", "token": "6ac224c7562db75841e2f98e0f9073d5", "ts": 1794979012.817709}
+{"token": "27d81d58bbf3fffbb1f41fbe8d6a3452", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "4c7dc4dd", "test_input": 1}, "effort_role": "task", "registered_at": 1794979012.8230145}
+{"event": "revoke", "token": "206aa6a172645bba5e7895f4a1af093f", "ts": 1794979036.854041}
+{"token": "3df3f72551633d2bcaa78f65f202f31d", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "beb8660c", "test_input": 0}, "effort_role": "task", "registered_at": 1794979036.8588264}
+{"event": "revoke", "token": "eeb7b2fff3fa812bee827711a21e481f", "ts": 1794979053.6175241}
+{"token": "4482324736dcd62ba444c65ad8638f7f", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "e619ca6e", "test_input": 0}, "effort_role": "task", "registered_at": 1794979053.6222591}
+{"event": "revoke", "token": "3df3f72551633d2bcaa78f65f202f31d", "ts": 1794979057.7370148}
+{"token": "5013771b172893a6d50b303f1c8e2797", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "e73095fd", "test_input": 0}, "effort_role": "task", "registered_at": 1794979057.7402558}
+{"event": "revoke", "token": "ee5ec3cb5074930bc363bbc0122b64ef", "ts": 1794979064.413037}
+{"token": "668b62fec67120d72dbbba5b186fae6a", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "e9c9d9a1", "test_input": 0}, "effort_role": "task", "registered_at": 1794979064.418579}
+{"event": "revoke", "token": "a3936d8b111ae6ea98923736f9eac364", "ts": 1794979068.2267005}
+{"token": "84f3e64f7c2e2baba49ae32be25ae842", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "eb5a1d5d", "test_input": 0}, "effort_role": "task", "registered_at": 1794979068.231837}
+{"event": "revoke", "token": "d2caa38fe50a5c7831ed18d8ad234a6a", "ts": 1794979071.4586477}
+{"token": "2ad3d680dfb10b6d15b9819d332ac6e6", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "f5aa3634", "test_input": 0}, "effort_role": "task", "registered_at": 1794979071.4619443}
+{"event": "revoke", "token": "8551fd6e46cb2ee5e06ef17f805e5219", "ts": 1794979075.5296328}
+{"token": "b4fabba251f08fa4f12311446edd0e23", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "4e34c42c", "test_input": 0}, "effort_role": "task", "registered_at": 1794979075.5331943}
+{"event": "revoke", "token": "2bbef71dc0df28d57aa211498bae8b00", "ts": 1794979091.2483447}
+{"token": "0f9f34512a2ce236efeb4a83519781aa", "role": "meta", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": 7, "run": "ext_source_s1_g40"}, "effort_role": "meta", "registered_at": 1794979092.0779397}
+{"event": "revoke", "token": "668b62fec67120d72dbbba5b186fae6a", "ts": 1794979095.36313}
+{"token": "e4534cb705eaa424f42e772106ce0f76", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "f76d97a5", "test_input": 0}, "effort_role": "task", "registered_at": 1794979095.365306}
+{"event": "revoke", "token": "84f3e64f7c2e2baba49ae32be25ae842", "ts": 1794979095.9123905}
+{"token": "d0cfe62b73575c56f82d90eff0f1a741", "role": "task", "scope": {"phase": "rescore", "arm": "g40", "seed": 1, "iteration": 6, "task": "fd096ab6", "test_input": 0}, "effort_role": "task", "registered_at": 1794979095.9157526}
+{"event": "revoke", "token": "4c2af7f82dafd4aecc991b10a7178a75", "ts": 1794979108.115166}
+{"token": "568661aa86b90ef2299088d8eede7a0f", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "4e34c42c", "test_input": 1}, "effort_role": "task", "registered_at": 1794979108.119825}
+{"event": "revoke", "token": "ae25b675d2d09c534272676f7afff2c9", "ts": 1794979111.4111476}
+{"token": "977b53a402c86cac08ef976bb6287643", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "53fb4810", "test_input": 0}, "effort_role": "task", "registered_at": 1794979111.4151795}
+{"event": "revoke", "token": "2ad3d680dfb10b6d15b9819d332ac6e6", "ts": 1794979129.896595}
+{"event": "revoke", "token": "79f6d3143251451a54a33f3d9d9370cb", "ts": 1794979146.6426573}
+{"token": "e79470457ca918816953c8932241cd42", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "5545f144", "test_input": 0}, "effort_role": "task", "registered_at": 1794979146.6460352}
+{"event": "revoke", "token": "8ad00b143bf0bb5315fc25b212218ed8", "ts": 1794979157.6509564}
+{"event": "revoke", "token": "fda1d2f48cbaf67cb52ebbc60cd0f986", "ts": 1794979176.1503525}
+{"event": "revoke", "token": "4482324736dcd62ba444c65ad8638f7f", "ts": 1794979177.0567627}
+{"event": "revoke", "token": "8d6354f32adc01cb395979d0ee054e4a", "ts": 1794979188.8981209}
+{"event": "revoke", "token": "acc33836e1ecfcb1e4c39ce750da5f7a", "ts": 1794979207.892855}
+{"event": "revoke", "token": "e4534cb705eaa424f42e772106ce0f76", "ts": 1794979210.6925066}
+{"event": "revoke", "token": "c6dd7e43a5f2d44c5d0ac2f0e4801e80", "ts": 1794979211.1570203}
+{"event": "revoke", "token": "977b53a402c86cac08ef976bb6287643", "ts": 1794979238.6421328}
+{"token": "cf5e1516f97682300385f90cf2a7a3be", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "581f7754", "test_input": 0}, "effort_role": "task", "registered_at": 1794979238.6459103}
+{"event": "revoke", "token": "a2f2c1ac53c829a7b4c28ddee127f0a7", "ts": 1794979271.5711975}
+{"token": "942d12b791ca6a4406c979b6baed2e88", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "581f7754", "test_input": 1}, "effort_role": "task", "registered_at": 1794979271.574965}
+{"event": "revoke", "token": "88e62bf0aff507cdb4aebaed2b812b8d", "ts": 1794979275.0726814}
+{"token": "75d0abf3b095738a8f888aa59a7779b7", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "58490d8a", "test_input": 0}, "effort_role": "task", "registered_at": 1794979275.0790868}
+{"event": "revoke", "token": "7b3d94d30e54e5f69b82d82181f78a4b", "ts": 1794979295.6236978}
+{"token": "3edca4e52a67b52a70b719ae44ff7764", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "58f5dbd5", "test_input": 0}, "effort_role": "task", "registered_at": 1794979295.6293263}
+{"event": "revoke", "token": "d0cfe62b73575c56f82d90eff0f1a741", "ts": 1794979311.2550182}
+{"event": "revoke", "token": "d0ebd4f5b7027ca0365a84252f3f1314", "ts": 1794979320.0735793}
+{"token": "26667f5e97331b65887c6a9521bb8daa", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "5961cc34", "test_input": 0}, "effort_role": "task", "registered_at": 1794979320.0784366}
+{"event": "revoke", "token": "75d0abf3b095738a8f888aa59a7779b7", "ts": 1794979327.0461676}
+{"token": "c79d6316ab75bc6bbe4dd2a523548f39", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "5dbc8537", "test_input": 0}, "effort_role": "task", "registered_at": 1794979327.0501337}
+{"event": "revoke", "token": "e79470457ca918816953c8932241cd42", "ts": 1794979351.8720973}
+{"token": "73ff8690e553a0870986c7ad35937b6c", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "5dbc8537", "test_input": 1}, "effort_role": "task", "registered_at": 1794979351.8764477}
+{"event": "revoke", "token": "5013771b172893a6d50b303f1c8e2797", "ts": 1794979381.8240743}
+{"token": "5b5e324510581dffd5981889c9e1923b", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "136b0064", "test_input": 0}, "effort_role": "task", "registered_at": 1794979382.9094727}
+{"token": "27e2fd70f4914df899b42dab652c4d67", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "0934a4d8", "test_input": 0}, "effort_role": "task", "registered_at": 1794979382.9125228}
+{"token": "e126507132b8a4a8503e72f9ef281858", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "13e47133", "test_input": 1}, "effort_role": "task", "registered_at": 1794979382.9163568}
+{"token": "1dc46d508433b811b29361cd8b41f0e1", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "13e47133", "test_input": 0}, "effort_role": "task", "registered_at": 1794979382.9166193}
+{"token": "0c14fc703b4e82d2f04bd8e826a87d94", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "16de56c4", "test_input": 0}, "effort_role": "task", "registered_at": 1794979382.9195194}
+{"token": "a1cf3cea2b3473c8476fb58cb3688fac", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "135a2760", "test_input": 0}, "effort_role": "task", "registered_at": 1794979382.9214022}
+{"token": "51478c4efcf6059f7b0b9b832ae183b5", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "16b78196", "test_input": 0}, "effort_role": "task", "registered_at": 1794979382.9226503}
+{"token": "cc1352333599f7a15cf432c740fa1f10", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "16de56c4", "test_input": 1}, "effort_role": "task", "registered_at": 1794979382.9233437}
+{"token": "07a71456263122d188f2dd2dcb66ad1a", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "142ca369", "test_input": 0}, "effort_role": "task", "registered_at": 1794979382.9249735}
+{"token": "1c4022cdbb2997736e0138ea98136b37", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "142ca369", "test_input": 1}, "effort_role": "task", "registered_at": 1794979382.926531}
+{"event": "revoke", "token": "27d81d58bbf3fffbb1f41fbe8d6a3452", "ts": 1794979408.5619478}
+{"token": "85f164cadc3db53a681a2970ccf036e5", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "62593bfd", "test_input": 0}, "effort_role": "task", "registered_at": 1794979408.5675094}
+{"event": "revoke", "token": "942d12b791ca6a4406c979b6baed2e88", "ts": 1794979421.968663}
+{"token": "64a56fb6ee60173f607ef7da41a4f776", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "62593bfd", "test_input": 1}, "effort_role": "task", "registered_at": 1794979421.9728048}
+{"event": "revoke", "token": "0f9f34512a2ce236efeb4a83519781aa", "ts": 1794979461.588852}
+{"token": "08f8b69cb88991bc0dc66fc37a575efe", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "4093f84a", "test_input": 0}, "effort_role": "task", "registered_at": 1794979461.9646237}
+{"token": "c0199ef000d74a253c840696d04320b3", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "42f83767", "test_input": 1}, "effort_role": "task", "registered_at": 1794979461.9686453}
+{"token": "8dd1d284326d44aa7407dfe1d471565e", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "0f63c0b9", "test_input": 0}, "effort_role": "task", "registered_at": 1794979461.969252}
+{"token": "3214d30b5f3be7a244b11a24d0fe9fcf", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "18419cfa", "test_input": 0}, "effort_role": "task", "registered_at": 1794979461.9699357}
+{"token": "cc29fab3e39421eaae14a14e134d5933", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "414297c0", "test_input": 0}, "effort_role": "task", "registered_at": 1794979461.970126}
+{"token": "0d43d9c648e64f6a8107b6377ac0a2f4", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "42f83767", "test_input": 0}, "effort_role": "task", "registered_at": 1794979461.9780428}
+{"token": "ea747c05b83f2ee45625c72e0a18f0ea", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "5b37cb25", "test_input": 0}, "effort_role": "task", "registered_at": 1794979461.9795635}
+{"token": "7c087c01e0701952aecdda92086b6e11", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "25e02866", "test_input": 0}, "effort_role": "task", "registered_at": 1794979461.9796736}
+{"token": "07132ac172fe0d7ebeb8c1f2b8682180", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "6d1d5c90", "test_input": 0}, "effort_role": "task", "registered_at": 1794979461.9822779}
+{"token": "ca999f50fcc6008c42a667b6c4a45ce5", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "50cb2852", "test_input": 0}, "effort_role": "task", "registered_at": 1794979461.9800532}
+{"token": "7c92630383acd0afdbcded04b198e06f", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "753ea09b", "test_input": 0}, "effort_role": "task", "registered_at": 1794979461.9829197}
+{"token": "0fc7997355741c069d98484d8b0ca317", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "469497ad", "test_input": 0}, "effort_role": "task", "registered_at": 1794979461.9840772}
+{"event": "revoke", "token": "e0f0e763431d323da07535101c70a8f5", "ts": 1794979473.0462132}
+{"token": "32408f172661cbe4bef720425e814966", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "64efde09", "test_input": 0}, "effort_role": "task", "registered_at": 1794979473.0502381}
+{"event": "revoke", "token": "7c087c01e0701952aecdda92086b6e11", "ts": 1794979483.5958123}
+{"token": "25586fd165c7e07d0ab2aa01b2b07530", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "85c4e7cd", "test_input": 0}, "effort_role": "task", "registered_at": 1794979483.5992842}
+{"event": "revoke", "token": "ca999f50fcc6008c42a667b6c4a45ce5", "ts": 1794979483.7630696}
+{"token": "c518f6c875bba202489259803db527d6", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "97c75046", "test_input": 0}, "effort_role": "task", "registered_at": 1794979483.7661023}
+{"event": "revoke", "token": "cc1352333599f7a15cf432c740fa1f10", "ts": 1794979486.2926595}
+{"token": "0d6bbf60c240ea6b97b7da8f23ac9343", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "1818057f", "test_input": 0}, "effort_role": "task", "registered_at": 1794979486.296477}
+{"event": "revoke", "token": "8dd1d284326d44aa7407dfe1d471565e", "ts": 1794979498.355289}
+{"token": "efce5b31a203916582f99fe74b32c983", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "9edfc990", "test_input": 0}, "effort_role": "task", "registered_at": 1794979498.3593035}
+{"event": "revoke", "token": "3edca4e52a67b52a70b719ae44ff7764", "ts": 1794979499.9145687}
+{"token": "c74cc8cfc4765b6d41efeb23a34301ab", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "65b59efc", "test_input": 0}, "effort_role": "task", "registered_at": 1794979499.9197817}
+{"event": "revoke", "token": "25586fd165c7e07d0ab2aa01b2b07530", "ts": 1794979506.054671}
+{"token": "5d92067b90297a5c6a9cc4d7d22847e8", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "a416fc5b", "test_input": 0}, "effort_role": "task", "registered_at": 1794979506.0577629}
+{"event": "revoke", "token": "07132ac172fe0d7ebeb8c1f2b8682180", "ts": 1794979516.9171498}
+{"token": "3a8953eae563cc3b9af996ef4f1df790", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "ad173014", "test_input": 0}, "effort_role": "task", "registered_at": 1794979516.9208329}
+{"event": "revoke", "token": "cf5e1516f97682300385f90cf2a7a3be", "ts": 1794979525.2889118}
+{"token": "ee6497fad9cd2814940e3547cbf42a51", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "65b59efc", "test_input": 1}, "effort_role": "task", "registered_at": 1794979525.2926679}
+{"event": "revoke", "token": "0c14fc703b4e82d2f04bd8e826a87d94", "ts": 1794979525.845261}
+{"token": "38b39e93fa8d3e9c6da579632cfc8081", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "195c6913", "test_input": 0}, "effort_role": "task", "registered_at": 1794979525.8522592}
+{"event": "revoke", "token": "08f8b69cb88991bc0dc66fc37a575efe", "ts": 1794979558.1801484}
+{"token": "9aa9d59b2560ef551e84a51a6d5a2986", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "ba9d41b8", "test_input": 0}, "effort_role": "task", "registered_at": 1794979558.1837287}
+{"event": "revoke", "token": "0fc7997355741c069d98484d8b0ca317", "ts": 1794979559.3002112}
+{"token": "83ccd6f1b5b76b7b3cb15a3ed199153a", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "beb8660c", "test_input": 0}, "effort_role": "task", "registered_at": 1794979559.3032844}
+{"event": "revoke", "token": "cc29fab3e39421eaae14a14e134d5933", "ts": 1794979564.2038352}
+{"token": "08f7bae8f91bb508882c539357d77129", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "e619ca6e", "test_input": 0}, "effort_role": "task", "registered_at": 1794979564.21315}
+{"event": "revoke", "token": "3a8953eae563cc3b9af996ef4f1df790", "ts": 1794979567.5856185}
+{"token": "8d075a7d7a7ee8e35539b1fe3aff50bb", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "e73095fd", "test_input": 0}, "effort_role": "task", "registered_at": 1794979567.5901763}
+{"event": "revoke", "token": "26667f5e97331b65887c6a9521bb8daa", "ts": 1794979568.2059565}
+{"token": "45cbcc4073aa1d5b0e0064281fd3f113", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "67e490f4", "test_input": 0}, "effort_role": "task", "registered_at": 1794979568.2103932}
+{"event": "revoke", "token": "3214d30b5f3be7a244b11a24d0fe9fcf", "ts": 1794979576.616979}
+{"token": "ca2b858a4d1f19c55d9bac61a0be0b09", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "e9c9d9a1", "test_input": 0}, "effort_role": "task", "registered_at": 1794979576.622253}
+{"event": "revoke", "token": "83ccd6f1b5b76b7b3cb15a3ed199153a", "ts": 1794979590.7488}
+{"token": "5e187cedf0bd66cd67bf4e181e330dd8", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "eb5a1d5d", "test_input": 0}, "effort_role": "task", "registered_at": 1794979590.752824}
+{"event": "revoke", "token": "0d43d9c648e64f6a8107b6377ac0a2f4", "ts": 1794979599.8206046}
+{"token": "84446b57400f509015987801ed71534e", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "f5aa3634", "test_input": 0}, "effort_role": "task", "registered_at": 1794979599.827516}
+{"event": "revoke", "token": "ca2b858a4d1f19c55d9bac61a0be0b09", "ts": 1794979600.538496}
+{"token": "5a4eaec57c2ee426b4d99aeddef93898", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "f76d97a5", "test_input": 0}, "effort_role": "task", "registered_at": 1794979600.5412629}
+{"event": "revoke", "token": "568661aa86b90ef2299088d8eede7a0f", "ts": 1794979601.0307682}
+{"token": "af9df547d89a293cec28a5d2313a19b2", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "6e453dd6", "test_input": 0}, "effort_role": "task", "registered_at": 1794979601.0345073}
+{"event": "revoke", "token": "73ff8690e553a0870986c7ad35937b6c", "ts": 1794979601.35599}
+{"token": "55cc79f1dc1f22e7fd35664dd76c0713", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "6e4f6532", "test_input": 0}, "effort_role": "task", "registered_at": 1794979601.3603675}
+{"event": "revoke", "token": "c0199ef000d74a253c840696d04320b3", "ts": 1794979605.2191982}
+{"token": "e6c263c3320edb7a89c926ef6f480fcf", "role": "task", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": "7", "task": "fd096ab6", "test_input": 0}, "effort_role": "task", "registered_at": 1794979605.2245626}
+{"event": "revoke", "token": "5a4eaec57c2ee426b4d99aeddef93898", "ts": 1794979609.740359}
+{"event": "revoke", "token": "5e187cedf0bd66cd67bf4e181e330dd8", "ts": 1794979613.440831}
+{"event": "revoke", "token": "0d6bbf60c240ea6b97b7da8f23ac9343", "ts": 1794979620.1426632}
+{"token": "1652077f95eacc23c29d2766985c61fe", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "195c6913", "test_input": 1}, "effort_role": "task", "registered_at": 1794979620.146782}
+{"event": "revoke", "token": "9aa9d59b2560ef551e84a51a6d5a2986", "ts": 1794979634.696033}
+{"event": "revoke", "token": "08f7bae8f91bb508882c539357d77129", "ts": 1794979638.1947443}
+{"event": "revoke", "token": "ea747c05b83f2ee45625c72e0a18f0ea", "ts": 1794979659.230142}
+{"event": "revoke", "token": "af9df547d89a293cec28a5d2313a19b2", "ts": 1794979660.9188488}
+{"token": "eb611a3f6a2ee254d6f35d86c192330c", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "6e4f6532", "test_input": 1}, "effort_role": "task", "registered_at": 1794979660.9433138}
+{"event": "revoke", "token": "b4fabba251f08fa4f12311446edd0e23", "ts": 1794979661.043253}
+{"token": "32343a23e63d39dcc9a4a091ab277a38", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "6ffbe589", "test_input": 0}, "effort_role": "task", "registered_at": 1794979661.047469}
+{"event": "revoke", "token": "64a56fb6ee60173f607ef7da41a4f776", "ts": 1794979662.1216354}
+{"token": "0213c1caa5394fc86fad9806c62adc67", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "71e489b6", "test_input": 0}, "effort_role": "task", "registered_at": 1794979662.1254132}
+{"event": "revoke", "token": "84446b57400f509015987801ed71534e", "ts": 1794979664.0853963}
+{"event": "revoke", "token": "7c92630383acd0afdbcded04b198e06f", "ts": 1794979687.3380523}
+{"event": "revoke", "token": "c518f6c875bba202489259803db527d6", "ts": 1794979717.4608371}
+{"event": "revoke", "token": "c74cc8cfc4765b6d41efeb23a34301ab", "ts": 1794979717.9142764}
+{"token": "65c51e115a2f1408dea5bc1bec52352b", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "71e489b6", "test_input": 1}, "effort_role": "task", "registered_at": 1794979717.9194899}
+{"event": "revoke", "token": "85f164cadc3db53a681a2970ccf036e5", "ts": 1794979720.5689604}
+{"token": "a7cc0d9d60e99a69556e9cdbd77f93b2", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "7491f3cf", "test_input": 0}, "effort_role": "task", "registered_at": 1794979720.5724103}
+{"event": "revoke", "token": "1dc46d508433b811b29361cd8b41f0e1", "ts": 1794979727.8749874}
+{"token": "96db9d65a36493afe11977da3c6149e3", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "1ae2feb7", "test_input": 0}, "effort_role": "task", "registered_at": 1794979727.8815897}
+{"event": "revoke", "token": "c79d6316ab75bc6bbe4dd2a523548f39", "ts": 1794979730.2198179}
+{"token": "af950ae59d5e6fe7ae76eaf7a2457778", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "7666fa5d", "test_input": 0}, "effort_role": "task", "registered_at": 1794979730.2245064}
+{"event": "revoke", "token": "e126507132b8a4a8503e72f9ef281858", "ts": 1794979735.7965496}
+{"token": "96092c31d557f400fbdd51857d169fae", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "1ae2feb7", "test_input": 1}, "effort_role": "task", "registered_at": 1794979735.7999299}
+{"event": "revoke", "token": "a1cf3cea2b3473c8476fb58cb3688fac", "ts": 1794979740.3102314}
+{"token": "a5cb9a29ec3a2f569dd0ce0abac89e82", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "1ae2feb7", "test_input": 2}, "effort_role": "task", "registered_at": 1794979740.3139932}
+{"event": "revoke", "token": "efce5b31a203916582f99fe74b32c983", "ts": 1794979764.013242}
+{"event": "revoke", "token": "ee6497fad9cd2814940e3547cbf42a51", "ts": 1794979790.954673}
+{"token": "2a8fab0766a064585f512f8de3a50a86", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "78332cb0", "test_input": 0}, "effort_role": "task", "registered_at": 1794979790.959521}
+{"event": "revoke", "token": "1c4022cdbb2997736e0138ea98136b37", "ts": 1794979828.1602273}
+{"token": "866fc2d557d2ed4c6df73ad1b4fd015d", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "20270e3b", "test_input": 0}, "effort_role": "task", "registered_at": 1794979828.163602}
+{"event": "revoke", "token": "0213c1caa5394fc86fad9806c62adc67", "ts": 1794979832.7593987}
+{"token": "0849c715349745a08579dfa845d8b415", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "78332cb0", "test_input": 1}, "effort_role": "task", "registered_at": 1794979832.7626965}
+{"event": "revoke", "token": "e6c263c3320edb7a89c926ef6f480fcf", "ts": 1794979848.4343603}
+{"event": "revoke", "token": "65c51e115a2f1408dea5bc1bec52352b", "ts": 1794979861.9898193}
+{"token": "beba431fa238e22de607604568ead1fa", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "7b0280bc", "test_input": 0}, "effort_role": "task", "registered_at": 1794979861.9941084}
+{"event": "revoke", "token": "a5cb9a29ec3a2f569dd0ce0abac89e82", "ts": 1794979866.3711631}
+{"token": "30bf6a9d1a4c12214f8bd92cb2ffe4c6", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "20270e3b", "test_input": 1}, "effort_role": "task", "registered_at": 1794979866.375073}
+{"event": "revoke", "token": "96db9d65a36493afe11977da3c6149e3", "ts": 1794979871.0057974}
+{"token": "fefbfe20850de22a2f10017366c132f0", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "20a9e565", "test_input": 0}, "effort_role": "task", "registered_at": 1794979871.0099647}
+{"event": "revoke", "token": "5d92067b90297a5c6a9cc4d7d22847e8", "ts": 1794979876.0449016}
+{"event": "revoke", "token": "96092c31d557f400fbdd51857d169fae", "ts": 1794979879.9247735}
+{"token": "f4cc3a7bed1589d519a0803bc42d1528", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "20a9e565", "test_input": 1}, "effort_role": "task", "registered_at": 1794979879.9286203}
+{"event": "revoke", "token": "07a71456263122d188f2dd2dcb66ad1a", "ts": 1794979886.1159816}
+{"token": "52a559af68dcb8fa8be65ae19f249826", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "21897d95", "test_input": 0}, "effort_role": "task", "registered_at": 1794979886.1200066}
+{"event": "revoke", "token": "38b39e93fa8d3e9c6da579632cfc8081", "ts": 1794979892.1879377}
+{"token": "7bfdb3f832a1bbb6389c0e04c981815a", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "21897d95", "test_input": 1}, "effort_role": "task", "registered_at": 1794979892.1916525}
+{"event": "revoke", "token": "51478c4efcf6059f7b0b9b832ae183b5", "ts": 1794979892.5171719}
+{"token": "55e302560149806df17581374d7b0ec2", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "221dfab4", "test_input": 0}, "effort_role": "task", "registered_at": 1794979892.523488}
+{"event": "revoke", "token": "8d075a7d7a7ee8e35539b1fe3aff50bb", "ts": 1794979916.2384434}
+{"token": "79b680dcc917300773120e687f71f9d8", "role": "meta", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": 8, "run": "ext_source_s1_g40"}, "effort_role": "meta", "registered_at": 1794979916.9609942}
+{"event": "revoke", "token": "2a8fab0766a064585f512f8de3a50a86", "ts": 1794979950.8154566}
+{"token": "132b3bcf28dc83ac9a0aaf76c80f2881", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "7b3084d4", "test_input": 0}, "effort_role": "task", "registered_at": 1794979950.819018}
+{"event": "revoke", "token": "0849c715349745a08579dfa845d8b415", "ts": 1794979969.5096846}
+{"token": "f33398be0e4f5eb4aa83896b2e8be7fa", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "7b5033c1", "test_input": 0}, "effort_role": "task", "registered_at": 1794979969.517963}
+{"event": "revoke", "token": "32343a23e63d39dcc9a4a091ab277a38", "ts": 1794979970.8427484}
+{"token": "dd332d75f4830e5b33a29df9e2bb2943", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "7b80bb43", "test_input": 0}, "effort_role": "task", "registered_at": 1794979970.8488758}
+{"event": "revoke", "token": "32408f172661cbe4bef720425e814966", "ts": 1794979995.1053038}
+{"token": "bb179244b10c220460113f5fbea20f56", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "7c66cb00", "test_input": 0}, "effort_role": "task", "registered_at": 1794979995.1134791}
+{"event": "revoke", "token": "5b5e324510581dffd5981889c9e1923b", "ts": 1794980000.1471782}
+{"token": "ac311372feb1865a28206d0a3c8bc3f6", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "221dfab4", "test_input": 1}, "effort_role": "task", "registered_at": 1794980000.1527696}
+{"event": "revoke", "token": "45cbcc4073aa1d5b0e0064281fd3f113", "ts": 1794980003.3908894}
+{"token": "9279202ccb05875520b3be1233082e56", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "7ed72f31", "test_input": 0}, "effort_role": "task", "registered_at": 1794980003.3959827}
+{"event": "revoke", "token": "f33398be0e4f5eb4aa83896b2e8be7fa", "ts": 1794980007.607083}
+{"token": "01a40663cc4f972fa9f277ed7491d8a4", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "7ed72f31", "test_input": 1}, "effort_role": "task", "registered_at": 1794980007.6113608}
+{"event": "revoke", "token": "af950ae59d5e6fe7ae76eaf7a2457778", "ts": 1794980041.0733094}
+{"token": "06e9e4e0c85345c04a599dd88a5dba63", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "800d221b", "test_input": 0}, "effort_role": "task", "registered_at": 1794980041.0778618}
+{"event": "revoke", "token": "55cc79f1dc1f22e7fd35664dd76c0713", "ts": 1794980045.0145273}
+{"token": "4d93b1883a00d9b1d97155a48fcac9cf", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "80a900e0", "test_input": 0}, "effort_role": "task", "registered_at": 1794980045.020291}
+{"event": "revoke", "token": "9279202ccb05875520b3be1233082e56", "ts": 1794980047.72288}
+{"token": "d2f131f7d2a3feb33e785579bb835e45", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "8698868d", "test_input": 0}, "effort_role": "task", "registered_at": 1794980047.7276042}
+{"event": "revoke", "token": "eb611a3f6a2ee254d6f35d86c192330c", "ts": 1794980062.7814965}
+{"token": "299df0bcbacfff02e40851eac10d5d47", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "88bcf3b4", "test_input": 0}, "effort_role": "task", "registered_at": 1794980062.785241}
+{"event": "revoke", "token": "55e302560149806df17581374d7b0ec2", "ts": 1794980067.688377}
+{"token": "d2aef80721cc10407cd4490129ca5a36", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "247ef758", "test_input": 0}, "effort_role": "task", "registered_at": 1794980067.6924307}
+{"event": "revoke", "token": "1652077f95eacc23c29d2766985c61fe", "ts": 1794980076.0468388}
+{"token": "52b757cf0cc7d20814ceb545542d030f", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "247ef758", "test_input": 1}, "effort_role": "task", "registered_at": 1794980076.0507097}
+{"event": "revoke", "token": "dd332d75f4830e5b33a29df9e2bb2943", "ts": 1794980103.4795694}
+{"token": "af193eff6b207743c38a469661669f25", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "88bcf3b4", "test_input": 1}, "effort_role": "task", "registered_at": 1794980103.4837039}
+{"event": "revoke", "token": "a7cc0d9d60e99a69556e9cdbd77f93b2", "ts": 1794980149.2771788}
+{"token": "962c0b3cbb78196f2de51ecd919e9afd", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "88e364bc", "test_input": 0}, "effort_role": "task", "registered_at": 1794980149.2817445}
+{"event": "revoke", "token": "27e2fd70f4914df899b42dab652c4d67", "ts": 1794980160.7956665}
+{"token": "a5f57bdddc17076f33db7d413c0a4e15", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "269e22fb", "test_input": 0}, "effort_role": "task", "registered_at": 1794980160.8007655}
+{"event": "revoke", "token": "30bf6a9d1a4c12214f8bd92cb2ffe4c6", "ts": 1794980170.2402217}
+{"token": "f7c543e9d1b029bf87d75511df20f040", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "269e22fb", "test_input": 1}, "effort_role": "task", "registered_at": 1794980170.2446697}
+{"event": "revoke", "token": "d2aef80721cc10407cd4490129ca5a36", "ts": 1794980176.7246766}
+{"token": "ffb9099320134460ded7a339eb79d3e8", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "271d71e2", "test_input": 0}, "effort_role": "task", "registered_at": 1794980176.7285159}
+{"event": "revoke", "token": "01a40663cc4f972fa9f277ed7491d8a4", "ts": 1794980180.050014}
+{"token": "ee226494a4b4b7392f4bc0621d437cbb", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "88e364bc", "test_input": 1}, "effort_role": "task", "registered_at": 1794980180.0543795}
+{"event": "revoke", "token": "bb179244b10c220460113f5fbea20f56", "ts": 1794980188.0441349}
+{"token": "2e1939239046bd1e76673b3168e262c6", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "89565ca0", "test_input": 0}, "effort_role": "task", "registered_at": 1794980188.0486324}
+{"event": "revoke", "token": "79b680dcc917300773120e687f71f9d8", "ts": 1794980212.652699}
+{"event": "revoke", "token": "ac311372feb1865a28206d0a3c8bc3f6", "ts": 1794980226.185476}
+{"token": "07d5091820ea05f508f3436f3cf80571", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "28a6681f", "test_input": 0}, "effort_role": "task", "registered_at": 1794980226.1892583}
+{"event": "revoke", "token": "4d93b1883a00d9b1d97155a48fcac9cf", "ts": 1794980227.027378}
+{"token": "18c582406304317fe2653f5762df36ee", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 2, "iteration": 3, "task": "898e7135", "test_input": 0}, "effort_role": "task", "registered_at": 1794980227.0309474}
+{"event": "revoke", "token": "f4cc3a7bed1589d519a0803bc42d1528", "ts": 1794980231.0995424}
+{"token": "9651fc82dc4f1a53098fe84f9ce2331e", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "291dc1e1", "test_input": 0}, "effort_role": "task", "registered_at": 1794980231.1035423}
+{"event": "revoke", "token": "866fc2d557d2ed4c6df73ad1b4fd015d", "ts": 1794980231.5480769}
+{"token": "75e7812f2e9ab6cbf8704f51b36abffc", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "2b83f449", "test_input": 0}, "effort_role": "task", "registered_at": 1794980231.5524316}
+{"event": "revoke", "token": "52b757cf0cc7d20814ceb545542d030f", "ts": 1794980244.422887}
+{"token": "067321a461033cbf09d808df2ef5ad1a", "role": "task", "scope": {"phase": "heldout", "arm": "g40", "seed": 1, "iteration": 1, "task": "2ba387bc", "test_input": 0}, "effort_role": "task", "registered_at": 1794980244.4268847}
+{"token": "9b8ff393901fba55fa6aa6df126265ea", "role": "meta", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 0, "iteration": 8, "run": "ext_source_s1_g40"}, "effort_role": "meta", "registered_at": 1794980271.1049}

@@ -84,3 +84,4 @@ IMPORT_OK
 IMPORT_OK 
 04:47:35 launched extension test ext_source_s1_g40: launched run_ext_source_s1_g40
 05:07:43 launched final exam for ext_source_s2_g40
+05:37:50 resumed ext_source_s1_g40 (infra aborts so far: 1)
