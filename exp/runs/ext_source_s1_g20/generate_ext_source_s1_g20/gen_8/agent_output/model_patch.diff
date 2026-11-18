@@ -1,0 +1,33 @@
+diff --git a/task_agent.py b/task_agent.py
+index 7b28f01..d0abfda 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -172,12 +172,20 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        # Spend the existing two-call budget on two independent solutions. A candidate-based
+-        # audit can anchor the second response to the first answer's small cell-placement errors;
+-        # instead, the second call re-derives the rule and explicitly checks examples and dimensions.
++        first = None
++        # Use the existing two-call budget for a solve followed by an audit. On ARC tasks,
++        # independent attempts often repeat the same reasoning failure; presenting the first
++        # grid lets the second call check exact placement against the demonstrations instead.
+         for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs, independent_check=(attempt == 1))
++                if attempt == 0:
++                    g = self.solve_once(inputs)
++                    first = g
++                elif first is not None:
++                    g = self.solve_once(inputs, candidate=first)
++                else:
++                    # A failed/invalid first response gives the audit nothing concrete to check.
++                    g = self.solve_once(inputs, independent_check=True)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..ef3a75e
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

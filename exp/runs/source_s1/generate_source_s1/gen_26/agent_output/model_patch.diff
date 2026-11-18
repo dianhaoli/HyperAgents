@@ -1,0 +1,71 @@
+diff --git a/task_agent.py b/task_agent.py
+index 6a3fe74..7fd7bb8 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -48,6 +48,38 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
++def _training_change_audit(input_grid, output_grid, coordinate_limit=48):
++    """Summarize demonstrated edits without overwhelming the prompt on large grids."""
++    in_h, in_w = len(input_grid), len(input_grid[0]) if input_grid else 0
++    out_h, out_w = len(output_grid), len(output_grid[0]) if output_grid else 0
++    if (in_h, in_w) != (out_h, out_w):
++        return f"dimensions {in_h}x{in_w} -> {out_h}x{out_w}"
++
++    changes = {}
++    for r, (in_row, out_row) in enumerate(zip(input_grid, output_grid)):
++        for c, (before, after) in enumerate(zip(in_row, out_row)):
++            if before != after:
++                changes.setdefault((before, after), []).append((r, c))
++    if not changes:
++        return "no cells changed"
++
++    total = sum(len(cells) for cells in changes.values())
++    descriptions = []
++    for (before, after), cells in sorted(changes.items()):
++        item = f"{before}->{after}: {len(cells)} cell(s)"
++        if total <= coordinate_limit:
++            item += " at " + ", ".join(f"({r},{c})" for r, c in cells)
++        else:
++            row_counts = {}
++            for r, _ in cells:
++                row_counts[r] = row_counts.get(r, 0) + 1
++            item += "; per-row counts " + ", ".join(
++                f"row {r}: {count}" for r, count in sorted(row_counts.items())
++            )
++        descriptions.append(item)
++    return f"{total} changed cell(s): " + "; ".join(descriptions)
++
++
+ def build_prompt(inputs):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+@@ -63,6 +95,10 @@ def build_prompt(inputs):
+         h, w = len(pair["output"]), len(pair["output"][0])
+         parts.append(f"Output ({h}x{w}):")
+         parts.append(grid_to_text(pair["output"]))
++        parts.append(
++            "Change audit (input value -> output value; coordinates are zero-based): "
++            + _training_change_audit(pair["input"], pair["output"])
++        )
+         parts.append("")
+     t = inputs["test_input"]
+     parts.append("## Test")
+@@ -71,11 +107,11 @@ def build_prompt(inputs):
+     parts.append("")
+     parts.append(
+         "Before applying a rule, audit the demonstrations: identify the relevant objects/colors and "
+-        "describe how the changed cells relate to them. Check the proposed rule against every "
+-        "input/output pair, including cells that stay unchanged; reject or revise it if even one "
+-        "pair disagrees. Do not infer a rule from only the endpoints or one example when the "
+-        "other examples constrain which cells change. Then apply the verified rule to the test, "
+-        "checking the grid dimensions and changed regions.\n\n"
++        "explain every listed changed cell using one concrete rule that works for every pair. "
++        "Also check the unchanged cells: do not alter cells merely to complete a shape or extend "
++        "a pattern beyond the bounds supported by the examples. If dimensions change, account for "
++        "that explicitly. Reject or revise any rule that cannot explain all demonstrated edits and "
++        "non-edits. Then apply the verified rule to the test and check its dimensions and bounds.\n\n"
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+         "Put nothing else inside the tags."

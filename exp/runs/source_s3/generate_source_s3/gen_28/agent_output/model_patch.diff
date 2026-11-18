@@ -1,0 +1,45 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index 3a03bee..3243afe 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -65,8 +65,23 @@ def _evaluation_summary(eval_path, max_candidates=3):
+                 if isinstance(value, int) and not isinstance(value, bool):
+                     sample_count = value
+                     break
+-            scope = (domain, sample_count)
++            # When reports expose task IDs, use the actual evaluated cohort rather than
++            # assuming that equal sample counts mean the same evaluation set. Fall back
++            # to counts only for report formats that do not provide per-task results.
++            task_scores = report.get("per_task_score")
++            if isinstance(task_scores, dict) and task_scores:
++                task_ids = tuple(sorted(map(str, task_scores)))
++                cohort = ("task_ids", task_ids)
++                cohort_label = f"{len(task_ids)} task IDs (exact cohort)"
++            else:
++                cohort = ("count", sample_count)
++                cohort_label = (
++                    "unknown sample count" if sample_count is None
++                    else f"{sample_count} test inputs/tasks (IDs unavailable)"
++                )
++            scope = (domain, cohort)
+             record = {
++                "cohort_label": cohort_label,
+                 "generation": "initial" if is_initial else dirname[4:],
+                 "score": score,
+                 "parent": metadata.get("parent_genid"),
+@@ -79,12 +94,12 @@ def _evaluation_summary(eval_path, max_candidates=3):
+             else:
+                 incomplete.append((domain, record))
+ 
+-    lines = ["Prior evaluation evidence (scores are comparable only within the same domain and sample count):"]
++    lines = ["Prior evaluation evidence (scores are comparable only within the same domain and exact cohort when task IDs are available; otherwise compare matching sample counts cautiously):"]
+     if not completed:
+         lines.append("- No completed, valid generation reports were found; inspect available metadata and reports before making performance claims.")
+-    for (domain, sample_count), records in sorted(completed.items()):
++    for (domain, _cohort), records in sorted(completed.items()):
+         records.sort(key=lambda item: (item["score"], str(item["generation"])), reverse=True)
+-        count_text = "unknown sample count" if sample_count is None else f"{sample_count} test inputs/tasks"
++        count_text = records[0]["cohort_label"]
+         top_records = records[:max_candidates]
+         # Keep the starting agent visible even when it is not among the top candidates.
+         baseline = next((record for record in records if record["generation"] == "initial"), None)
