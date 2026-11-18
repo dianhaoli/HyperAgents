@@ -1,1 +1,3 @@
 [eval] {'phase': 'demo_eval_rpA0', 'arm': 'demo', 'seed': 'rpA0', 'iteration': 'rep1'} round 0: 4 test inputs to run (0 cached)
+[demo eval rpA0] rep 1: score 0.250 on 4 tasks (missing 0)
+[eval] {'phase': 'demo_eval_rpA0', 'arm': 'demo', 'seed': 'rpA0', 'iteration': 'rep2'} round 0: 4 test inputs to run (0 cached)
