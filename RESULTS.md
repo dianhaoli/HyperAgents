@@ -7,9 +7,9 @@
 ## Main estimates (held-out ARC-AGI-2 public evaluation, 120 tasks, 167 test inputs)
 
 - B0 (A_0, two plain attempts): 29.3% (reps: 30.1%, 27.9%, 29.7%)
-- **G** (I_0-built agents minus B0): +0.3 points, 95% Welch CI [-2.7, +3.3] (df 4.9)
-- **Delta** (evolved-improver agents minus I_0-built agents): -0.4 points, 95% Welch CI [-11.7, +10.9] (df 1.6)
-- Evolved arm gain over B0: -0.1 points, 95% Welch CI [-14.7, +14.5] (df 1.3)
+- **G** (I_0-built agents minus B0): +0.4 points, 95% Welch CI [-1.9, +2.8] (df 5.3)
+- **Delta** (evolved-improver agents minus I_0-built agents): -1.8 points, 95% Welch CI [-4.2, +0.6] (df 7.8)
+- Evolved arm gain over B0: -1.4 points, 95% Welch CI [-4.0, +1.3] (df 5.9)
 - Qualifying evolved improvers: 5 of 6 source seeds
 
 ## Per-run held-out scores
@@ -19,11 +19,16 @@
 | payoff_I0_1 | I0 | r1 | 4 | 26.9% | 6 |
 | payoff_I0_2 | I0 | r2 | 4 | 29.4% | 7 |
 | payoff_I0_3 | I0 | r3 | 3 | 30.4% | 5 |
+| payoff_I0_4 | I0 | r4 | 5 | 30.4% | 7 |
 | payoff_I0_5 | I0 | r5 | 3 | 31.4% | 3 |
+| payoff_I0_6 | I0 | r6 | 3 | 29.4% | 6 |
+| payoff_Ig_source_s1 | Ig | 1 | 1 | 26.0% | 4 |
 | payoff_Ig_source_s2 | Ig | 2 | 3 | 27.4% | 5 |
 | payoff_Ig_source_s3 | Ig | 3 | 1 | 31.0% | 2 |
+| payoff_Ig_source_s5 | Ig | 5 | 3 | 27.2% | 6 |
+| payoff_Ig_source_s6 | Ig | 6 | 2 | 27.9% | 5 |
 
-Run-to-run SD: B0 1.2%, I_0 arm 1.9%, evolved arm 2.6%.
+Run-to-run SD: B0 1.2%, I_0 arm 1.5%, evolved arm 1.9%.
 
 ## Secondary results
 
@@ -47,10 +52,10 @@ Run-to-run SD: B0 1.2%, I_0 arm 1.9%, evolved arm 2.6%.
 
 ## Spend by role (USD, ledger)
 
-- meta: $3.14
+- meta: $3.56
 - probe: $0.00
-- task: $102.15
-- **total: $105.29** (hard stop at $150)
+- task: $118.51
+- **total: $122.07** (hard stop at $150)
 
 ## Crashes, aborts and reruns
 
@@ -70,19 +75,20 @@ Run-to-run SD: B0 1.2%, I_0 arm 1.9%, evolved arm 2.6%.
 | arm / phase | rollouts | timeouts |
 |---|---|---|
 | b0 / A0 | 501 | 0 |
-| ext_payoff / g20 | 272 | 0 |
-| heldout / I0 | 852 | 0 |
-| heldout / Ig | 829 | 0 |
-| heldout / g20 | 91 | 0 |
+| ext_payoff / g20 | 350 | 0 |
+| ext_payoff / g40 | 30 | 0 |
+| heldout / I0 | 1002 | 0 |
+| heldout / Ig | 862 | 0 |
+| heldout / g20 | 441 | 0 |
 | initial / A0 | 221 | 0 |
 | payoff / I0 | 1079 | 0 |
 | payoff / Ig | 572 | 0 |
 | rescore / I0 | 312 | 0 |
 | rescore / Ig | 260 | 0 |
-| rescore / g20 | 133 | 0 |
+| rescore / g20 | 208 | 0 |
 | screen / A0 | 309 | 0 |
 | smoke / I0 | 13 | 0 |
-| source / I0src | 2440 | 1 |
+| source / I0src | 2840 | 1 |
 | trial / Ig | 78 | 0 |
 | xhigh / A0 | 167 | 0 |
 
@@ -90,8 +96,8 @@ Run-to-run SD: B0 1.2%, I_0 arm 1.9%, evolved arm 2.6%.
 
 ## Model and reasoning effort actually used
 
-- Model string returned by the API: `gpt-6-luna` (18741 calls); calls from 2026-11-17 to 2026-11-18.
-- Effort echoed by the API, by role: meta=high: 2475, probe=high: 2, task=high: 15874, task=xhigh: 390.
+- Model string returned by the API: `gpt-6-luna` (21263 calls); calls from 2026-11-17 to 2026-11-18.
+- Effort echoed by the API, by role: meta=high: 2724, probe=high: 2, task=high: 18147, task=xhigh: 390.
 
 # EXTENSION (DESIGN_v2.md, not pre-registered in f577cc7)
 
@@ -101,11 +107,11 @@ Does the coach get better at coaching over generations? Exam score of the player
 
 | generation | runs | mean | 95% t-interval | scores |
 |---|---|---|---|---|
-| 0 | 4 | 29.5% | [26.5%, 32.6%] | 26.9%, 29.4%, 31.4%, 30.4% |
-| 12 | 2 | 29.2% | [6.2%, 52.1%] | 27.4%, 31.0% |
+| 0 | 6 | 29.7% | [28.1%, 31.3%] | 26.9%, 29.4%, 31.4%, 30.4%, 30.4%, 29.4% |
+| 12 | 5 | 27.9% | [25.6%, 30.2%] | 27.4%, 31.0%, 27.2%, 26.0%, 27.9% |
 - Paired change 12->20 (seeds 0-3): n/a
 - Paired change 20->40 (seeds 0-3): n/a
-- Picks with changed coach code: generation 12 (part A rule) 5 of 6 seeds; extension 9 of 9 ({'source_s1:g6': 1, 'source_s2:g6': 5, 'source_s3:g6': 3, 'source_s4:g6': 6, 'source_s4:g20': 12, 'source_s2:g20': 9, 'source_s3:g20': 9, 'source_s1:g20': 1, 'source_s4:g30': 15}).
+- Picks with changed coach code: generation 12 (part A rule) 5 of 6 seeds; extension 12 of 12 ({'source_s1:g6': 1, 'source_s2:g6': 5, 'source_s3:g6': 3, 'source_s4:g6': 6, 'source_s4:g20': 12, 'source_s2:g20': 9, 'source_s3:g20': 9, 'source_s1:g20': 1, 'source_s4:g30': 15, 'source_s2:g30': 9, 'source_s4:g40': 13, 'source_s3:g30': 9}).
 
 ## Diff audit of every picked coach (each changed hunk vs I_0; 2 independent judges + tiebreak)
 
@@ -130,22 +136,27 @@ Every deviation and harness fix is numbered in DECISIONS.md (items marked DEVIAT
 ```
 HEADLINE: Neither improver beat two plain attempts on ARC-AGI-2
 B0 = 29.3% (reps: 30.1%, 27.9%, 29.7%)
-G                +0.3 pts  95% CI [-2.7, +3.3]  df=4.9
-Delta            -0.4 pts  95% CI [-11.7, +10.9]  df=1.6
-I0_gain_over_B0  +0.3 pts  95% CI [-2.7, +3.3]  df=4.9
-Ig_gain_over_B0  -0.1 pts  95% CI [-14.7, +14.5]  df=1.3
+G                +0.4 pts  95% CI [-1.9, +2.8]  df=5.3
+Delta            -1.8 pts  95% CI [-4.2, +0.6]  df=7.8
+I0_gain_over_B0  +0.4 pts  95% CI [-1.9, +2.8]  df=5.3
+Ig_gain_over_B0  -1.4 pts  95% CI [-4.0, +1.3]  df=5.9
 
 | run | arm | seed | final node | held-out |
 |---|---|---|---|---|
 | payoff_I0_1 | I0 | r1 | 4 | 26.9% |
 | payoff_I0_2 | I0 | r2 | 4 | 29.4% |
 | payoff_I0_3 | I0 | r3 | 3 | 30.4% |
+| payoff_I0_4 | I0 | r4 | 5 | 30.4% |
 | payoff_I0_5 | I0 | r5 | 3 | 31.4% |
+| payoff_I0_6 | I0 | r6 | 3 | 29.4% |
+| payoff_Ig_source_s1 | Ig | 1 | 1 | 26.0% |
 | payoff_Ig_source_s2 | Ig | 2 | 3 | 27.4% |
 | payoff_Ig_source_s3 | Ig | 3 | 1 | 31.0% |
+| payoff_Ig_source_s5 | Ig | 5 | 3 | 27.2% |
+| payoff_Ig_source_s6 | Ig | 6 | 2 | 27.9% |
 
-run-to-run SD: {'B0': '1.2%', 'I0': '1.9%', 'Ig': '2.6%'}
+run-to-run SD: {'B0': '1.2%', 'I0': '1.5%', 'Ig': '1.9%'}
 self-edit: {'source_s1': {'gens': 12, 'self_edit_gens': 1, 'self_edit_parents': 1}, 'source_s2': {'gens': 12, 'self_edit_gens': 4, 'self_edit_parents': 3}, 'source_s3': {'gens': 12, 'self_edit_gens': 5, 'self_edit_parents': 3}, 'source_s4': {'gens': 12, 'self_edit_gens': 1, 'self_edit_parents': 0}, 'source_s5': {'gens': 12, 'self_edit_gens': 7, 'self_edit_parents': 5}, 'source_s6': {'gens': 12, 'self_edit_gens': 3, 'self_edit_parents': 3}} rate 0.2916666666666667
 tokens by arm: {'I0': {'task_tokens_per_task_eval': 27048.02303030303, 'meta_tokens_per_iteration': 349804.3333333333, 'n_task_evals': 825, 'n_meta_iterations': 48}, 'Ig': {'task_tokens_per_task_eval': 23510.296363636364, 'meta_tokens_per_iteration': 187913.875, 'n_task_evals': 550, 'n_meta_iterations': 40}}
-spend by role: {'probe': 0.0, 'task': 102.155, 'meta': 3.14} total 105.295
+spend by role: {'probe': 0.0, 'task': 118.512, 'meta': 3.556} total 122.068
 ```

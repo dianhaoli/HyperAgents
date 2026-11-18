@@ -10,3 +10,5 @@ payoff_I0_6 cand gen_4: loop score 0.740 rescore 0.660 combined 0.700
 [eval] {'phase': 'heldout', 'arm': 'I0', 'seed': 'r6', 'iteration': 3} round 0: 140 test inputs to run (27 cached)
 [eval] {'phase': 'heldout', 'arm': 'I0', 'seed': 'r6', 'iteration': 3} round 1: 2 test inputs to run (165 cached)
 [eval] {'phase': 'heldout', 'arm': 'I0', 'seed': 'r6', 'iteration': 3} round 2: 1 test inputs to run (166 cached)
+{"run": "payoff_I0_6", "arm": "I0", "seed": "r6", "source_seed": null, "node_scores": {"initial": 0.62, "2": 0.66, "3": 0.78, "4": 0.74, "5": 0.6, "7": 0.62, "8": 0.7}, "candidates": ["3", "4"], "combined": {"3": 0.7, "4": 0.7}, "final_node": "3", "heldout": 0.29444444444444445, "heldout_missing": 0, "n_accepted": 6}
+__JOB_DONE__

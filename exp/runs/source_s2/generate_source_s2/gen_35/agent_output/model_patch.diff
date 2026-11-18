@@ -1,0 +1,156 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index af4e1d1..a2314d5 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -20,6 +20,9 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+         return "No evaluation reports were found (evaluation directory is unavailable)."
+ 
+     reports = []
++    task_statuses = {}
++    task_observations = {}
++    task_failures = {}
+     for root, dirs, files in os.walk(eval_path):
+         dirs.sort()
+         if "report.json" not in files:
+@@ -44,18 +47,40 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+         if not isinstance(data, dict):
+             continue
+         score = data.get("overall_accuracy", data.get("accuracy"))
++        if isinstance(score, bool):
++            continue
+         try:
+             score = float(score)
+-        except (TypeError, ValueError):
++        except (TypeError, ValueError, OverflowError):
++            continue
++        if not math.isfinite(score):
+             continue
+         kind_parts = relative_parts[generation_index + 1:]
+         kind = "/".join(kind_parts) if kind_parts else "report"
+         task_scores = data.get("per_task_score", {})
+-        failed = sorted(
+-            str(task) for task, value in task_scores.items()
+-            if isinstance(value, (int, float)) and value < 1
+-        ) if isinstance(task_scores, dict) else []
+-        reports.append((generation, label, kind, score, data.get("total"), failed))
++        outcomes = {}
++        if isinstance(task_scores, dict):
++            for task, value in task_scores.items():
++                if isinstance(value, bool) or not isinstance(value, (int, float)):
++                    continue
++                try:
++                    if not math.isfinite(value):
++                        continue
++                except (TypeError, ValueError, OverflowError):
++                    continue
++                task = str(task)
++                passed = value >= 1
++                outcomes[task] = passed
++                key = (kind, task)
++                task_observations.setdefault(key, set()).add(generation)
++                if not passed:
++                    task_failures.setdefault(key, set()).add(generation)
++        task_statuses[(kind, generation)] = outcomes
++        failed = sorted(task for task, passed in outcomes.items() if not passed)
++        total = data.get("total")
++        if isinstance(total, bool) or not isinstance(total, int):
++            total = None
++        reports.append((generation, label, kind, score, total, failed))
+ 
+     if not reports:
+         return "No usable evaluation reports were found in the supplied history."
+@@ -100,9 +125,44 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+                 f"below gen_{best[1]} best {best[3]:.3f}; inspect its changes before proposing another."
+             )
+ 
++    for kind, entries in sorted(by_kind.items()):
++        generations = sorted({entry[0] for entry in entries})
++        if len(generations) < 2:
++            continue
++        previous_generation, latest_generation = generations[-2:]
++        previous = task_statuses.get((kind, previous_generation), {})
++        latest = task_statuses.get((kind, latest_generation), {})
++        common_tasks = previous.keys() & latest.keys()
++        regressed = sorted(task for task in common_tasks if previous[task] and not latest[task])
++        recovered = sorted(task for task in common_tasks if not previous[task] and latest[task])
++        if regressed or recovered:
++            changes = []
++            if regressed:
++                changes.append("newly partial/failed: " + ", ".join(regressed[:12]))
++            if recovered:
++                changes.append("recovered: " + ", ".join(recovered[:12]))
++            lines.append(
++                f"- Task-level changes from gen_{previous_generation} to gen_{latest_generation} "
++                f"[{kind}]: " + "; ".join(changes)
++            )
++
++    recurring = []
++    for (kind, task), failed_generations in task_failures.items():
++        if len(failed_generations) >= 2:
++            observed = len(task_observations[(kind, task)])
++            recurring.append((kind, task, len(failed_generations), observed))
++    recurring.sort(key=lambda item: (item[0], -item[2], item[1]))
++    if recurring:
++        details = ", ".join(
++            f"{task} ({failure_count}/{observed_count} generations)"
++            for _, task, failure_count, observed_count in recurring[:12]
++        )
++        lines.append(f"- Recurring partial/failed tasks across runs: {details}")
++
+     lines.append(
+-        "Use these reports and the associated predictions/patches to identify repeatable "
+-        "improvements, investigate recurring failures, and preserve changes that improve "
++        "Inspect cited generations' agent_output/model_patch.diff and predictions for task-level "
++        "regressions and recurring failures. Use this evidence to identify repeatable improvements "
++        "and preserve changes that improve "
+         "overall performance without causing avoidable regressions."
+     )
+     return "\n".join(lines)
+diff --git a/tests/test_meta_agent.py b/tests/test_meta_agent.py
+index 5eff86c..017dd63 100644
+--- a/tests/test_meta_agent.py
++++ b/tests/test_meta_agent.py
+@@ -66,5 +66,43 @@ class EvaluationHistorySummaryTests(unittest.TestCase):
+             self.assertIn("No usable", summarize_evaluation_history(root))
+ 
+ 
++class EvaluationTrendTests(unittest.TestCase):
++    def _write_report(self, root, generation, data):
++        path = os.path.join(root, f"gen_{generation}", "arc_eval", "report.json")
++        os.makedirs(os.path.dirname(path), exist_ok=True)
++        with open(path, "w", encoding="utf-8") as stream:
++            json.dump(data, stream)
++
++    def test_summarizes_task_regressions_recoveries_and_recurrence(self):
++        with tempfile.TemporaryDirectory() as root:
++            self._write_report(root, 1, {
++                "overall_accuracy": 0.75, "total": 3,
++                "per_task_score": {"regressed": 1.0, "recovered": 0.0, "repeat": 0.0},
++            })
++            self._write_report(root, 2, {
++                "overall_accuracy": 0.75, "total": 3,
++                "per_task_score": {"regressed": 0.0, "recovered": 1.0, "repeat": 0.0},
++            })
++            summary = summarize_evaluation_history(root)
++            self.assertIn("newly partial/failed: regressed", summary)
++            self.assertIn("recovered: recovered", summary)
++            self.assertIn("repeat (2/2 generations)", summary)
++
++    def test_ignores_invalid_and_non_finite_scores(self):
++        with tempfile.TemporaryDirectory() as root:
++            self._write_report(root, 1, {
++                "overall_accuracy": 0.5, "total": 1,
++                "per_task_score": {"huge": 10 ** 1000, "valid": 0.0},
++            })
++            self._write_report(root, 2, {
++                "overall_accuracy": float("inf"), "total": 1,
++                "per_task_score": {"valid": 1.0},
++            })
++            summary = summarize_evaluation_history(root)
++            self.assertIn("gen_1 [arc_eval]: 0.500", summary)
++            self.assertNotIn("huge", summary)
++            self.assertNotIn("gen_2 [arc_eval]", summary)
++
++
+ if __name__ == "__main__":
+     unittest.main()

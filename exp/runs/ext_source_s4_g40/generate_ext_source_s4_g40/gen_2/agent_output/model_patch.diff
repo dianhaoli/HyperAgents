@@ -1,0 +1,15 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..0cbfe7f 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -57,6 +57,10 @@ def build_prompt(inputs):
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
+         "",
+     ]
++    parts.extend([
++        "Check every occurrence of a relevant pattern or object in the demonstrations: determine whether the rule applies to all instances or selects one by a consistent criterion, and do the same in the test. If the rule extracts a region, compare candidate regions against that criterion instead of choosing only the most visually prominent one.",
++        "",
++    ])
+     for i, pair in enumerate(inputs["train"], 1):
+         parts.append(f"## Example {i}")
+         h, w = len(pair["input"]), len(pair["input"][0])

@@ -4,6 +4,7 @@ Pre-registration: DESIGN.md / splits.json / analysis.py at `f577cc7`. Extension:
 Hard cap $200 (gateway). One gateway (`arcexp/start_gateway.sh` is locked and idempotent).
 
 ## Done
+- **PART A COMPLETE.** Headline: "Neither improver beat two plain attempts on ARC-AGI-2". G = +0.4 pts [-1.9, +2.8]; Delta = -1.8 pts [-4.2, +0.6]. 6 I0 + 5 Ig exams in exp/results/final_runs.jsonl; RESULTS.md.
 - B0 complete: 30.1 / 27.9 / 29.7 (mean 29.3%). xhigh pass 41.1%. Pilot exams: payoff_I0_1 26.9%, payoff_I0_2 29.4% -> pilot gate PASSED.
 - Part A trials passed (all 5 transplanted coaches ran). Part A pay-off runs launched (5 I_g + I0_3..6).
 - Smoke test, screen, splits, B0 reps 0-1 (30.1%, 27.9%), source runs s1-s6 to 12 generations, pilot runs

@@ -36,29 +36,64 @@
    "seed_index": 2,
    "heldout": 0.3097222222222222,
    "run": "payoff_Ig_source_s3"
+  },
+  {
+   "generation": 12,
+   "seed_index": 4,
+   "heldout": 0.2722222222222222,
+   "run": "payoff_Ig_source_s5"
+  },
+  {
+   "generation": 12,
+   "seed_index": 0,
+   "heldout": 0.25972222222222224,
+   "run": "payoff_Ig_source_s1"
+  },
+  {
+   "generation": 12,
+   "seed_index": 5,
+   "heldout": 0.2791666666666667,
+   "run": "payoff_Ig_source_s6"
+  },
+  {
+   "generation": 0,
+   "seed_index": null,
+   "heldout": 0.30416666666666664,
+   "run": "payoff_I0_4"
+  },
+  {
+   "generation": 0,
+   "seed_index": null,
+   "heldout": 0.29444444444444445,
+   "run": "payoff_I0_6"
   }
  ],
  "per_generation": {
   "0": {
-   "n": 4,
-   "mean": 0.2954861111111111,
-   "lo": 0.2651098910883626,
-   "hi": 0.32586233113385965,
+   "n": 6,
+   "mean": 0.2967592592592593,
+   "lo": 0.28077487358170816,
+   "hi": 0.3127436449368104,
    "scores": [
     0.2694444444444445,
     0.29444444444444445,
     0.3138888888888889,
-    0.30416666666666664
+    0.30416666666666664,
+    0.30416666666666664,
+    0.29444444444444445
    ]
   },
   "12": {
-   "n": 2,
-   "mean": 0.29166666666666663,
-   "lo": 0.0622490811524018,
-   "hi": 0.5210842521809315,
+   "n": 5,
+   "mean": 0.2788888888888889,
+   "lo": 0.25573899600159894,
+   "hi": 0.3020387817761789,
    "scores": [
     0.27361111111111114,
-    0.3097222222222222
+    0.3097222222222222,
+    0.2722222222222222,
+    0.25972222222222224,
+    0.2791666666666667
    ]
   }
  },
@@ -85,9 +120,12 @@
    "source_s2:g20": 9,
    "source_s3:g20": 9,
    "source_s1:g20": 1,
-   "source_s4:g30": 15
+   "source_s4:g30": 15,
+   "source_s2:g30": 9,
+   "source_s4:g40": 13,
+   "source_s3:g30": 9
   },
-  "extension picks with changed coach code": "9 of 9"
+  "extension picks with changed coach code": "12 of 12"
  },
  "diff_audit_summary": {
   "hunks": 7,
