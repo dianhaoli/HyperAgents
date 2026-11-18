@@ -1,22 +1,22 @@
-/* fig-puzzle.js — Figure 2, "Try one": an exam (held-out) ARC-AGI-2 task you can solve yourself.
-   Shows the train pairs and the test input, a paint editor (palette, paint/fill, resize, copy input,
-   clear), two checks like the player's pass@2, then the truth with wrong cells outlined and how the
-   23 exam runs did on the same test input (with any run's two attempts).
-   Data: tasks.json at init; heldout.json lazily (prefetched when the figure nears the viewport, or on Check).
-   Emits: select-task {task, set:'heldout', source:'puzzle'} on shuffle / task pick and from the Fig 3 link.
-   Listens: nothing. Hash: #puzzle?task=ID (read once at init, written on a user pick).
-   Styles: assets/fig-puzzle.css. */
+/* fig-puzzle.js — Figure 2 (mount "puzzle"): try an exam puzzle yourself.
+   At rest: the example pairs, then the test input and your answer grid side by side at one cell size,
+   a 10-swatch palette, and two buttons (Check, Another puzzle). One interaction: paint + Check, two
+   tries like the player. After the last try (or a success): your answer diffed against the correct
+   one, one line on how the AI players did on this puzzle (heldout.json), and a link into
+   Explore → Every exam answer. Extra tools (fill, resize, copy input, clear, show answer,
+   difficulty) sit behind "More tools".
+   Data: tasks.json at init; heldout.json prefetched when the figure nears the viewport, or on Check.
+   Emits: select-task {task, set:'heldout', source:'puzzle'} only from the Explore link.
+   Hash: #puzzle?task=ID (read once at init, written on "Another puzzle"). Styles: assets/fig-puzzle.css. */
 (function(){
   'use strict';
 
   var NAMES = ['black', 'blue', 'red', 'green', 'yellow', 'grey', 'magenta', 'orange', 'sky blue', 'maroon'];
-  var MAX_DIM = 20;          // pool: exam tasks whose every grid fits in 20 x 20 (painting stays practical)
-  var EASY = 0.7, HARD = 0.3; // difficulty bands on heldout_mean_solve
-  var DIFF = [
-    { value: 'all', label: 'All' },
-    { value: 'easy', label: 'Easy' },
-    { value: 'medium', label: 'Medium' },
-    { value: 'hard', label: 'Hard' }
+  var MAX_DIM = 20;           // pool: exam puzzles whose every grid fits in 20 x 20 (painting stays practical)
+  var EASY = 0.7, HARD = 0.3;  // difficulty bands on heldout_mean_solve
+  var ARMS = [                 // arms reported in the "how the AI did" line, in reading order
+    { key: 'B0', label: 'no coach' }, { key: 'I0', label: 'original coach' },
+    { key: 'Ig', label: 'self-improved coach' }, { key: 'xhigh', label: 'think longer' }
   ];
 
   function band(s){ return s >= EASY ? 'easy' : s >= HARD ? 'medium' : 'hard'; }
@@ -25,61 +25,71 @@
   function dims(g){ return g.length + '×' + g[0].length; }
   function clamp(x, a, b){ return Math.max(a, Math.min(b, x)); }
 
+  /* EX.more fallback (core provides it per the plan) */
+  function more(container, label, build, o){
+    if(EX.more) return EX.more(container, label, build, o);
+    var d = EX.h('details', { 'class': 'more' }, container);
+    EX.h('summary', null, d, label);
+    var body = EX.h('div', { 'class': 'more-body' }, d), built = false;
+    d.addEventListener('toggle', function(){ if(d.open && !built){ built = true; build(body); } });
+    return { el: d, body: body, open: function(){ d.open = true; }, close: function(){ d.open = false; } };
+  }
+
+  /* the puzzle Figure 2 opens with: deterministic from tasks.json (shared so Figure 5 can skip it) */
+  function buildPool(TK){
+    return TK.heldout.map(function(id){
+      var t = TK.tasks[id], m = 0;
+      t.train.concat(t.test).forEach(function(p){
+        [p.input, p.output].forEach(function(g){ if(g) m = Math.max(m, g.length, g[0].length); });
+      });
+      return { id: id, t: t, maxDim: m, solve: t.heldout_mean_solve, band: band(t.heldout_mean_solve) };
+    }).filter(function(x){ return x.maxDim <= MAX_DIM && x.t.test.length && x.t.test.every(function(p){ return p.output; }); });
+  }
+  function pickDefault(list){
+    return list.slice().sort(function(a, b){
+      return ((a.t.test.length > 1) - (b.t.test.length > 1)) || (a.maxDim - b.maxDim) || (Math.abs(a.solve - 0.5) - Math.abs(b.solve - 0.5)) || (a.id < b.id ? -1 : 1);
+    })[0];
+  }
+  EX.puzzleDefaultId = function(TK){
+    var pool = buildPool(TK);
+    var d = pickDefault(pool.filter(function(x){ return x.band === 'medium'; })) || pickDefault(pool);
+    return d ? d.id : null;
+  };
+
   EX.mount('puzzle', function(node, ctx){
     return EX.load('tasks').then(function(TK){
       node.innerHTML = '';
-      var F = EX.fmt;
 
       /* ---------- pool ---------- */
-      var pool = TK.heldout.map(function(id){
-        var t = TK.tasks[id], m = 0;
-        t.train.concat(t.test).forEach(function(p){
-          [p.input, p.output].forEach(function(g){ if(g) m = Math.max(m, g.length, g[0].length); });
-        });
-        return { id: id, t: t, maxDim: m, solve: t.heldout_mean_solve, band: band(t.heldout_mean_solve) };
-      }).filter(function(x){ return x.maxDim <= MAX_DIM && x.t.test.length && x.t.test.every(function(p){ return p.output; }); });
+      var pool = buildPool(TK);
       var byId = {}; pool.forEach(function(x){ byId[x.id] = x; });
       var counts = { all: pool.length, easy: 0, medium: 0, hard: 0 };
       pool.forEach(function(x){ counts[x.band]++; });
 
-      // default: a medium task with the smallest grids; ties -> closest to a 50 % solve rate
-      function pickDefault(list){
-        return list.slice().sort(function(a, b){
-          return ((a.t.test.length > 1) - (b.t.test.length > 1)) || (a.maxDim - b.maxDim) || (Math.abs(a.solve - 0.5) - Math.abs(b.solve - 0.5)) || (a.id < b.id ? -1 : 1);
-        })[0];
-      }
       var hashTask = (EX.hash.get().section === 'puzzle') ? EX.hash.param('task') : null;
-      var cur = (hashTask && byId[hashTask]) || pickDefault(pool.filter(function(x){ return x.band === 'medium'; })) || pickDefault(pool);
+      var cur = (hashTask && byId[hashTask]) || byId[EX.puzzleDefaultId(TK)];
       var filter = 'all';
 
       /* ---------- state ---------- */
-      var S = { ti: 0, out: null, color: 1, tool: 'paint', tries: [], done: false, run: null, cr: 0, cc: 0 };
+      var S = { out: null, color: 1, tool: 'paint', tries: [], done: false, cr: 0, cc: 0 };
+      var narrow = false, cell = 20;
 
       /* ---------- skeleton ---------- */
       var root = EX.h('div', { 'class': 'fx-puzzle' }, node);
-      var top = EX.h('div', { 'class': 'pz-top' }, root);
-      var diffSeg = EX.seg(top, DIFF.map(function(d){ return { value: d.value, label: d.label + ' · ' + counts[d.value] }; }), filter,
-        function(v){ filter = v; if(!inFilter(cur)) shuffle(); updShuffle(); }, { label: 'Difficulty' });
-      var shuffleBtn = EX.h('button', { type: 'button', 'class': 'btn' }, top, 'Another task ↻');
-      shuffleBtn.addEventListener('click', function(){ shuffle(); });
-      var def = EX.h('p', { 'class': 'pz-def' }, root);
-      var meta = EX.h('p', { 'class': 'pz-meta' }, root);
-      var trainSec = EX.h('div', null, root);
+      EX.h('div', { 'class': 'pz-lab' }, root, 'Examples');
+      var trainRow = EX.h('div', { 'class': 'pz-train' }, root);
       var work = EX.h('div', { 'class': 'pz-work' }, root);
       var colIn = EX.h('div', { 'class': 'pz-col' }, work);
+      var inLab = EX.h('div', { 'class': 'pz-lab' }, colIn, 'Test input');
+      var inHost = EX.h('div', { 'class': 'pz-grid' }, colIn);
       var colOut = EX.h('div', { 'class': 'pz-col' }, work);
-      var reveal = EX.h('div', { 'class': 'pz-reveal', hidden: true }, root);
+      EX.h('div', { 'class': 'pz-lab' }, colOut, 'Your answer');
+      var edHost = EX.h('div', { 'class': 'pz-grid' }, colOut);
 
-      // output column: editor + controls (built once; editor svg rebuilt on size change)
-      EX.h('div', { 'class': 'pz-sec' }, colOut, 'Your answer');
-      var edHost = EX.h('div', null, colOut);
-      var cellInfo = EX.h('div', { 'class': 'pz-cellinfo', 'aria-live': 'polite' }, colOut);
-      var pal = EX.h('div', { 'class': 'pz-pal', role: 'radiogroup', 'aria-label': 'Paint colour' }, colOut);
+      var pal = EX.h('div', { 'class': 'pz-pal', role: 'radiogroup', 'aria-label': 'Paint colour' }, root);
       var chips = NAMES.map(function(nm, i){
         var b = EX.h('button', { type: 'button', 'class': 'pz-chip', role: 'radio', 'aria-checked': String(i === S.color),
-          tabindex: i === S.color ? '0' : '-1', 'aria-label': 'Colour ' + i + ', ' + nm, title: i + ' · ' + nm }, pal);
-        EX.h('span', { 'class': 'sw', style: { background: EX.ARC[i] } }, b);
-        EX.h('span', { 'class': 'd', 'aria-hidden': 'true' }, b, String(i));
+          tabindex: i === S.color ? '0' : '-1', 'aria-label': nm, title: nm, style: { background: EX.ARC[i] } }, pal);
         b.addEventListener('click', function(){ setColor(i, false); });
         b.addEventListener('keydown', function(e){
           var k = e.key, n = null;
@@ -90,32 +100,45 @@
         });
         return b;
       });
-      var tools = EX.h('div', { 'class': 'pz-tools' }, colOut);
-      var toolSeg = EX.seg(tools, [{ value: 'paint', label: 'Paint' }, { value: 'fill', label: 'Fill area' }], S.tool,
-        function(v){ S.tool = v; }, { ariaLabel: 'Tool' });
-      var sizeBox = EX.h('span', { 'class': 'pz-size' }, tools);
-      EX.h('span', { 'class': 'control-label' }, sizeBox, 'Size');
-      var inR = EX.h('input', { type: 'number', min: 1, max: 30, step: 1, inputmode: 'numeric', 'aria-label': 'Rows' }, sizeBox);
-      EX.h('span', { 'class': 'x', 'aria-hidden': 'true' }, sizeBox, '×');
-      var inC = EX.h('input', { type: 'number', min: 1, max: 30, step: 1, inputmode: 'numeric', 'aria-label': 'Columns' }, sizeBox);
-      [inR, inC].forEach(function(inp){ inp.addEventListener('change', function(){ resize(+inR.value, +inC.value); }); });
-      var tools2 = EX.h('div', { 'class': 'pz-tools' }, colOut);
-      var copyBtn = EX.h('button', { type: 'button', 'class': 'btn small' }, tools2, 'Copy input');
-      var clearBtn = EX.h('button', { type: 'button', 'class': 'btn small' }, tools2, 'Clear');
-      copyBtn.addEventListener('click', function(){ if(S.done) return; S.out = copyGrid(testPair().input); drawEditor(); say('Copied the test input (' + dims(S.out) + ').'); });
-      clearBtn.addEventListener('click', function(){ if(S.done) return; S.out = blank(S.out.length, S.out[0].length); drawEditor(); say('Cleared to black (' + dims(S.out) + ').'); });
-      var actions = EX.h('div', { 'class': 'pz-actions' }, colOut);
-      var checkBtn = EX.h('button', { type: 'button', 'class': 'btn primary' }, actions, 'Check');
-      var triesEl = EX.h('span', { 'class': 'pz-tries' }, actions);
-      var giveBtn = EX.h('button', { type: 'button', 'class': 'btn quiet' }, actions, 'Show the answer');
-      var againBtn = EX.h('button', { type: 'button', 'class': 'btn', hidden: true }, actions, 'Start over');
-      var feedback = EX.h('p', { 'class': 'pz-feedback', role: 'status', 'aria-live': 'polite' }, colOut);
-      checkBtn.addEventListener('click', check);
-      giveBtn.addEventListener('click', function(){ finish(false, true); });
-      againBtn.addEventListener('click', function(){ loadTest(S.ti); edSvg && edSvg.focus(); });
 
-      def.textContent = 'Showing the ' + pool.length + ' of ' + TK.heldout.length + ' exam tasks whose grids are all at most ' + MAX_DIM + '×' + MAX_DIM +
-        '. Difficulty is the average exam-run score on the task: easy ≥ ' + F.pct(EASY, 0) + ', medium ' + F.pct(HARD, 0) + '–' + F.pct(EASY, 0) + ', hard < ' + F.pct(HARD, 0) + '.';
+      var actions = EX.h('div', { 'class': 'pz-actions' }, root);
+      var checkBtn = EX.h('button', { type: 'button', 'class': 'btn primary' }, actions, 'Check');
+      var nextBtn = EX.h('button', { type: 'button', 'class': 'btn quiet' }, actions, 'Another puzzle');
+      var feedback = EX.h('p', { 'class': 'pz-feedback', role: 'status', 'aria-live': 'polite' }, root);
+      checkBtn.addEventListener('click', function(){
+        if(S.done){ resetTry(); if(edSvg) edSvg.focus(); } else check();
+      });
+      nextBtn.addEventListener('click', function(){ shuffle(); });
+
+      var reveal = EX.h('div', { 'class': 'pz-reveal', hidden: true }, root);
+
+      /* ---------- more tools (collapsed) ---------- */
+      var tools = {};
+      more(root, 'More tools', function(body){
+        var row1 = EX.h('div', { 'class': 'pz-toolrow' }, body);
+        tools.seg = EX.seg(row1, [{ value: 'paint', label: 'Paint' }, { value: 'fill', label: 'Fill area' }], S.tool,
+          function(v){ S.tool = v; }, { ariaLabel: 'Tool' });
+        var sizeBox = EX.h('span', { 'class': 'pz-size' }, row1);
+        EX.h('span', null, sizeBox, 'Size');
+        tools.r = EX.h('input', { type: 'number', min: 1, max: 30, step: 1, inputmode: 'numeric', 'aria-label': 'Rows' }, sizeBox);
+        EX.h('span', { 'aria-hidden': 'true' }, sizeBox, '×');
+        tools.c = EX.h('input', { type: 'number', min: 1, max: 30, step: 1, inputmode: 'numeric', 'aria-label': 'Columns' }, sizeBox);
+        [tools.r, tools.c].forEach(function(inp){ inp.addEventListener('change', function(){ resize(+tools.r.value, +tools.c.value); }); });
+        var row2 = EX.h('div', { 'class': 'pz-toolrow' }, body);
+        tools.copy = EX.h('button', { type: 'button', 'class': 'btn' }, row2, 'Copy test input');
+        tools.clear = EX.h('button', { type: 'button', 'class': 'btn' }, row2, 'Clear');
+        tools.show = EX.h('button', { type: 'button', 'class': 'btn' }, row2, 'Show the answer');
+        tools.copy.addEventListener('click', function(){ if(S.done) return; S.out = copyGrid(testPair().input); drawWork(); });
+        tools.clear.addEventListener('click', function(){ if(S.done) return; S.out = blank(S.out.length, S.out[0].length); drawWork(); });
+        tools.show.addEventListener('click', function(){ if(!S.done) finish(false, true); });
+        EX.h('p', { 'class': 'pz-note' }, body, 'Keyboard: arrows move, Space paints, 0–9 pick a colour, F fills.');
+        syncTools();
+      });
+      function syncTools(){
+        if(!tools.r) return;
+        tools.r.value = S.out.length; tools.c.value = S.out[0].length;
+        [tools.r, tools.c, tools.copy, tools.clear, tools.show].forEach(function(b){ b.disabled = S.done; });
+      }
 
       /* ---------- heldout (lazy) ---------- */
       var HO = null, hoP = null;
@@ -132,115 +155,76 @@
 
       /* ---------- helpers ---------- */
       function inFilter(x){ return filter === 'all' || x.band === filter; }
-      function testPair(){ return cur.t.test[S.ti]; }
-      function say(t){ cellInfo.textContent = t; }
-      function updShuffle(){
-        var n = pool.filter(inFilter).length;
-        shuffleBtn.disabled = n < 2 && inFilter(cur);
-      }
+      function testPair(){ return cur.t.test[0]; }
       function setColor(i, focus){
         S.color = i;
         chips.forEach(function(b, j){ b.setAttribute('aria-checked', String(j === i)); b.tabIndex = j === i ? 0 : -1; });
         if(focus) chips[i].focus();
       }
       function shuffle(){
-        var list = pool.filter(function(x){ return inFilter(x) && x !== cur; });
-        if(!list.length) list = pool.filter(inFilter);
+        // skip Figure 5's puzzles so "Another puzzle" never spoils them
+        var list = pool.filter(function(x){ return inFilter(x) && x !== cur && !(EX.watchList && EX.watchList.indexOf(x.id) >= 0); });
         if(!list.length) return;
-        setTask(list[Math.floor(Math.random() * list.length)], true);
+        cur = list[Math.floor(Math.random() * list.length)];
+        EX.hash.set('puzzle', { task: cur.id });
+        drawTrain(); resetTry();
       }
 
-      /* ---------- task ---------- */
-      function setTask(x, user){
-        cur = x;
-        if(user){
-          EX.hash.set('puzzle', { task: x.id });
-          EX.select('task', { task: x.id, set: 'heldout', source: 'puzzle' });
-        }
-        drawTask();
-        loadTest(0);
-        updShuffle();
-      }
-      function trainMax(){
-        var w = ctx.width() || 900;
-        return w < 520 ? clamp(Math.floor((w - 30) / 2), 90, 170) : 150;
-      }
-      function drawTask(){
-        var t = cur.t;
-        meta.innerHTML = '';
-        EX.h('span', null, meta, 'Exam task ');
-        EX.h('span', { 'class': 'm' }, meta, cur.id);
-        EX.h('span', { 'class': 'sep', 'aria-hidden': 'true' }, meta, '·');
-        EX.h('span', null, meta, t.train.length + ' example pairs');
-        EX.h('span', { 'class': 'sep', 'aria-hidden': 'true' }, meta, '·');
-        EX.h('span', null, meta, t.test.length === 1 ? '1 test input' : t.test.length + ' test inputs');
-        EX.h('span', { 'class': 'sep', 'aria-hidden': 'true' }, meta, '·');
-        EX.h('span', null, meta, cur.band.charAt(0).toUpperCase() + cur.band.slice(1));
-        EX.h('span', { 'class': 'note' }, meta, ' (average run score ' + F.pct(cur.solve) + ')');
-        trainSec.innerHTML = '';
-        EX.h('div', { 'class': 'pz-sec' }, trainSec, 'Examples: input → output');
-        var row = EX.h('div', { 'class': 'pz-train' }, trainSec);
-        var ms = trainMax();
-        t.train.forEach(function(p, i){
-          EX.arcPair(row, p.input, p.output, { maxSize: ms, maxCell: 16, labels: ['Example ' + (i + 1) + ' · ' + dims(p.input), dims(p.output)],
-            title: 'Example ' + (i + 1) });
+      /* ---------- drawing ---------- */
+      function drawTrain(){
+        trainRow.innerHTML = '';
+        var w = ctx.width() || 800, n = cur.t.train.length;
+        var perRow = Math.min(n, w >= 700 ? 3 : w >= 470 ? 2 : 1);
+        var ms = clamp(Math.floor(((w - (perRow - 1) * 28) / perRow - 34) / 2), 60, perRow === 1 ? 110 : 150);
+        cur.t.train.forEach(function(p, i){
+          EX.arcPair(trainRow, p.input, p.output, { maxSize: ms, maxCell: 16, title: 'Example ' + (i + 1) });
         });
       }
-      function drawInput(){
-        colIn.innerHTML = '';
-        var t = cur.t;
-        EX.h('div', { 'class': 'pz-sec' }, colIn, 'Test input');
-        if(t.test.length > 1){
-          var box = EX.h('div', { 'class': 'pz-tests' }, colIn);
-          EX.seg(box, t.test.map(function(_, i){ return { value: i, label: String(i + 1) }; }), S.ti,
-            function(v){ loadTest(+v); }, { label: 'Input', mono: true });
-        }
-        var p = testPair();
-        EX.arcGrid(colIn, p.input, { maxSize: inputMax(), maxCell: 24, label: dims(p.input), title: 'Test input, ' + dims(p.input) });
+      function cellSize(){
+        var w = ctx.width() || 800, p = testPair();
+        var m = Math.max(p.input.length, p.input[0].length, S.out.length, S.out[0].length);
+        var colW = narrow ? Math.min(w, 300) : Math.min(300, Math.floor((w - 40) / 2));
+        return clamp(Math.floor((colW - 1) / m), 6, 28);
       }
-      function inputMax(){
-        var w = ctx.width() || 900;
-        return root.classList.contains('narrow') ? clamp(w, 160, 340) : clamp(Math.floor((w - 40) * 0.42), 180, 300);
-      }
-
-      function loadTest(i){
-        S.ti = i; S.tries = []; S.done = false; S.run = null; S.cr = 0; S.cc = 0;
+      function drawWork(){
+        cell = cellSize();
         var p = testPair();
-        S.out = blank(p.input.length, p.input[0].length);
-        drawInput();
+        inLab.textContent = cur.t.test.length > 1 ? 'Test input (1 of ' + cur.t.test.length + ')' : 'Test input';
+        inHost.innerHTML = '';
+        EX.arcGrid(inHost, p.input, { cell: cell, title: 'Test input, ' + dims(p.input) });
         drawEditor();
+        syncTools();
+      }
+      function resetTry(){
+        var p = testPair();
+        S.tries = []; S.done = false; S.cr = 0; S.cc = 0;
+        S.out = blank(p.input.length, p.input[0].length);
+        drawWork();
         reveal.hidden = true; reveal.innerHTML = '';
-        feedback.innerHTML = '';
-        say('Grid starts as the test input’s size, all black. Change the size if the output should differ.');
+        feedback.textContent = '';
         updActions();
       }
 
       /* ---------- editor ---------- */
-      var edSvg = null, edCells = null, edCur = null, edCell = 20, painting = false, lastRC = null;
-      function editorMax(){
-        var w = ctx.width() || 900;
-        return root.classList.contains('narrow') ? clamp(w, 160, 380) : clamp(Math.floor((w - 40) * 0.5), 200, 380);
-      }
+      var edSvg = null, edCells = null, edCur = null, painting = false, lastRC = null;
       function drawEditor(){
         var g = S.out, h = g.length, w = g[0].length;
-        inR.value = h; inC.value = w;
-        edCell = clamp(Math.floor((editorMax() - 1) / Math.max(h, w)), 8, 32);
-        var W = w * edCell + 1, H = h * edCell + 1;
+        var W = w * cell + 1, H = h * cell + 1;
         edHost.innerHTML = '';
         edSvg = EX.s('svg', { 'class': 'pz-editor' + (S.done ? ' locked' : ''), width: W, height: H, viewBox: '0 0 ' + W + ' ' + H,
           tabindex: 0, role: 'application', 'aria-roledescription': 'paint grid',
-          'aria-label': 'Your answer, ' + h + ' by ' + w + '. Arrow keys move, Space or Enter paints, digits 0 to 9 pick a colour, F fills an area.' }, edHost);
+          'aria-label': 'Your answer, ' + h + ' by ' + w + '. Arrow keys move, Space paints, digits 0 to 9 pick a colour, F fills an area.' }, edHost);
         EX.s('rect', { 'class': 'bg', x: 0, y: 0, width: W, height: H }, edSvg);
         edCells = [];
         for(var r = 0; r < h; r++){
           edCells.push([]);
           for(var c = 0; c < w; c++){
-            edCells[r].push(EX.s('rect', { x: c * edCell + 1, y: r * edCell + 1, width: edCell - 1, height: edCell - 1, fill: EX.ARC[g[r][c]] }, edSvg));
+            edCells[r].push(EX.s('rect', { x: c * cell + 1, y: r * cell + 1, width: cell - 1, height: cell - 1, fill: EX.ARC[g[r][c]] }, edSvg));
           }
         }
         S.cr = clamp(S.cr, 0, h - 1); S.cc = clamp(S.cc, 0, w - 1);
-        edCur = EX.s('rect', { 'class': 'cur', width: edCell - 1, height: edCell - 1 }, edSvg);
-        moveCursor(S.cr, S.cc, false);
+        edCur = EX.s('rect', { 'class': 'cur', width: cell - 1, height: cell - 1 }, edSvg);
+        moveCursor(S.cr, S.cc);
         edSvg.addEventListener('pointerdown', onDown);
         edSvg.addEventListener('pointermove', onMove);
         edSvg.addEventListener('pointerup', onUp);
@@ -249,8 +233,8 @@
         edSvg.addEventListener('keydown', onKey);
       }
       function rcAt(e){
-        var b = edSvg.getBoundingClientRect(), sx = (S.out[0].length * edCell + 1) / b.width;
-        var c = Math.floor(((e.clientX - b.left) * sx - 1) / edCell), r = Math.floor(((e.clientY - b.top) * sx - 1) / edCell);
+        var b = edSvg.getBoundingClientRect(), sx = (S.out[0].length * cell + 1) / b.width;
+        var c = Math.floor(((e.clientX - b.left) * sx - 1) / cell), r = Math.floor(((e.clientY - b.top) * sx - 1) / cell);
         if(r < 0 || c < 0 || r >= S.out.length || c >= S.out[0].length) return null;
         return [r, c];
       }
@@ -259,21 +243,20 @@
         S.out[r][c] = v; edCells[r][c].setAttribute('fill', EX.ARC[v]);
       }
       function flood(r, c, v){
-        var g = S.out, from = g[r][c]; if(from === v) return 0;
-        var st = [[r, c]], n = 0;
+        var g = S.out, from = g[r][c]; if(from === v) return;
+        var st = [[r, c]];
         while(st.length){
           var p = st.pop(), y = p[0], x = p[1];
           if(y < 0 || x < 0 || y >= g.length || x >= g[0].length || g[y][x] !== from) continue;
-          paint(y, x, v); n++;
+          paint(y, x, v);
           st.push([y + 1, x], [y - 1, x], [y, x + 1], [y, x - 1]);
         }
-        return n;
       }
       function apply(r, c, first){
         if(S.done) return;
-        if(S.tool === 'fill'){ if(first){ var n = flood(r, c, S.color); say('Filled ' + n + ' cell' + (n === 1 ? '' : 's') + ' with ' + NAMES[S.color] + '.'); } }
-        else { paint(r, c, S.color); }
-        moveCursor(r, c, false);
+        if(S.tool === 'fill'){ if(first) flood(r, c, S.color); }
+        else paint(r, c, S.color);
+        moveCursor(r, c);
       }
       function onDown(e){
         if(S.done || (e.button != null && e.button !== 0)) return;
@@ -290,195 +273,124 @@
         lastRC = rc; apply(rc[0], rc[1], false);
       }
       function onUp(){ painting = false; lastRC = null; }
-      function moveCursor(r, c, announce){
+      function moveCursor(r, c){
         S.cr = r; S.cc = c;
-        edCur.setAttribute('x', c * edCell + 1); edCur.setAttribute('y', r * edCell + 1);
-        if(announce) say('Row ' + (r + 1) + ', column ' + (c + 1) + ': ' + NAMES[S.out[r][c]] + '.');
+        edCur.setAttribute('x', c * cell + 1); edCur.setAttribute('y', r * cell + 1);
       }
       function onKey(e){
         var k = e.key, h = S.out.length, w = S.out[0].length, r = S.cr, c = S.cc;
-        if(k === 'ArrowUp'){ r = Math.max(0, r - 1); }
-        else if(k === 'ArrowDown'){ r = Math.min(h - 1, r + 1); }
-        else if(k === 'ArrowLeft'){ c = Math.max(0, c - 1); }
-        else if(k === 'ArrowRight'){ c = Math.min(w - 1, c + 1); }
-        else if(k === 'Home'){ c = 0; } else if(k === 'End'){ c = w - 1; }
-        else if(/^[0-9]$/.test(k)){ e.preventDefault(); setColor(+k, false); say('Colour ' + k + ', ' + NAMES[+k] + '.'); return; }
-        else if(k === ' ' || k === 'Enter'){
-          e.preventDefault(); if(S.done) return;
-          paint(r, c, S.color); say('Painted row ' + (r + 1) + ', column ' + (c + 1) + ' ' + NAMES[S.color] + '.'); return;
-        }
-        else if(k === 'f' || k === 'F'){ e.preventDefault(); if(S.done) return; var n = flood(r, c, S.color); say('Filled ' + n + ' cell' + (n === 1 ? '' : 's') + ' with ' + NAMES[S.color] + '.'); return; }
+        if(k === 'ArrowUp') r = Math.max(0, r - 1);
+        else if(k === 'ArrowDown') r = Math.min(h - 1, r + 1);
+        else if(k === 'ArrowLeft') c = Math.max(0, c - 1);
+        else if(k === 'ArrowRight') c = Math.min(w - 1, c + 1);
+        else if(k === 'Home') c = 0; else if(k === 'End') c = w - 1;
+        else if(/^[0-9]$/.test(k)){ e.preventDefault(); setColor(+k, false); return; }
+        else if(k === ' ' || k === 'Enter'){ e.preventDefault(); if(!S.done) paint(r, c, S.color); return; }
+        else if(k === 'f' || k === 'F'){ e.preventDefault(); if(!S.done) flood(r, c, S.color); return; }
         else return;
         e.preventDefault();
         if(e.shiftKey && !S.done) paint(r, c, S.color);   // Shift+arrow paints a stroke
-        moveCursor(r, c, true);
+        moveCursor(r, c);
       }
       function resize(h, w){
         if(S.done) return;
         h = clamp(Math.round(h) || 1, 1, 30); w = clamp(Math.round(w) || 1, 1, 30);
         var g = blank(h, w);
         for(var r = 0; r < Math.min(h, S.out.length); r++) for(var c = 0; c < Math.min(w, S.out[0].length); c++) g[r][c] = S.out[r][c];
-        S.out = g; drawEditor(); say('Resized to ' + dims(g) + '.');
+        S.out = g; drawWork();
       }
 
       /* ---------- checking ---------- */
       function updActions(){
-        var left = 2 - S.tries.length;
-        checkBtn.disabled = S.done; giveBtn.hidden = S.done; againBtn.hidden = !S.done;
-        checkBtn.textContent = (S.tries.length && !S.done) ? 'Check try 2' : 'Check';
-        triesEl.textContent = S.done ? '' : (left === 2 ? '2 tries' : '1 try left');
-        [copyBtn, clearBtn, inR, inC].forEach(function(b){ b.disabled = S.done; });
+        checkBtn.textContent = S.done ? 'Start over' : 'Check';
+        checkBtn.classList.toggle('primary', !S.done);
         if(edSvg) edSvg.classList.toggle('locked', S.done);
+        syncTools();
+      }
+      function diffCount(g, truth){
+        if(g.length !== truth.length || g[0].length !== truth[0].length) return -1;
+        var n = 0;
+        for(var r = 0; r < g.length; r++) for(var c = 0; c < g[0].length; c++) if(g[r][c] !== truth[r][c]) n++;
+        return n;
+      }
+      function missText(n){
+        return n < 0 ? 'the size is wrong' : n + ' cell' + (n === 1 ? '' : 's') + ' off';
       }
       function check(){
         if(S.done) return;
+        loadHeldout().catch(function(){});
         var truth = testPair().output, g = copyGrid(S.out);
         S.tries.push(g);
         if(EX.gridsEqual(g, truth)) return finish(true, false);
-        if(S.tries.length >= 2) return finish(false, false);
-        feedback.innerHTML = '<b class="no">Not exact.</b> One try left. Like the player, you get no hint about which cells are off.';
+        var n = diffCount(g, truth);
+        if(S.tries.length >= 2) return finish(false, false, n);
+        feedback.innerHTML = '<b class="no">Not quite:</b> ' + EX.esc(missText(n)) + ' (try 1 of 2).';
         updActions();
       }
-      function finish(ok, gaveUp){
+      function finish(ok, gaveUp, n){
         S.done = true; updActions();
-        var n = S.tries.length;
-        feedback.innerHTML = ok ? '<b class="ok">Exactly right</b> on try ' + n + '. That counts as solved under pass@2.'
-          : gaveUp ? (n ? '<b>Answer shown</b> after ' + n + ' try.' : '<b>Answer shown.</b>')
-          : '<b class="no">Both tries missed.</b> Under pass@2 this input is not solved.';
-        drawReveal();
+        feedback.innerHTML = ok ? '<b class="ok">Correct!</b>' + (S.tries.length > 1 ? ' On your second try.' : '')
+          : gaveUp ? 'Here is the answer.'
+          : '<b class="no">Not quite:</b> ' + EX.esc(missText(n)) + '. That was your last try. Wrong cells are outlined in white below.';
+        drawReveal(ok);
       }
 
       /* ---------- reveal ---------- */
-      function cmpMax(){ var w = ctx.width() || 900; return w < 520 ? clamp(Math.floor((w - 16) / 2), 120, 200) : 190; }
-      function drawReveal(){
+      function drawReveal(ok){
         reveal.hidden = false; reveal.innerHTML = '';
-        var truth = testPair().output, ms = cmpMax();
-        EX.h('div', { 'class': 'pz-sec' }, reveal, 'The truth' + (S.tries.length ? ' and your tries' : ''));
+        var truth = testPair().output;
         var row = EX.h('div', { 'class': 'pz-cmp' }, reveal);
-        S.tries.forEach(function(g, i){
-          var ok = EX.gridsEqual(g, truth), sameSize = g.length === truth.length && g[0].length === truth[0].length;
-          var svg = EX.arcGrid(row, g, { maxSize: ms, maxCell: 20, diffAgainst: truth, title: 'Your try ' + (i + 1),
-            label: 'Your try ' + (i + 1) + ' ' + (ok ? '<span class="ok">✓ right</span>' : '<span class="no">✗ ' +
-              (sameSize ? '' : 'wrong size') + '</span>') });
-          if(!ok && sameSize && svg.__arc){ svg.parentNode.querySelector('.arc-cap .no').textContent = '✗ ' + svg.__arc.wrong + ' cell' + (svg.__arc.wrong === 1 ? '' : 's') + ' off'; }
-        });
-        EX.arcGrid(row, truth, { maxSize: ms, maxCell: 20, title: 'Truth, ' + dims(truth), label: '<b>Truth</b> · ' + dims(truth) });
-        if(S.tries.some(function(g){ return !EX.gridsEqual(g, truth); })){
-          var lg = EX.h('p', { 'class': 'pz-legend' }, reveal);
-          EX.h('span', { 'class': 'box', 'aria-hidden': 'true' }, lg);
-          lg.appendChild(document.createTextNode('Outlined cells differ from the truth. A dashed outline round the whole grid means the size is wrong.'));
+        var m = Math.max(truth.length, truth[0].length, S.out.length, S.out[0].length);
+        var w = ctx.width() || 800;
+        var c = clamp(Math.floor((Math.min(narrow ? Math.floor((w - 16) / 2) : 280, 280) - 1) / m), 4, 22);
+        if(S.tries.length){
+          var last = S.tries[S.tries.length - 1];
+          EX.arcGrid(row, last, { cell: c, diffAgainst: truth, label: 'Your answer', title: 'Your answer' });
         }
-        EX.h('div', { 'class': 'pz-sec' }, reveal, 'How the exam runs did on this input');
-        var runsBox = EX.h('div', { 'class': 'pz-runs' }, reveal);
-        if(HO) drawRuns(runsBox);
+        EX.arcGrid(row, truth, { cell: c, label: 'Correct answer', title: 'Correct answer, ' + dims(truth) });
+        var ai = EX.h('p', { 'class': 'pz-ai' }, reveal);
+        if(HO) aiLine(ai);
         else {
-          EX.h('div', { 'class': 'pz-loading', role: 'status' }, runsBox, 'Loading the exam runs’ answers…');
-          var taskAt = cur.id, tiAt = S.ti;
-          loadHeldout().then(function(){ if(cur.id === taskAt && S.ti === tiAt && S.done){ runsBox.innerHTML = ''; drawRuns(runsBox); } })
-            .catch(function(err){ runsBox.innerHTML = ''; EX.h('div', { 'class': 'empty' }, runsBox, 'The exam runs’ answers could not be loaded (' + (err && err.message || err) + ').'); });
+          ai.textContent = 'Loading how the AI players did…';
+          var at = cur.id;
+          loadHeldout().then(function(){ if(cur.id === at && S.done) aiLine(ai); })
+            .catch(function(){ ai.textContent = 'How the AI players did could not be loaded.'; });
         }
-        var a = EX.h('a', { 'class': 'pz-link', href: '#replay?task=' + encodeURIComponent(cur.id) }, reveal,
-          'See every run’s two attempts on this task in Figure 3 →');
+        var a = EX.h('a', { 'class': 'pz-link', href: '#replay?task=' + encodeURIComponent(cur.id) }, reveal, 'See every run’s answer →');
         a.addEventListener('click', function(e){
           e.preventDefault();
-          EX.select('task', { task: cur.id, set: 'heldout', source: 'puzzle' });
-          EX.hash.set('replay', { task: cur.id }, { scroll: true });
+          var id = cur.id;
+          EX.state.revealTask = id;
+          if(EX.explore && EX.explore.open) EX.explore.open('replay', { scroll: true });
+          else EX.hash.set('replay', { task: id }, { scroll: true });
+          EX.select('task', { task: id, set: 'heldout', source: 'puzzle' });
         });
       }
-
-      function recOf(run){
-        var R = HO.runs[run]; if(!R || !R.results) return null;
-        var arr = R.results[cur.id]; return arr ? arr[S.ti] || null : null;
-      }
-      function solvedRec(rec){ return !!(rec && rec.c && rec.c.some(function(v){ return !!v; })); }
-
-      function drawRuns(box){
-        var runs = Object.keys(HO.runs).sort(function(a, b){
-          return EX.GROUP_ORDER.indexOf(EX.runGroup(a)) - EX.GROUP_ORDER.indexOf(EX.runGroup(b));
-        });
-        var solved = runs.filter(function(r){ return solvedRec(recOf(r)); });
-        var total = EX.h('p', { 'class': 'pz-total' }, box);
-        total.innerHTML = '<b>' + solved.length + ' of ' + runs.length + '</b> exam runs solved this test input' +
-          (cur.t.test.length > 1 ? ' (input ' + (S.ti + 1) + ' of ' + cur.t.test.length + ')' : '') + '.';
-        if(!S.run || runs.indexOf(S.run) < 0){
-          // default: the plain player (B0 rep 0) if it has answer grids, else the first run with grids
-          S.run = runs.filter(function(r){ return /^B0/.test(r) && HO.runs[r].has_preds; })[0] ||
-            runs.filter(function(r){ return HO.runs[r].has_preds; })[0] || runs[0];
-        }
-        var marks = [];
-        EX.GROUP_ORDER.forEach(function(gk){
-          var rs = runs.filter(function(r){ return EX.runGroup(r) === gk; });
-          if(!rs.length) return;
-          var k = rs.filter(function(r){ return solvedRec(recOf(r)); }).length;
-          var row = EX.h('div', { 'class': 'pz-grp' }, box);
-          EX.h('span', { 'class': 'g' }, row, EX.GROUP_LABEL[gk] || gk);
-          EX.h('span', { 'class': 'k' }, row, k + ' / ' + rs.length);
-          var mk = EX.h('span', { 'class': 'pz-marks' }, row);
-          rs.forEach(function(r){
-            var rec = recOf(r), ok = solvedRec(rec);
-            var lab = EX.runLabel(r, { short: true });
-            var b = EX.h('button', { type: 'button', 'class': 'pz-mk ' + (!rec ? 'na' : ok ? 'ok' : 'no'), 'data-run': r,
-              'aria-pressed': String(r === S.run), title: EX.runLabel(r) + (!rec ? ': no record' : ok ? ': solved' : ': missed'),
-              'aria-label': EX.runLabel(r) + (!rec ? ', no record' : ok ? ', solved' : ', missed') + '. Show its answers.' }, mk, !rec ? '–' : ok ? '✓' : '✗');
-            b.addEventListener('click', function(){ S.run = r; marks.forEach(function(m){ m.setAttribute('aria-pressed', String(m.getAttribute('data-run') === r)); }); sel.value = r; drawRunAnswers(ansBox); });
-            marks.push(b);
-          });
-        });
-        var pick = EX.h('div', { 'class': 'pz-pick' }, box);
-        var sel = EX.selectBox(pick, EX.GROUP_ORDER.map(function(gk){
-          return { group: EX.GROUP_LABEL[gk] || gk, options: runs.filter(function(r){ return EX.runGroup(r) === gk; }).map(function(r){
-            var rec = recOf(r); return { value: r, label: EX.runLabel(r) + (!rec ? ' · no record' : solvedRec(rec) ? ' · ✓' : ' · ✗') };
-          }) };
-        }).filter(function(g){ return g.options.length; }), S.run, function(v){
-          S.run = v; marks.forEach(function(m){ m.setAttribute('aria-pressed', String(m.getAttribute('data-run') === v)); }); drawRunAnswers(ansBox);
-        }, { label: 'Answers from' });
-        var ansBox = EX.h('div', null, box);
-        drawRunAnswers(ansBox);
-      }
-
-      function drawRunAnswers(box){
-        box.innerHTML = '';
-        var r = S.run, R = HO.runs[r], rec = recOf(r), truth = testPair().output, ms = cmpMax();
-        var cap = EX.h('p', { 'class': 'pz-runcap' }, box);
-        if(!rec){ cap.textContent = EX.runLabel(r) + ' has no record for this input.'; return; }
-        var calls = rec.calls != null ? rec.calls + ' model call' + (rec.calls === 1 ? '' : 's') : null;
-        var bits = [EX.runLabel(r) + ' (' + (EX.GROUP_LABEL[EX.runGroup(r)] || '') + ')', solvedRec(rec) ? 'solved' : 'missed'];
-        if(calls) bits.push(calls);
-        if(rec.tok != null) bits.push(F.tokens(rec.tok) + ' tokens');
-        if(rec.timeout) bits.push('timed out');
-        if(rec.err) bits.push('error');
-        cap.textContent = bits.join(' · ') + '.';
-        if(!R.has_preds || !rec.p){
-          EX.h('div', { 'class': 'notice' }, box, 'Only the right/wrong flags were kept for this run, not its answer grids, to keep the page under its size budget.');
-          return;
-        }
-        var row = EX.h('div', { 'class': 'pz-cmp' }, box);
-        var c = rec.c || [];
-        [0, 1].forEach(function(i){
-          var g = rec.p[i];
-          if(g === '=1') g = rec.p[0];
-          var ok = !!c[i];
-          var lab = 'Attempt ' + (i + 1) + (rec.p[i] === '=1' ? ' (same as 1)' : '') + ' ' + (ok ? '<span class="ok">✓</span>' : '<span class="no">✗</span>');
-          if(Array.isArray(g) && g.length && Array.isArray(g[0])){
-            EX.arcGrid(row, g, { maxSize: ms, maxCell: 20, diffAgainst: truth, label: lab, title: EX.runLabel(r) + ' attempt ' + (i + 1) });
-          } else {
-            EX.arcGrid(row, null, { label: lab, emptySize: Math.min(ms, 96), emptyText: i >= (rec.n || 0) ? 'no answer returned' : 'no grid' });
-          }
-        });
-        EX.arcGrid(row, truth, { maxSize: ms, maxCell: 20, label: '<b>Truth</b>', title: 'Truth' });
+      function aiLine(el){
+        var bits = ARMS.map(function(arm){
+          var rs = Object.keys(HO.runs).filter(function(r){ return EX.runGroup(r) === arm.key; });
+          var recs = rs.map(function(r){ var R = HO.runs[r].results; return R && R[cur.id] ? R[cur.id][0] : null; }).filter(Boolean);
+          var k = recs.filter(function(rec){ return rec.c && rec.c.some(function(v){ return !!v; }); }).length;
+          if(!recs.length) return null;
+          if(recs.length === 1) return arm.label + ': ' + (k ? 'solved' : 'missed');
+          return arm.label + ' ' + k + ' of ' + recs.length + ' runs';
+        }).filter(Boolean);
+        el.innerHTML = '<b>How the AI did on this puzzle:</b> ' + bits.map(EX.esc).join(' · ');
       }
 
       /* ---------- layout ---------- */
       function layout(w){
-        root.classList.toggle('narrow', w < 640);
+        narrow = (w || 800) < 560;
+        root.classList.toggle('narrow', narrow);
       }
       layout(ctx.width());
-      drawTask(); loadTest(0); updShuffle();
+      drawTrain(); resetTry();
       ctx.onResize(function(w){
         layout(w);
-        drawTask(); drawInput(); drawEditor();
-        if(S.done) drawReveal();
+        drawTrain(); drawWork();
+        if(S.done) drawReveal(S.tries.length && EX.gridsEqual(S.tries[S.tries.length - 1], testPair().output));
       });
+      if(ctx.onShow) ctx.onShow(function(){ layout(ctx.width()); drawTrain(); drawWork(); });
     });
   });
 })();

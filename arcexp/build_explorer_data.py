@@ -56,6 +56,8 @@ _SECRET_PATTERNS = [
     (re.compile(r"(?i)((?:api[_-]?key|access[_-]?token|secret|password)\s*[=:]\s*['\"]?)[A-Za-z0-9._\-]{12,}"), "kv-secret"),
     (re.compile(r"\b[0-9a-f]{32}\b"), "32hex-gateway-token"),
     (re.compile(r"\bgh[pousr]_[A-Za-z0-9]{20,}"), "github-token"),
+    (re.compile(r"/home/[A-Za-z0-9_.\-]+/HyperAgents/"), "local-path"),
+    (re.compile(r"\b[0-9a-f]{40}\b"), "commit-hash"),
 ]
 
 
@@ -67,6 +69,10 @@ def scrub(text):
             REDACTIONS[name] += 1
             if name == "kv-secret":
                 return m.group(1) + "[REDACTED]"
+            if name == "local-path":
+                return ""  # repo-relative
+            if name == "commit-hash":
+                return "[commit]"
             return "[REDACTED]"
         text = pat.sub(rep, text)
     return text
@@ -167,7 +173,7 @@ def run_kind(run):
 
 
 # ----------------------------------------------------------------------------- diffs
-COACH_PREFIXES = ("meta_agent.py", "run_meta_agent.py", "agent/", "tests/test_meta_agent")
+COACH_PREFIXES = ("meta_agent.py", "run_meta_agent.py", "agent/", "tests/test_meta_agent", "utils/")
 PLAYER_PREFIXES = ("task_agent.py", "run_task_agent.py", "domains/", "tests/test_task_agent")
 
 
@@ -961,7 +967,7 @@ FIELD_DOCS = {
         "node.parent / children": "tree edges (string ids)",
         "node.practice_score": "loop_score_on_set from nodes.json (practice-set score the loop saw; null = not evaluated/invalid)",
         "node.valid": "valid_parent flag (could be selected as a parent)",
-        "node.files_changed": "files in this generation's model_patch.diff: {path, role: coach|player|other, added, removed, binary}. coach = meta_agent.py, run_meta_agent.py, agent/**, tests/test_meta_agent*; player = task_agent.py, run_task_agent.py, domains/**, tests/test_task_agent*; other = pyc, .gitignore, generate_loop.py, utils/**, stray files",
+        "node.files_changed": "files in this generation's model_patch.diff: {path, role: coach|player|other, added, removed, binary}. coach = meta_agent.py, run_meta_agent.py, agent/**, utils/** (the coach's own helpers, e.g. utils/git_utils.py), tests/test_meta_agent*; player = task_agent.py, run_task_agent.py, domains/**, tests/test_task_agent*; other = pyc, .gitignore, generate_loop.py, stray files",
         "node.touched_coach / touched_player": "booleans derived from files_changed",
         "node.coach_files_changed_vs_I0": "from nodes.json: coach files that differ from I_0 in this node's code (cumulative), null if unknown",
         "node.diff": "the coach's edit (unified diff) for this generation, binary sections removed, capped ~6 KB; diff_truncated / diff_full_chars tell if/how much was cut",

@@ -20,7 +20,9 @@
      num(x, d=1)
      signed(x, d=1)   "+1.2" / "−1.2"
    Runs and terms
-     EX.runLabel(runId, {short}) -> human label ("I₀ run 1", "I_g · source_s3", ...)
+     EX.ARM_LABEL {B0:'No coach', I0:'Original coach', Ig:'Self-improved coach', g20, g40, xhigh:'Think longer (no coach)'}
+     EX.runLabel(runId, {plain, short, html}) -> plain: "Original coach, run 3"; else technical ("I₀ run 3")
+     EX.sym('I0'|'Ig'|'A0', 'html'|'svg'|'text') -> <i>I</i><sub>g</sub> | svg tspans | "I_g"
      EX.runGroup(runId) -> 'B0'|'xhigh'|'I0'|'Ig'|'g20'|'g40'|'source'
      EX.GROUP_ORDER, EX.GROUP_LABEL
    ARC grids
@@ -48,8 +50,15 @@
    Figures
      EX.mount(name, initFn)  initFn(node, ctx) may return a Promise. Runs once when
          .mount[data-fig=name] exists. Errors (sync or async) render a quiet inline message.
-         ctx = {name, figure (the <figure>), panel, width(), onResize(fn), setStatus(text), EX}
+         ctx = {name, figure (the <figure>), panel, width(), onResize(fn), onShow(fn), setStatus(text), EX}
      EX.figures — registry {name: {status:'pending'|'ready'|'error', error}}
+   Simplified-page additions
+     EX.more(container, label, buildFn, {open}) -> {el, body, open(), close()}   <details class="more">, lazy build
+     EX.roving(container, itemSelector, {onActivate, orientation:'vertical'|'horizontal'|'grid'}) -> {focus(i), refresh(), index()}
+     EX.explore.open(tab, {scroll, anchor}) ; EX.explore.current() ; tabs: tree|replay|transcripts|audit|numbers
+         emits 'tab-shown' {tab}. Mounts inside a hidden tab panel are deferred until first shown;
+         ctx.onShow(fn(width)) fires every time the panel is shown (after layout).
+     Deep links (#tree?run=..&node=.., #replay?task=..) open the tab and then EX.select(..., {source:'hash'}).
    Hash routing (ASCII names only)
      EX.hash.get() -> {section, params}      e.g. "#tree?run=source_s1&node=3"
      EX.hash.set(section, params, {replace=true, scroll=false})
@@ -181,9 +190,9 @@
   /* ---------------- runs & terms ---------------- */
   EX.GROUP_ORDER = ['B0', 'xhigh', 'I0', 'Ig', 'g20', 'g40'];
   EX.GROUP_LABEL = {
-    B0: 'B0 · two plain attempts', xhigh: 'A₀ at xhigh effort',
-    I0: 'I₀ · original coach', Ig: 'I_g · evolved coach',
-    g20: 'Extension · gen 20 coach', g40: 'Extension · gen 40 coach', source: 'Source run'
+    B0: 'No coach', xhigh: 'Think longer, no coach',
+    I0: 'Original coach', Ig: 'Self-improved coach',
+    g20: 'Generation-20 coach', g40: 'Generation-40 coach', source: 'Self-improvement run'
   };
   EX.runGroup = function(run){
     if(!run) return null;
@@ -196,12 +205,35 @@
     if(/^source_/.test(run)) return 'source';
     return null;
   };
+  /* plain names for the main story; technical names (with EX.sym) for Explore */
+  EX.ARM_LABEL = { B0: 'No coach', I0: 'Original coach', Ig: 'Self-improved coach',
+    g20: 'Generation-20 coach', g40: 'Generation-40 coach', xhigh: 'Think longer, no coach', source: 'Self-improvement run' };
+  /* EX.sym('I0'|'Ig'|'A0', 'html'|'svg'|'text') */
+  var SYM = { I0: ['I', '0', 'I₀'], Ig: ['I', 'g', 'I_g'], A0: ['A', '0', 'A₀'] };
+  EX.sym = function(name, mode){
+    var s = SYM[name]; if(!s) return EX.esc(name);
+    if(mode === 'text') return s[2];
+    if(mode === 'svg') return '<tspan font-style="italic">' + s[0] + '</tspan><tspan baseline-shift="sub" font-size="75%">' + s[1] + '</tspan>';
+    return '<i>' + s[0] + '</i><sub>' + s[1] + '</sub>';
+  };
+  /* EX.runLabel(run, {plain, short, html}) */
   EX.runLabel = function(run, opts){
-    var short = opts && opts.short, m;
+    opts = opts || {};
+    var short = opts.short, m;
+    if(opts.plain || !opts.technical){
+      if((m = /^B0_rep(\d)$/.exec(run))) return 'No coach, run ' + (+m[1] + 1);
+      if(run === 'xhigh') return 'Think longer, no coach';
+      if((m = /^payoff_I0_(\d)$/.exec(run))) return 'Original coach, run ' + m[1];
+      if((m = /^payoff_Ig_source_s(\d)$/.exec(run))) return 'Self-improved coach from run ' + m[1];
+      if((m = /^ext_source_s(\d)_g(\d+)$/.exec(run))) return 'Generation-' + m[2] + ' coach from run ' + m[1];
+      if((m = /^source_s(\d)$/.exec(run))) return 'Self-improvement run ' + m[1];
+      return run;
+    }
+    var I0 = EX.sym('I0', opts.html ? 'html' : 'text'), Ig = EX.sym('Ig', opts.html ? 'html' : 'text'), A0 = EX.sym('A0', opts.html ? 'html' : 'text');
     if((m = /^B0_rep(\d)$/.exec(run))) return short ? 'B0 rep ' + m[1] : 'B0, rep ' + m[1];
-    if(run === 'xhigh') return short ? 'xhigh' : 'A₀ at xhigh';
-    if((m = /^payoff_I0_(\d)$/.exec(run))) return short ? 'I₀ #' + m[1] : 'I₀ run ' + m[1];
-    if((m = /^payoff_Ig_source_(s\d)$/.exec(run))) return short ? 'I_g ' + m[1] : 'I_g from ' + m[1];
+    if(run === 'xhigh') return short ? 'xhigh' : A0 + ' at xhigh';
+    if((m = /^payoff_I0_(\d)$/.exec(run))) return short ? I0 + ' #' + m[1] : I0 + ' run ' + m[1];
+    if((m = /^payoff_Ig_source_(s\d)$/.exec(run))) return short ? Ig + ' ' + m[1] : Ig + ' from ' + m[1];
     if((m = /^ext_source_(s\d)_g(\d+)$/.exec(run))) return short ? 'g' + m[2] + ' ' + m[1] : 'gen-' + m[2] + ' coach from ' + m[1];
     if((m = /^source_(s\d)$/.exec(run))) return short ? m[1] : 'source run ' + m[1];
     return run;
@@ -346,8 +378,10 @@
         for(var r2 = 0; r2 < h; r2++) for(var c2 = 0; c2 < w; c2++){
           if(grid[r2][c2] !== truth[r2][c2]){
             wrong++;
-            EX.s('rect', { 'class': 'arc-wrong', x: c2 * cell + gap + inset - 0.5, y: r2 * cell + gap + inset - 0.5,
-              width: Math.max(1, cell - gap - 2 * inset + 1), height: Math.max(1, cell - gap - 2 * inset + 1), 'stroke-width': sw }, svg);
+            // white outline with a thin dark inner line: visible on every ARC colour, black included
+            var wx = c2 * cell + gap + inset - 0.5, wy = r2 * cell + gap + inset - 0.5, ww = Math.max(1, cell - gap - 2 * inset + 1);
+            EX.s('rect', { 'class': 'arc-wrong cellmark', x: wx, y: wy, width: ww, height: ww, 'stroke-width': sw }, svg);
+            if(cell >= 9) EX.s('rect', { 'class': 'arc-wrong-in', x: wx + sw / 2 + 0.5, y: wy + sw / 2 + 0.5, width: Math.max(1, ww - sw - 1), height: Math.max(1, ww - sw - 1) }, svg);
           }
         }
         if(wrong) svg.setAttribute('aria-label', (opts.title || 'grid') + ': ' + wrong + ' wrong cell' + (wrong > 1 ? 's' : ''));
@@ -403,7 +437,7 @@
   };
   EX.selectBox = function(container, options, value, onChange, o){
     o = o || {};
-    var lab = EX.h('label', { style: { display: 'inline-flex', alignItems: 'center', gap: '8px' } }, container);
+    var lab = EX.h('label', { style: { display: 'inline-flex', alignItems: 'center', gap: '8px', maxWidth: '100%', minWidth: '0' } }, container);
     if(o.label) EX.h('span', { 'class': 'control-label' }, lab, o.label);
     var sel = EX.h('select', { 'class': 'select' + (o.mono ? ' mono' : '') }, lab);
     options.forEach(function(opt){
@@ -463,10 +497,16 @@
   };
   window.addEventListener('hashchange', function(){ EX.emit('hash', EX.hash.get()); });
 
-  /* ---------------- figure registry ---------------- */
+  /* ---------------- figure registry ----------------
+     Mounts inside a hidden [role=tabpanel] are deferred until that panel is first shown. */
   EX.figures = {};
-  var pendingInits = {};
+  var pendingInits = {}, deferred = {}, showFns = {};
   function figureOf(node){ return node.closest ? node.closest('figure') : null; }
+  var exploreAwake = false;   // Explore mounts wait until the section nears the viewport (or a tab is opened)
+  function hiddenPanelOf(node){
+    var p = node.closest ? node.closest('[role="tabpanel"]') : null;
+    return p && (p.hidden || !exploreAwake) ? p : null;
+  }
   function showError(node, name, err){
     console.error('[EX] figure "' + name + '" failed:', err);
     EX.figures[name] = { status: 'error', error: err };
@@ -480,22 +520,26 @@
   function runInit(name, fn){
     var node = doc.querySelector('.mount[data-fig="' + name + '"]');
     if(!node){ pendingInits[name] = fn; return false; }
-    if(EX.figures[name] && EX.figures[name].status !== 'pending') return true;
+    if(EX.figures[name] && EX.figures[name].status !== 'pending' && EX.figures[name].status !== 'deferred') return true;
+    if(hiddenPanelOf(node)){ deferred[name] = fn; EX.figures[name] = { status: 'deferred' }; return true; }
     EX.figures[name] = { status: 'pending' };
     node.classList.add('is-loading');
-    var status = node.querySelector('.mount-status');
     var resizeFns = [];
     var ctx = {
       name: name, EX: EX, node: node, figure: figureOf(node),
       panel: node.closest ? node.closest('.fig-panel') : null,
       width: function(){ return node.clientWidth; },
       setStatus: function(t){ var s = node.querySelector('.mount-status'); if(s) s.textContent = t; },
-      onResize: function(fn){ resizeFns.push(fn); }
+      onResize: function(fn){ resizeFns.push(fn); },
+      onShow: function(fn){ (showFns[name] = showFns[name] || []).push(fn); }
     };
     if(window.ResizeObserver){
       var lastW = -1, raf = 0;
       new ResizeObserver(function(){
-        var w = node.clientWidth; if(w === lastW) return; lastW = w;
+        var w = node.clientWidth;
+        if(w === 0 || w === lastW) return;          // hidden tab panels report 0: ignore
+        var first = lastW === -1; lastW = w;
+        if(first) return;
         cancelAnimationFrame(raf);
         raf = requestAnimationFrame(function(){ resizeFns.forEach(function(f){ try { f(w); } catch(e){ console.error(e); } }); });
       }).observe(node);
@@ -522,19 +566,184 @@
     Object.keys(pendingInits).forEach(function(name){
       var fn = pendingInits[name]; delete pendingInits[name]; runInit(name, fn);
     });
-    // any mount that never got a module: say so quietly
     setTimeout(function(){
       doc.querySelectorAll('.mount[data-fig]').forEach(function(n){
         var name = n.getAttribute('data-fig');
-        if(!EX.figures[name]){ var s = n.querySelector('.mount-status'); if(s) s.textContent = 'This interactive figure is not available.'; }
+        if(!EX.figures[name] && !hiddenPanelOf(n)){ var s = n.querySelector('.mount-status'); if(s) s.textContent = 'This interactive figure is not available.'; }
       });
     }, 4000);
+  }
+  /* run deferred mounts inside a panel that just became visible, then fire onShow */
+  function panelShown(panel){
+    panel.querySelectorAll('.mount[data-fig]').forEach(function(n){
+      var name = n.getAttribute('data-fig');
+      if(deferred[name]){ var fn = deferred[name]; delete deferred[name]; EX.figures[name] = { status: 'pending' }; runInit(name, fn); }
+    });
+    requestAnimationFrame(function(){
+      panel.querySelectorAll('.mount[data-fig]').forEach(function(n){
+        (showFns[n.getAttribute('data-fig')] || []).forEach(function(f){ try { f(n.clientWidth); } catch(e){ console.error(e); } });
+      });
+    });
+  }
+
+  /* ---------------- disclosure: EX.more ----------------
+     EX.more(container, label, buildFn, {open}) -> {el, body, open(), close()} ; buildFn(body) runs on first open */
+  EX.more = function(container, label, buildFn, o){
+    o = o || {};
+    var d = EX.h('details', { 'class': 'more' }, container);
+    var sm = EX.h('summary', null, d);
+    EX.h('span', null, sm, label || 'More options');
+    var body = EX.h('div', { 'class': 'more-body' }, d);
+    var built = false;
+    function build(){ if(built || !buildFn) return; built = true; try { buildFn(body); } catch(e){ console.error('[EX] more() build failed', e); } }
+    d.addEventListener('toggle', function(){ if(d.open) build(); });
+    if(o.open){ d.open = true; build(); }
+    return { el: d, body: body, open: function(){ d.open = true; build(); }, close: function(){ d.open = false; } };
+  };
+
+  /* ---------------- roving focus: EX.roving ----------------
+     One tab stop for a list/matrix; arrows move focus; Enter/Space activate. */
+  EX.roving = function(container, itemSelector, o){
+    o = o || {};
+    // Chromium makes an SVG <g>/<svg> with focus listeners tabbable: keep the container itself out of the tab order
+    if(container instanceof SVGElement && !container.hasAttribute('tabindex')) container.setAttribute('tabindex', '-1');
+    var orient = o.orientation || 'vertical', cur = 0, items = [];
+    function list(){ return Array.prototype.slice.call(container.querySelectorAll(itemSelector)); }
+    function refresh(){
+      items = list();
+      if(!items.length) return;
+      var pick = -1;
+      items.forEach(function(el, i){ if(pick < 0 && (el.getAttribute('aria-selected') === 'true' || el.getAttribute('aria-current') === 'true' || el.getAttribute('aria-pressed') === 'true')) pick = i; });
+      if(pick >= 0) cur = pick;
+      cur = Math.max(0, Math.min(items.length - 1, cur));
+      items.forEach(function(el, i){ el.setAttribute('tabindex', i === cur ? '0' : '-1'); });
+    }
+    function focus(i){
+      if(!items.length) refresh(); if(!items.length) return;
+      cur = Math.max(0, Math.min(items.length - 1, i));
+      items.forEach(function(el, j){ el.setAttribute('tabindex', j === cur ? '0' : '-1'); });
+      items[cur].focus();
+      if(items[cur].scrollIntoView) try { items[cur].scrollIntoView({ block: 'nearest', inline: 'nearest' }); } catch(e){}
+    }
+    function cols(){
+      if(!items.length) return 1;
+      var top = items[0].getBoundingClientRect().top, n = 0;
+      for(var i = 0; i < items.length; i++){ if(Math.abs(items[i].getBoundingClientRect().top - top) < 2) n++; else break; }
+      return Math.max(1, n);
+    }
+    container.addEventListener('keydown', function(e){
+      var i = items.indexOf(e.target); if(i < 0){ refresh(); i = items.indexOf(e.target); } if(i < 0) return;
+      var k = e.key, next = null;
+      var prevK = orient === 'horizontal' ? ['ArrowLeft'] : orient === 'vertical' ? ['ArrowUp'] : ['ArrowLeft'];
+      var nextK = orient === 'horizontal' ? ['ArrowRight'] : orient === 'vertical' ? ['ArrowDown'] : ['ArrowRight'];
+      if(orient === 'vertical'){ prevK.push('ArrowLeft'); nextK.push('ArrowRight'); }
+      if(orient === 'horizontal'){ prevK.push('ArrowUp'); nextK.push('ArrowDown'); }
+      if(prevK.indexOf(k) >= 0) next = i - 1;
+      else if(nextK.indexOf(k) >= 0) next = i + 1;
+      else if(orient === 'grid' && k === 'ArrowUp') next = i - cols();
+      else if(orient === 'grid' && k === 'ArrowDown') next = i + cols();
+      else if(k === 'Home') next = 0;
+      else if(k === 'End') next = items.length - 1;
+      else if((k === 'Enter' || k === ' ') && o.onActivate){ e.preventDefault(); o.onActivate(items[i], i, e); return; }
+      if(next != null){ e.preventDefault(); if(next >= 0 && next < items.length) focus(next); }
+    });
+    container.addEventListener('focusin', function(e){
+      var i = items.indexOf(e.target); if(i < 0) return;
+      cur = i; items.forEach(function(el, j){ el.setAttribute('tabindex', j === cur ? '0' : '-1'); });
+    });
+    refresh();
+    return { focus: focus, refresh: refresh, index: function(){ return cur; } };
+  };
+
+  /* ---------------- Explore tabs: EX.explore ----------------
+     <div class="explore-tabs" role="tablist"><button role="tab" data-tab="tree" id="tab-tree" aria-controls="panel-tree">…
+     <div role="tabpanel" id="panel-tree" aria-labelledby="tab-tree" hidden>… */
+  var TABS = ['tree', 'replay', 'transcripts', 'audit', 'numbers'];
+  var currentTab = null;
+  EX.explore = {
+    tabs: TABS,
+    current: function(){ return currentTab; },
+    open: function(tab, o){
+      o = o || {};
+      if(TABS.indexOf(tab) < 0) return;
+      var panel = doc.getElementById('panel-' + tab); if(!panel) return;
+      var changed = tab !== currentTab || (!exploreAwake && !o.dormant);
+      if(!o.dormant) exploreAwake = true;
+      TABS.forEach(function(t){
+        var b = doc.getElementById('tab-' + t), p = doc.getElementById('panel-' + t);
+        var on = t === tab;
+        if(b){ b.setAttribute('aria-selected', String(on)); b.setAttribute('tabindex', on ? '0' : '-1'); }
+        if(p) p.hidden = !on;
+      });
+      currentTab = tab;
+      if(changed) panelShown(panel);
+      if(o.scroll){
+        var target = o.anchor ? doc.getElementById(o.anchor) : doc.getElementById('explore');
+        if(target) requestAnimationFrame(function(){ target.scrollIntoView({ behavior: EX.reduceMotion || o.instant ? 'auto' : 'smooth', block: 'start' }); });
+      }
+      if(changed) EX.emit('tab-shown', { tab: tab });
+    }
+  };
+  function buildTabs(){
+    var bar = doc.querySelector('.explore-tabs'); if(!bar) return;
+    var btns = bar.querySelectorAll('[role="tab"]');
+    btns.forEach(function(b){
+      b.addEventListener('click', function(){
+        var t = b.getAttribute('data-tab');
+        EX.explore.open(t);
+        // keep the address shareable; modules refine it (#tree?run=…) on their own picks
+        if(EX.hash.get().section !== t) EX.hash.set(t, {});
+      });
+    });
+    bar.addEventListener('keydown', function(e){
+      var list = Array.prototype.slice.call(btns), i = list.indexOf(doc.activeElement); if(i < 0) return;
+      var n = null;
+      if(e.key === 'ArrowRight') n = (i + 1) % list.length;
+      else if(e.key === 'ArrowLeft') n = (i - 1 + list.length) % list.length;
+      else if(e.key === 'Home') n = 0; else if(e.key === 'End') n = list.length - 1;
+      if(n == null) return;
+      e.preventDefault(); list[n].focus();
+      var tn = list[n].getAttribute('data-tab');
+      EX.explore.open(tn);
+      if(EX.hash.get().section !== tn) EX.hash.set(tn, {});
+    });
+    // tabs wrap onto a second line on narrow screens (CSS), so no scroll hint is needed
+    // wake the default tab's modules when the section comes near the viewport
+    var sec = doc.getElementById('explore');
+    var wake = function(){ if(!exploreAwake && currentTab) EX.explore.open(currentTab); };
+    if(sec && window.IntersectionObserver){
+      var io = new IntersectionObserver(function(es){ if(es.some(function(e){ return e.isIntersecting; })){ io.disconnect(); wake(); } }, { rootMargin: '900px 0px' });
+      io.observe(sec);
+    } else wake();
+  }
+
+  /* ---------------- sidenotes: inline after their paragraph below 1280px ---------------- */
+  var snWide = null;
+  function placeSidenotes(){
+    var wide = window.innerWidth >= 1280;
+    if(wide === snWide) return; snWide = wide;
+    doc.querySelectorAll('.sidenote').forEach(function(sn){
+      if(!sn.__home){
+        var mark = doc.createElement('span'); mark.className = 'sn-home'; mark.hidden = true;
+        sn.parentNode.insertBefore(mark, sn); sn.__home = mark;
+      }
+      var home = sn.__home, p = home.closest('p, li');
+      if(wide || !p){ if(sn.previousSibling !== home) home.parentNode.insertBefore(sn, home.nextSibling); return; }
+      // after the paragraph, keeping source order among several notes
+      var after = p, nx = p.nextElementSibling;
+      while(nx && nx.classList.contains('sidenote') && nx.__home && nx !== sn && p.contains(nx.__home)){ after = nx; nx = nx.nextElementSibling; }
+      after.parentNode.insertBefore(sn, after.nextSibling);
+      sn.classList.add('sn-inline');
+    });
+    if(wide) doc.querySelectorAll('.sidenote.sn-inline').forEach(function(sn){ sn.classList.remove('sn-inline'); });
   }
 
   /* ---------------- bound values in prose ----------------
      <span data-v="pct:B0.mean">29.3%</span>   — static text is the fallback;
-     core replaces it from summary.json (+ EX.derived) and warns on mismatch.
-     formats: pct pct0 pts ptsU pp ci ciPct usd int tokens raw num
+     core replaces it from summary.json (+ derived) and warns on mismatch.
+     A path starting with "compute." reads compute.json, keyed by run id:
+       data-v="tokens:compute.B0_rep2.heldout_eval_ledger_tokens"
+     formats: pct pct0 pts ptsU pp pp0 ci ciPct usd int tokens raw num num2
      <span data-bar="spend.by_role.task" data-of="spend.total"> gets width = share */
   EX.derive = function(S){
     var d = {};
@@ -546,6 +755,24 @@
     d.metaTokI0 = S.tokens_by_arm.I0.meta_tokens_per_iteration; d.metaTokIg = S.tokens_by_arm.Ig.meta_tokens_per_iteration;
     d.taskTokI0 = S.tokens_by_arm.I0.task_tokens_per_task_eval; d.taskTokIg = S.tokens_by_arm.Ig.task_tokens_per_task_eval;
     d.B0min = Math.min.apply(null, S.B0.reps); d.B0max = Math.max.apply(null, S.B0.reps);
+    d.rounds = S.tokens_by_arm.I0.n_meta_iterations / d.nI0;          // coaching rounds per pay-off run (8)
+    var gens = Object.keys(se).map(function(k){ return se[k].gens; });
+    d.sourceGens = gens.length ? Math.max.apply(null, gens) : null;     // 12
+    var pg = S.extension && S.extension.per_generation ? Object.keys(S.extension.per_generation).map(Number) : [];
+    d.extMaxGen = pg.length ? Math.max.apply(null, pg) : null;          // 40
+    // the same coach (source_s1 node 1) re-run at gen 12, 20, 40
+    var pts = (S.extension && S.extension.points) || [], by = {};
+    pts.forEach(function(p){ by[p.run] = p.heldout; });
+    d.sameCoach = { g12: S.Ig_runs.payoff_Ig_source_s1, g20: by.ext_source_s1_g20, g40: by.ext_source_s1_g40 };
+    var sc = [d.sameCoach.g12, d.sameCoach.g20, d.sameCoach.g40].filter(function(x){ return typeof x === 'number'; });
+    d.sameCoachSpread = sc.length ? Math.max.apply(null, sc) - Math.min.apply(null, sc) : null;
+    // the one run whose final player was the untouched starting player (ext_source_s4_g20)
+    (S.final_runs || []).forEach(function(r){
+      if(r.final_node === 'initial' && r.combined){
+        d.untouchedWin = { run: r.run, untouched: r.combined.initial,
+          edited: Math.max.apply(null, Object.keys(r.combined).filter(function(k){ return k !== 'initial'; }).map(function(k){ return r.combined[k]; })) };
+      }
+    });
     return d;
   };
   function getPath(o, path){
@@ -563,53 +790,112 @@
       case 'int': return EX.fmt.int(v);
       case 'tokens': return EX.fmt.tokens(v);
       case 'num': return EX.fmt.num(v, 1);
+      case 'num2': return EX.fmt.num(v, 2);
       case 'pp': return EX.fmt.num(Math.abs(v) * 100, 1);
+      case 'pp0': return EX.fmt.num(Math.abs(v) * 100, 0);
       default: return String(v);
     }
   }
   EX.bindValues = function(scope){
     var nodes = (scope || doc).querySelectorAll('[data-v]');
     if(!nodes.length) return Promise.resolve();
-    return EX.load('summary').then(function(S){
-      var src = Object.assign({}, S, { derived: EX.derive(S) });
+    var needCompute = Array.prototype.some.call(nodes, function(n){ return /:compute\./.test(n.getAttribute('data-v')); });
+    return Promise.all([EX.load('summary'), needCompute ? EX.load('compute') : null]).then(function(res){
+      var S = res[0], C = res[1], comp = {};
+      if(C && C.runs) C.runs.forEach(function(r){ comp[r.run] = r; });
+      var src = Object.assign({}, S, { derived: EX.derive(S), compute: comp });
       nodes.forEach(function(n){
         var spec = n.getAttribute('data-v'), i = spec.indexOf(':');
         var f = i >= 0 ? spec.slice(0, i) : 'raw', path = i >= 0 ? spec.slice(i + 1) : spec;
         var v = getPath(src, path);
-        if(v === undefined){ console.warn('[EX] bound value not found:', spec); return; }
+        if(v === undefined || v === null){ console.warn('[EX] bound value not found:', spec); return; }
         var txt = fmtBound(f, v);
         if(n.textContent.trim() !== txt) console.warn('[EX] prose value "' + n.textContent.trim() + '" replaced by data value "' + txt + '" (' + spec + ')');
         n.textContent = txt;
       });
       (scope || doc).querySelectorAll('[data-bar]').forEach(function(n){
-        var v = getPath(src, n.getAttribute('data-bar')), of = getPath(src, n.getAttribute('data-of'));
+        var v = getPath(src, n.getAttribute('data-bar'));
+        var of = n.hasAttribute('data-max') ? +n.getAttribute('data-max') : getPath(src, n.getAttribute('data-of'));
         if(typeof v === 'number' && typeof of === 'number' && of > 0) n.style.width = (100 * v / of).toFixed(2) + '%';
       });
     }).catch(function(e){ console.warn('[EX] could not bind values', e); });
   };
 
-  /* ---------------- theme toggle + boot ---------------- */
+  /* ---------------- theme toggle: quiet text "Auto · Light · Dark" ---------------- */
   function buildThemeToggle(){
     var host = doc.querySelector('[data-theme-toggle]'); if(!host) return;
     host.innerHTML = '';
-    EX.seg(host, [{ value: 'auto', label: 'Auto' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }],
-      storedTheme(), function(v){ EX.theme.set(v); }, { label: 'Theme' });
+    host.setAttribute('role', 'group'); host.setAttribute('aria-label', 'Colour theme');
+    var cur = storedTheme(), btns = [];
+    [['auto', 'Auto'], ['light', 'Light'], ['dark', 'Dark']].forEach(function(o, i){
+      if(i) EX.h('span', { 'class': 'tt-sep', 'aria-hidden': 'true' }, host, '·');
+      var b = EX.h('button', { type: 'button', 'class': 'tt-btn', 'data-opt': o[0], 'aria-pressed': String(o[0] === cur) }, host, o[1]);
+      b.addEventListener('click', function(){
+        EX.theme.set(o[0]);
+        btns.forEach(function(x){ x.setAttribute('aria-pressed', String(x === b)); });
+      });
+      btns.push(b);
+    });
   }
+
+  /* ---------------- hash routing ----------------
+     #tree… #replay… #transcripts… #audit… open that Explore tab; #numbers #cost #appendix #caveats
+     open Numbers; old section names map to the new sections. */
+  var TAB_OF = { tree: 'tree', replay: 'replay', transcripts: 'transcripts', audit: 'audit',
+    numbers: 'numbers', cost: 'numbers', appendix: 'numbers', caveats: 'numbers', files: 'numbers', explore: null };
+  var SECTION_ALIAS = { question: 'setup', extension: 'generations', tldr: 'top' };
+  function route(h, o){
+    o = o || {};
+    var sec = h.section; if(!sec) return null;
+    if(Object.prototype.hasOwnProperty.call(TAB_OF, sec)){
+      var tab = TAB_OF[sec];
+      if(tab) EX.explore.open(tab);
+      var anchor = (sec === 'cost' || sec === 'appendix' || sec === 'caveats' || sec === 'files') ? sec : 'explore';
+      return doc.getElementById(anchor);
+    }
+    return doc.getElementById(SECTION_ALIAS[sec] || sec);
+  }
+  function seedFromHash(h){
+    var p = h.params || {};
+    if(p.node && p.run) EX.select('node', { run: p.run, node: p.node, source: 'hash' });
+    else if(p.run) EX.select('run', { run: p.run, source: 'hash' });
+    if(p.task) EX.select('task', { task: p.task, set: p.set || 'heldout', source: 'hash' });
+  }
+  function settleThen(fn){
+    var tries = 0;
+    (function settle(){
+      var all = Object.keys(EX.figures).every(function(k){ return EX.figures[k].status !== 'pending'; });
+      if(all || ++tries > 30) fn(); else setTimeout(settle, 150);
+    })();
+  }
+  window.addEventListener('hashchange', function(){
+    var h = EX.hash.get();
+    var target = route(h);
+    if(h.params && Object.keys(h.params).length) seedFromHash(h);
+    if(target) target.scrollIntoView({ behavior: EX.reduceMotion ? 'auto' : 'smooth' });
+  });
+
+  /* ---------------- boot ---------------- */
   function boot(){
     readColors();
     buildThemeToggle();
+    buildTabs();
+    placeSidenotes();
+    window.addEventListener('resize', placeSidenotes);
+    // open the default tab before flushing, so its mounts are not deferred
+    var h = EX.hash.get();
+    var firstTab = TAB_OF[h.section] || 'tree';
+    EX.explore.open(firstTab, { dormant: !TAB_OF[h.section] && h.section !== 'explore' });
     EX.bindValues();
     flushPending();
-    // honour a deep link once figures have had a chance to lay out
-    var h = EX.hash.get();
-    if(h.section){
-      var target = doc.getElementById(h.section);
-      if(target){
-        var tries = 0;
-        var settle = function(){ var all = Object.keys(EX.figures).every(function(k){ return EX.figures[k].status !== 'pending'; });
-          if(all || ++tries > 20){ target.scrollIntoView(); } else setTimeout(settle, 150); };
-        setTimeout(settle, 150);
-      }
+    var target = route(h);
+    if(h.params && Object.keys(h.params).length) seedFromHash(h);
+    if(target){
+      // scroll at once (lazy figures may stay pending a long time), then once more after
+      // figures above have settled, unless the reader has scrolled away meanwhile
+      target.scrollIntoView();
+      var y0 = window.scrollY;
+      settleThen(function(){ if(Math.abs(window.scrollY - y0) < 4) target.scrollIntoView(); });
     }
   }
   if(doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot();

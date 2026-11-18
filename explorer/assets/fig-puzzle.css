@@ -1,90 +1,70 @@
-/* fig-puzzle.css — Figure 2, "Try one". Every selector starts with .fx-puzzle. */
+/* fig-puzzle.css - Figure 2, "try a puzzle". Every selector starts with .fx-puzzle (plus the mount's
+   reserved height). Two type sizes: --fs-fig-text (buttons, readouts) and --fs-axis (grid labels). */
+.mount[data-fig="puzzle"]{min-height:620px}
+@media (max-width:719px){ .mount[data-fig="puzzle"]{min-height:1100px} }
+
 .fx-puzzle{position:relative;font-variant-numeric:tabular-nums}
-.fx-puzzle .pz-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:2px 0 6px}
-.fx-puzzle .pz-meta{font-size:13.5px;color:var(--ink-2);line-height:1.45;margin:0 0 14px}
-.fx-puzzle .pz-meta .m{font-family:var(--font-mono);font-size:12.5px;color:var(--ink)}
-.fx-puzzle .pz-meta .sep{color:var(--ink-muted);margin:0 6px}
-.fx-puzzle .pz-meta .note{color:var(--ink-muted)}
-.fx-puzzle .pz-sec{font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-muted);font-weight:500;margin:18px 0 8px}
-.fx-puzzle .pz-sec:first-child{margin-top:0}
-.fx-puzzle .pz-train{display:flex;flex-wrap:wrap;gap:18px 34px;align-items:flex-start}
+.fx-puzzle .pz-lab{font-size:var(--fs-axis,13px);color:var(--ink-muted);margin:0 0 8px;line-height:1.3}
+.fx-puzzle .pz-train{display:flex;flex-wrap:wrap;gap:20px 28px;align-items:center;margin:0 0 28px}
 .fx-puzzle .pz-train .arc-pair{gap:10px}
-.fx-puzzle .pz-work{display:grid;grid-template-columns:minmax(0,auto) minmax(0,1fr);gap:18px 40px;align-items:start;
-  border-top:1px solid var(--rule);padding-top:16px;margin-top:20px}
-.fx-puzzle.narrow .pz-work{grid-template-columns:minmax(0,1fr)}
+.fx-puzzle .arc-pair .arc-arrow{color:var(--ink-muted);font-size:var(--fs-fig-text,15px)}
+
+.fx-puzzle .pz-work{display:flex;flex-wrap:wrap;gap:20px 40px;align-items:flex-start;
+  border-top:1px solid var(--rule);padding-top:20px}
+.fx-puzzle.narrow .pz-work{flex-direction:column}
 .fx-puzzle .pz-col{min-width:0}
-.fx-puzzle .pz-tests{margin:0 0 10px}
+.fx-puzzle .pz-grid{line-height:0}
+.fx-puzzle .pz-grid svg{max-width:100%;height:auto}
 
 /* editor */
-.fx-puzzle .pz-editor{display:block;touch-action:none;cursor:crosshair;border-radius:1px;max-width:100%}
+.fx-puzzle .pz-editor{display:block;touch-action:none;cursor:crosshair;max-width:100%}
 .fx-puzzle .pz-editor:focus{outline:none}
-.fx-puzzle .pz-editor:focus-visible{outline:2px solid var(--accent);outline-offset:3px;box-shadow:none}
+.fx-puzzle .pz-editor:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .fx-puzzle .pz-editor .bg{fill:var(--rule)}
 .fx-puzzle .pz-editor .cur{fill:none;stroke:var(--accent);stroke-width:2.5;display:none;pointer-events:none}
-.fx-puzzle .pz-editor:focus .cur{display:block}
+.fx-puzzle .pz-editor:focus-visible .cur{display:block}
 .fx-puzzle .pz-editor.locked{cursor:default}
-.fx-puzzle .pz-cellinfo{font-family:var(--font-mono);font-size:11.5px;color:var(--ink-muted);min-height:1.4em;margin-top:6px}
 
-/* palette */
-.fx-puzzle .pz-pal{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0 4px;max-width:420px}
-.fx-puzzle .pz-chip{position:relative;width:34px;height:34px;padding:0;border:1px solid var(--rule-strong);border-radius:4px;
-  cursor:pointer;background:var(--bg);display:flex;align-items:center;justify-content:center}
-.fx-puzzle .pz-chip .sw{display:block;width:22px;height:22px;border-radius:2px}
-.fx-puzzle .pz-chip .d{position:absolute;right:2px;bottom:0;font-family:var(--font-mono);font-size:9px;line-height:1;color:var(--ink-muted)}
-.fx-puzzle .pz-chip[aria-checked="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
-.fx-puzzle .pz-chip[aria-checked="true"] .d{color:var(--accent)}
-.fx-puzzle .pz-chip:hover{border-color:var(--accent-hover)}
-.fx-puzzle .pz-tools{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin:10px 0 0}
-.fx-puzzle .pz-size{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-2)}
-.fx-puzzle .pz-size input{font:inherit;font-family:var(--font-mono);font-size:13px;width:3.6em;min-height:34px;padding:4px 6px;color:var(--ink);
-  background:var(--bg);border:1px solid var(--rule-strong);border-radius:4px}
-.fx-puzzle .pz-size input:hover{border-color:var(--accent-hover)}
-.fx-puzzle .pz-size .x{color:var(--ink-muted)}
-.fx-puzzle .pz-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin:16px 0 0}
-.fx-puzzle .pz-tries{font-size:13px;color:var(--ink-muted)}
-.fx-puzzle .pz-feedback{font-size:14.5px;line-height:1.5;color:var(--ink-2);margin:10px 0 0;min-height:1.5em}
+/* palette: one row of swatches, no digits */
+.fx-puzzle .pz-pal{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 0}
+.fx-puzzle .pz-chip{width:36px;height:36px;padding:0;border:1px solid var(--rule-strong);border-radius:4px;cursor:pointer}
+.fx-puzzle .pz-chip[aria-checked="true"]{box-shadow:0 0 0 2px var(--panel),0 0 0 4px var(--accent);border-color:var(--panel)}
+.fx-puzzle .pz-chip:focus-visible{outline:2px dashed var(--ink);outline-offset:4px}
+
+.fx-puzzle .pz-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:20px 0 0}
+.fx-puzzle .pz-actions .btn{font-size:var(--fs-fig-text,15px);min-height:42px;padding:8px 20px}
+.fx-puzzle .pz-actions .btn.quiet{padding-left:8px;padding-right:8px}
+.fx-puzzle .pz-feedback{font-size:var(--fs-fig-text,15px);line-height:1.5;color:var(--ink-2);margin:12px 0 0;min-height:1.5em}
 .fx-puzzle .pz-feedback b{font-weight:600}
 .fx-puzzle .pz-feedback .ok{color:var(--correct)}
 .fx-puzzle .pz-feedback .no{color:var(--wrong)}
 
-/* reveal */
-.fx-puzzle .pz-reveal{border-top:1px solid var(--rule);margin-top:22px;padding-top:16px}
-.fx-puzzle .pz-reveal[hidden]{display:none}
-.fx-puzzle .pz-cmp{display:flex;flex-wrap:wrap;gap:16px 26px;align-items:flex-start}
-.fx-puzzle .pz-cmp .arc-fig{width:min-content}
-.fx-puzzle .pz-legend{font-size:12.5px;color:var(--ink-muted);margin:8px 0 0;line-height:1.45}
-.fx-puzzle .pz-legend .box{display:inline-block;width:10px;height:10px;border:2px solid var(--wrong);vertical-align:-1px;margin-right:4px}
-.fx-puzzle .pz-runs{margin:4px 0 0}
-.fx-puzzle .pz-total{font-size:15px;line-height:1.5;color:var(--ink);margin:0 0 10px}
-.fx-puzzle .pz-total b{font-weight:600}
-.fx-puzzle .pz-grp{display:grid;grid-template-columns:minmax(0,13.5em) auto minmax(0,1fr);gap:4px 14px;align-items:center;
-  font-size:13.5px;padding:5px 0;border-bottom:1px solid var(--rule)}
-.fx-puzzle .pz-grp:first-of-type{border-top:1px solid var(--rule)}
-.fx-puzzle .pz-grp .g{color:var(--ink-2)}
-.fx-puzzle .pz-grp .k{font-family:var(--font-mono);font-size:12.5px;color:var(--ink);white-space:nowrap}
-.fx-puzzle .pz-marks{display:flex;flex-wrap:wrap;gap:3px}
-.fx-puzzle .pz-mk{font:inherit;font-family:var(--font-mono);font-size:12px;min-width:30px;height:28px;padding:0 4px;border-radius:3px;
-  border:1px solid var(--rule-strong);background:var(--bg);color:var(--ink-2);cursor:pointer;line-height:1}
-.fx-puzzle .pz-mk.ok{color:var(--correct);border-color:var(--correct)}
-.fx-puzzle .pz-mk.no{color:var(--wrong);border-color:var(--rule-strong)}
-.fx-puzzle .pz-mk.na{color:var(--ink-muted);border-style:dashed}
-.fx-puzzle .pz-mk[aria-pressed="true"]{box-shadow:0 0 0 2px var(--accent);border-color:var(--accent)}
-.fx-puzzle .pz-mk:hover{border-color:var(--accent-hover)}
-.fx-puzzle .pz-pick{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:16px 0 10px}
-.fx-puzzle .pz-runcap{font-size:13.5px;color:var(--ink-2)}
-.fx-puzzle .pz-link{display:inline-block;margin-top:14px;font-size:14.5px;color:var(--accent);text-decoration:underline;text-decoration-color:var(--accent-wash);
-  text-underline-offset:3px}
+/* after the last try */
+.fx-puzzle .pz-reveal{margin:18px 0 0;padding-top:18px;border-top:1px solid var(--rule)}
+.fx-puzzle .pz-cmp{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-start}
+.fx-puzzle .arc-cap{font-family:var(--font-sans);font-size:var(--fs-axis,13px);color:var(--ink-muted)}
+.fx-puzzle .pz-ai{font-size:var(--fs-fig-text,15px);line-height:1.55;color:var(--ink-2);margin:16px 0 0}
+.fx-puzzle .pz-ai b{font-weight:600;color:var(--ink)}
+.fx-puzzle .pz-link{display:inline-block;margin-top:8px;font-size:var(--fs-fig-text,15px);color:var(--accent);
+  text-decoration:underline;text-decoration-color:var(--accent-wash);text-underline-offset:3px;padding:8px 0}
 .fx-puzzle .pz-link:hover{color:var(--accent-hover);text-decoration-color:currentColor}
-.fx-puzzle .pz-loading{font-size:13px;font-style:italic;color:var(--ink-muted);padding:8px 0}
-.fx-puzzle .pz-def{font-size:12.5px;color:var(--ink-muted);line-height:1.45;margin:6px 0 0}
 
+/* "More tools" (core styles details.more; these only lay out its contents) */
+.fx-puzzle > details.more{margin-top:20px}
+.fx-puzzle > details.more > summary{cursor:pointer;font-size:var(--fs-fig-text,15px);color:var(--ink-muted);min-height:40px;
+  display:inline-flex;align-items:center}
+.fx-puzzle > details.more > summary:hover{color:var(--accent-hover)}
+.fx-puzzle .pz-toolrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin:10px 0 0}
+.fx-puzzle .pz-toolrow .btn{font-size:var(--fs-axis,13px)}
+.fx-puzzle .pz-size{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-axis,13px);color:var(--ink-2)}
+.fx-puzzle .pz-size input{font:inherit;width:3.6em;min-height:36px;padding:4px 6px;color:var(--ink);
+  background:var(--bg);border:1px solid var(--rule-strong);border-radius:4px}
+.fx-puzzle .pz-note{font-size:var(--fs-axis,13px);line-height:1.5;color:var(--ink-muted);margin:12px 0 0;max-width:62ch}
+
+.fx-puzzle.narrow .pz-train{gap:16px}
+.fx-puzzle.narrow .pz-cmp{gap:12px 16px;flex-wrap:nowrap}
+.fx-puzzle.narrow .pz-pal{display:grid;grid-template-columns:repeat(5,44px);gap:8px}
 @media (max-width:719px){
-  .fx-puzzle .pz-chip{width:40px;height:40px}
-  .fx-puzzle .pz-chip .sw{width:26px;height:26px}
-  .fx-puzzle .pz-pal{max-width:226px}
-  .fx-puzzle .pz-grp{grid-template-columns:minmax(0,1fr) auto;}
-  .fx-puzzle .pz-grp .pz-marks{grid-column:1 / -1}
-  .fx-puzzle .pz-mk{min-width:40px;height:40px}
-  .fx-puzzle .btn{min-height:40px}
-  .fx-puzzle .pz-cmp{gap:14px 12px}
+  .fx-puzzle .pz-chip{width:44px;height:44px}
+  .fx-puzzle .pz-actions .btn{min-height:44px}
 }
