@@ -1,0 +1,385 @@
+<title>Coaching the Coach</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="An experiment report: does an LLM coach that rewrites itself build better ARC-AGI-2 players? A pre-registered test, an extension to 40 generations, and every run's data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/fig-audit.css">
+<link rel="stylesheet" href="assets/fig-replay.css">
+<link rel="stylesheet" href="assets/fig-transcripts.css">
+<link rel="stylesheet" href="assets/fig-puzzle.css">
+<link rel="stylesheet" href="assets/fig-tree.css">
+
+<div class="ex-wrap">
+
+<div class="ex-top l-wide">
+  <span class="brand">Coaching the Coach</span>
+  <span class="theme-toggle" data-theme-toggle></span>
+</div>
+
+<header class="ex-header l-body">
+  <div class="kicker">An experiment report · ARC-AGI-2 · Nov 2026</div>
+  <h1>Does a self-improving coach get better at coaching?</h1>
+  <p class="dek">We let an LLM agent rewrite itself while it coached another agent at ARC-AGI-2 puzzles. Then we checked whether the rewritten coach was any better.</p>
+  <div class="byline">
+    <div><b>Model</b>gpt-6-luna, reasoning effort high</div>
+    <div><b>Exam</b><span data-v="int:sets.heldout_tasks">120</span> evaluation tasks, <span data-v="int:sets.heldout_test_inputs">167</span> test inputs</div>
+    <div><b>Status</b>Pre-registered test + extension</div>
+    <div><b>Total spend</b><span data-v="usd:spend.total">$152.23</span></div>
+  </div>
+</header>
+
+<main>
+
+<section class="l-body tldr" aria-labelledby="tldr-h">
+  <h2 id="tldr-h">In short</h2>
+  <ul>
+    <li><span class="hl">Neither improver beat two plain attempts on ARC-AGI-2.</span> That is the pre-registered headline. Players built by the original coach scored <span data-v="pct:I0_mean">29.7%</span> on a held-out exam. A player that simply asks the model twice scored <span data-v="pct:B0.mean">29.3%</span>.</li>
+    <li>The coaching gain was <i>G</i> = <span data-v="pts:G.est">+0.4</span> points, 95% interval <span data-v="ci:G">[−1.9, +2.8]</span>. Players built by self-evolved coaches scored <i>Δ</i> = <span data-v="pts:Delta.est">−1.8</span> points against the original coach's, interval <span data-v="ci:Delta">[−4.2, +0.6]</span>. Both intervals contain zero.</li>
+    <li>In a follow-up that was not pre-registered, coaches taken from generation 40 built players that scored <span data-v="pts:extension.gen40_minus_gen0.est">+0.6</span> points against generation 0, interval <span data-v="ci:extension.gen40_minus_gen0">[−6.5, +7.8]</span>. Several "later" coaches were the same code as earlier ones, so this is weak evidence either way.</li>
+    <li>Raising the model's reasoning effort to xhigh, which no coach was allowed to change, scored <span data-v="pct:xhigh.score">41.1%</span>. The whole study cost <span data-v="usd:spend.total">$152.23</span> in model calls.</li>
+  </ul>
+</section>
+
+<nav class="toc l-body" aria-label="Contents">
+  <ol>
+    <li><a href="#question"><span class="n">1</span>The question</a></li>
+    <li><a href="#puzzle"><span class="n">2</span>ARC puzzles</a></li>
+    <li><a href="#replay"><span class="n">3</span>Replays</a></li>
+    <li><a href="#results"><span class="n">4</span>Main result</a></li>
+    <li><a href="#tree"><span class="n">5</span>How coaches evolved</a></li>
+    <li><a href="#extension"><span class="n">6</span>Later generations</a></li>
+    <li><a href="#transcripts"><span class="n">7</span>Transcripts</a></li>
+    <li><a href="#audit"><span class="n">8</span>What coaches changed</a></li>
+    <li><a href="#caveats"><span class="n">9</span>Caveats</a></li>
+    <li><a href="#cost"><span class="n">10</span>Cost</a></li>
+    <li><a href="#appendix"><span class="n">A</span>Appendix</a></li>
+  </ol>
+</nav>
+
+<!-- ============================ 1. The question ============================ -->
+<section class="l-body" aria-labelledby="question">
+  <h2 id="question"><span class="h-num">1</span>The question</h2>
+  <p>This study has two LLM agents. The <b data-term="player">player</b> is a short program that tries to solve one ARC-AGI-2 puzzle. It may make at most two model calls and submit two answers per test input. The <b data-term="coach">coach</b> is an agent that reads the player's practice results and edits the player's code to make it better.<sup class="fn" id="fnref-1"><a href="#fn-1">1</a></sup><span class="sidenote" id="fn-1"><span class="sn-num">1</span>"Coach" and "player" are the repository's <code>meta agent</code> and <code>task agent</code>. We use the plain names throughout.</span> The coach can also edit <i>itself</i>. The idea is that a coach that rewrites its own code might become a better coach over time.</p>
+  <p>We asked a narrow version of that idea. Take a coach that has evolved itself, freeze it, and give it the same budget as the original coach. Does it build a better player? An extension then asked whether coaches taken from later generations do better than coaches from earlier ones.</p>
+  <p>A "better player" has one meaning here: a higher score on a held-out exam that no coach ever saw. The exam is all <span data-v="int:sets.heldout_tasks">120</span> public ARC-AGI-2 evaluation tasks <a class="cite" href="#ref-arc">[1]</a>. Before any pay-off result existed, we committed the design, the data splits and the analysis script <a class="cite" href="#ref-design">[2]</a>. That record fixed two comparisons and their 95% intervals. <i>G</i> asks whether players built by the original coach beat a plain baseline. <i>Δ</i> asks whether players built by an evolved coach beat players built by the original one.</p>
+</section>
+
+<figure class="fig l-page" id="fig-setup">
+  <div class="fig-panel">
+    <div class="fig-head">
+      <div class="fig-title">Two loops: the coach rewrites itself in one, and is frozen in the other</div>
+      <p class="fig-text">On the left, the coach and player evolve together, and every generation adds a node to an archive tree. One changed coach is picked from each tree and carried, frozen, into the loop on the right. There it trains a fresh player, and that player takes the exam once.</p>
+      <p class="fig-hint">Hover over or tap any box or arrow to see what it does.</p>
+    </div>
+    <div class="mount" data-fig="setup"><div class="mount-status">Loading figure…</div></div>
+  </div>
+  <figcaption><b>Figure 1</b>: The experiment's two loops. The gateway below both loops is the only route to the model, and no agent can edit it. Counts are read from <span class="src">summary.json</span> and <span class="src">trees.json</span>. The example tree is <span class="src">source_s3</span>, generations 0–12.</figcaption>
+</figure>
+
+<section class="l-body">
+  <p>The left loop is a <b data-term="source">source run</b>. We ran the repository's own evolution loop for 12 generations, six times, on a 25-task practice set (runs <code>source_s1</code>–<code>source_s6</code>). In each generation the coach could edit the player, its own code, or both, starting from any earlier node in the tree. Every coach started from the same original coach, <b data-term="i0">I<sub>0</sub></b>. We had to adapt I<sub>0</sub> slightly before it would edit code at all.<sup class="fn" id="fnref-2"><a href="#fn-2">2</a></sup><span class="sidenote" id="fn-2"><span class="sn-num">2</span>With the repository's verbatim instruction, the model only asked clarifying questions and never edited code. One sentence was added ("work autonomously") and tool-call parsing was loosened. Both groups started from this adapted coach. DECISIONS 14, 15.</span></p>
+  <p>From each source run we picked one evolved coach, <b data-term="ig">I<sub>g</sub></b>. The rule was fixed in advance. Among coaches whose code differs from I<sub>0</sub> and that produced at least one scored child, take the one whose children improved most. Five of the six runs had one. In <code>source_s4</code>, the only coach edit never produced a scored child.</p>
+  <p>The right loop is a <b data-term="payoff">pay-off run</b>. A frozen coach, either I<sub>0</sub> or an I<sub>g</sub>, gets the plain starting player <b data-term="a0">A<sub>0</sub></b> and eight rounds on a second, disjoint 25-task practice set.<sup class="fn" id="fnref-3"><a href="#fn-3">3</a></sup><span class="sidenote" id="fn-3"><span class="sn-num">3</span>Each practice set has 19 tasks the starting player solves sometimes but not always, 3 it always solves and 3 it never solves. Too few intermediate tasks qualified to fill both sets with them.</span> Its code is locked, so it can only improve the player. We ran six pay-off runs with I<sub>0</sub> and five with an I<sub>g</sub>. At the end, the two best players are re-scored on the practice set, and the one with the higher combined score takes the <b data-term="exam">exam</b> once. The unedited A<sub>0</sub> is eligible to be that player.<sup class="fn" id="fnref-4"><a href="#fn-4">4</a></sup><span class="sidenote" id="fn-4"><span class="sn-num">4</span>This happened once. In the extension's <code>source_s4</code> generation-20 run, A<sub>0</sub> beat every edited player on the practice set. So that exam score is A<sub>0</sub>'s own.</span></p>
+  <p>Underneath both loops sits a <b data-term="gateway">gateway</b>. It is the only route to the model, and no agent can edit it. It fixes the model (<code>gpt-6-luna</code>), the reasoning effort (<i>high</i>), the cap of two calls and two answers per test input, and the total spending cap. Reasoning effort is an API setting for how long the model thinks before it answers.<sup class="fn" id="fnref-5"><a href="#fn-5">5</a></sup><span class="sidenote" id="fn-5"><span class="sn-num">5</span>The next level up is <i>xhigh</i>. We ran the plain player once at xhigh as a reference. No coach could use it.</span> Because the gateway sets it, no coach could buy a better score by raising it.</p>
+</section>
+
+<!-- ============================ 2. ARC puzzles ============================ -->
+<section class="l-body" aria-labelledby="puzzle">
+  <h2 id="puzzle"><span class="h-num">2</span>What an ARC puzzle is</h2>
+  <p>An ARC-AGI-2 task shows a few example pairs. Each pair is an input grid of coloured cells and the output grid it should become. Somewhere in the pairs is a rule: fill the enclosed shapes, mirror the pattern, count and recolour. The player sees the examples plus a new test input and must produce the output grid exactly. That means every cell, every colour and the right size. A single wrong cell fails the answer.</p>
+  <p>The player may submit two answers per test input, and the input counts as solved if either one is exactly right. This is <i>pass@2</i>. Some tasks have more than one test input, and those give partial credit. The exam score is this pass@2, averaged over the <span data-v="int:sets.heldout_tasks">120</span> tasks.</p>
+</section>
+
+<figure class="fig l-page" id="fig-puzzle">
+  <div class="fig-panel">
+    <div class="fig-head">
+      <div class="fig-title">Try one: find the rule, then paint the answer</div>
+      <p class="fig-text">These are the example pairs from one practice task. Paint the output for the test input. Then check it against the truth and against what the player answered on the same input.</p>
+      <p class="fig-hint">Paint the output. You get two tries, like the player.</p>
+    </div>
+    <div class="mount" data-fig="puzzle"><div class="mount-status">Loading figure…</div></div>
+  </div>
+  <figcaption><b>Figure 2</b>: One ARC-AGI-2 task. Exact match is strict: the size and every cell must be right. Grids come from <span class="src">tasks.json</span>, and player answers from <span class="src">transcripts.json</span> and <span class="src">heldout.json</span>.</figcaption>
+</figure>
+
+<!-- ============================ 3. Replays ============================ -->
+<section class="l-body" aria-labelledby="replay">
+  <h2 id="replay"><span class="h-num">3</span>Watching answers change</h2>
+  <p>Before the scores, it helps to see what the players actually produce. The figure below has two views. The first follows one practice task through a source run, generation by generation. You can see when the player's answer turns from wrong to right, and sometimes back again. The second takes one exam task and lines up every final player's two attempts against the truth.</p>
+  <p>Two things stand out. Wrong answers are often close: the rule is half-found, and a few cells or one colour are off. And outcomes are noisy. The three baseline runs are the same unedited player run three times, yet they often disagree on the same task.<sup class="fn" id="fnref-6"><a href="#fn-6">6</a></sup><span class="sidenote" id="fn-6"><span class="sn-num">6</span>Exam answer grids are kept for 17 of the 23 exam runs. To keep the page under its size budget, the six extension runs from <code>source_s2</code>–<code>source_s4</code> keep only their right/wrong flags.</span></p>
+</section>
+
+<figure class="fig l-wide" id="fig-replay">
+  <div class="fig-panel">
+    <div class="fig-head">
+      <div class="fig-title">The same puzzle, across generations and across runs</div>
+      <p class="fig-text">Each cell is one player's two attempts beside the truth. Wrong cells are outlined. The sparkline tracks the practice score of the generation being shown.</p>
+      <p class="fig-hint">Step through generations, or switch to the exam view and pick a task.</p>
+    </div>
+    <div class="mount" data-fig="replay"><div class="mount-status">Loading figure…</div></div>
+  </div>
+  <figcaption><b>Figure 3</b>: Replays. Practice-run answers come from <span class="src">transcripts.json</span>; only failed inputs have full transcripts, and solved ones are answer-only. Exam answers come from <span class="src">heldout.json</span>; six extension runs have flags but no grids.</figcaption>
+</figure>
+
+<!-- ============================ 4. Main result ============================ -->
+<section class="l-body" aria-labelledby="results">
+  <h2 id="results"><span class="h-num">4</span>Main result: no coach beat two plain attempts</h2>
+  <p>The baseline, B0, is the unedited player A<sub>0</sub>: it asks the model for the answer twice. Run three times on the exam, it scored <span data-v="pct:B0.reps.0">30.1%</span>, <span data-v="pct:B0.reps.1">27.9%</span> and <span data-v="pct:B0.reps.2">29.7%</span>, a mean of <span data-v="pct:B0.mean">29.3%</span>. The six players built by the original coach averaged <span data-v="pct:I0_mean">29.7%</span>. The five built by evolved coaches averaged <span data-v="pct:Ig_mean">27.9%</span>.</p>
+  <p>The pre-registered comparisons put numbers on that. Players built by the original coach beat B0 by <i>G</i> = <span data-v="pts:G.est">+0.4</span> points, with a 95% interval of <span data-v="ci:G">[−1.9, +2.8]</span>. Players built by evolved coaches scored <i>Δ</i> = <span data-v="pts:Delta.est">−1.8</span> points against the original coach's, interval <span data-v="ci:Delta">[−4.2, +0.6]</span>. Against B0 directly they scored <span data-v="pts:Ig_gain_over_B0.est">−1.4</span> points, interval <span data-v="ci:Ig_gain_over_B0">[−4.0, +1.3]</span>.<sup class="fn" id="fnref-7"><a href="#fn-7">7</a></sup><span class="sidenote" id="fn-7"><span class="sn-num">7</span>All intervals are Welch t-intervals <a class="cite" href="#ref-welch">[3]</a>. This is a standard interval for the difference of two group means that does not assume the groups have equal spread. When it contains 0, the data cannot tell the difference from no effect.</span> Every interval contains zero. We found no evidence that either coach helped, and none that evolving the coach helped or hurt.</p>
+  <p>For scale, the run-to-run standard deviation was <span data-v="pp:sd.B0">1.2</span> points for B0, <span data-v="pp:sd.I0">1.5</span> for the original-coach runs and <span data-v="pp:sd.Ig">1.9</span> for the evolved-coach runs. The one lever that clearly moved the score was not coaching. A single pass of A<sub>0</sub> at xhigh effort scored <span data-v="pct:xhigh.score">41.1%</span>, against <span data-v="pct:B0.mean">29.3%</span> for B0. The gateway locked effort at high for every player, so no coach could reach that gain.</p>
+  <p>Coaching also did not buy its score by spending more at test time. Every final player stayed within the same two-call budget, and tokens per exam input were similar across arms. The figure's second view divides each run's score by the tokens it used.<sup class="fn" id="fnref-8"><a href="#fn-8">8</a></sup><span class="sidenote" id="fn-8"><span class="sn-num">8</span>One oddity is shown as recorded rather than corrected. For B0 rep 2, <span class="src">compute.json</span> logs about 0.67 calls and 15k tokens per test input, roughly a third of the other two reps. Its score is in line with them.</span></p>
+</section>
+
+<figure class="fig l-page" id="fig-results">
+  <div class="fig-panel">
+    <div class="fig-head">
+      <div class="fig-title">Every arm lands inside the noise of two plain attempts</div>
+      <p class="fig-text">Each dot is one final player's exam score. Bars show the arm mean with its 95% interval, and the shaded band spans the three baseline runs. On the right, <i>G</i> and <i>Δ</i> are drawn as intervals in points, and both cross zero.</p>
+      <p class="fig-hint">Hover over or tap a dot to see its run. Switch to "per 10k tokens" to compare on cost.</p>
+    </div>
+    <div class="mount" data-fig="results"><div class="mount-status">Loading figure…</div></div>
+  </div>
+  <figcaption><b>Figure 4</b>: Exam score by arm: task-averaged pass@2 over <span data-v="int:sets.heldout_tasks">120</span> tasks. xhigh is a single run at higher effort, shown apart as a reference, not as a compared arm. Sources: <span class="src">summary.json</span> and <span class="src">compute.json</span>.</figcaption>
+</figure>
+
+<!-- ============================ 5. Tree ============================ -->
+<section class="l-body" aria-labelledby="tree">
+  <h2 id="tree"><span class="h-num">5</span>How the coaches evolved</h2>
+  <p>Each source run leaves an archive tree. Every node is one saved version of the coach and player code, with its practice score. Reading the six trees side by side shows how little self-improvement actually happened. In the first 12 generations, only <span data-v="int:derived.selfEditGens">21</span> of <span data-v="int:derived.totalGens">72</span> generations (<span data-v="pct0:self_edit_rate">29%</span>) changed the coach's own code. By run, from <code>source_s1</code> to <code>source_s6</code>, that was 1, 4, 5, 1, 7 and 3 of 12.<sup class="fn" id="fnref-9"><a href="#fn-9">9</a></sup><span class="sidenote" id="fn-9"><span class="sn-num">9</span>15 of those 21 changed coaches were later chosen as the starting point for a further edit. The original coach also ended 11 of its first 31 coaching steps without any edit, mostly from tool-call format problems. This was left unchanged, as pre-registered (DECISIONS 27).</span> Most generations spent their effort on the player.</p>
+  <p>Practice scores bounce around too. A node's score is one pass over 25 tasks, and the same player can gain or lose a few tasks on a rerun. So a "best" node is partly a lucky one. That matters for the pick rule, which favours the coach whose children improved most.</p>
+  <p>Four runs (<code>source_s1</code>–<code>source_s4</code>) were later continued to 40 generations for the extension. The small multiples share one generation axis, so you can see where <code>source_s5</code> and <code>source_s6</code> stop at 12.</p>
+</section>
+
+<figure class="fig l-wide" id="fig-tree">
+  <div class="fig-panel">
+    <div class="fig-head">
+      <div class="fig-title">Coaches rarely rewrote themselves, and the picks often repeat</div>
+      <p class="fig-text">Each circle is a node. Darker fill means a higher practice score. A thin ring marks a node whose coach changed its own code, and blue labels mark the I<sub>g</sub> and extension picks. Pick a run in the small multiples to open its tree below.</p>
+      <p class="fig-hint">Click or press Enter on a run, then on a node, to inspect its record and diff. Arrow keys move between nodes.</p>
+    </div>
+    <div class="mount" data-fig="tree"><div class="mount-status">Loading figure…</div></div>
+  </div>
+  <figcaption><b>Figure 5</b>: Archive trees of the six source runs. Practice scores are over the 25-task source practice set, and nodes that were never scored are dashed. Source: <span class="src">trees.json</span>.</figcaption>
+</figure>
+
+<!-- ============================ 6. Extension ============================ -->
+<section class="l-body" aria-labelledby="extension">
+  <h2 id="extension"><span class="h-num">6</span>Do later coaches do better?</h2>
+  <p>The main test compared the original coach with coaches from the first 12 generations. Perhaps self-improvement needs longer. We planned a follow-up after seeing the main result, so it is <b>not pre-registered</b> <a class="cite" href="#ref-design2">[4]</a>. Runs <code>source_s1</code>–<code>source_s4</code> were continued to 40 generations. At generations 20 and 40 we picked a coach from each, using a slightly stricter rule (at least three descendants), and tested each one exactly like a pay-off run.</p>
+  <p>The means at generations 0, 12, 20 and 40 were <span data-v="pct:extension.per_generation.0.mean">29.7%</span>, <span data-v="pct:extension.per_generation.12.mean">27.9%</span>, <span data-v="pct:extension.per_generation.20.mean">29.8%</span> and <span data-v="pct:extension.per_generation.40.mean">30.3%</span>. Generation 40 minus generation 0 is <span data-v="pts:extension.gen40_minus_gen0.est">+0.6</span> points, interval <span data-v="ci:extension.gen40_minus_gen0">[−6.5, +7.8]</span>. That interval is wide and includes zero, so there is no detectable trend. Generation 12 is the five I<sub>g</sub> runs. That is not the same set of source runs as generations 20 and 40, since it includes <code>source_s5</code> and <code>source_s6</code> and lacks <code>source_s4</code>.</p>
+  <p>There is a deeper problem. The pick rule often chose the <i>same coach node</i> at several generations. <code>source_s1</code> picked node 1 at generations 12, 20 and 40. Re-running that one fixed coach gave players that scored <span data-v="pct:Ig_runs.payoff_Ig_source_s1">26.0%</span>, 27.8% and 36.0%, a spread of about 10 points.<sup class="fn" id="fnref-10"><a href="#fn-10">10</a></sup><span class="sidenote" id="fn-10"><span class="sn-num">10</span><code>source_s3</code> picked node 9 at both 20 and 40. <code>source_s2</code> picked node 5 at 12 and 40, and node 9 at 20. For these runs the "paired change" is just the noise of re-running one coach (DECISIONS 37).</span> Against that noise, a trend over generations cannot be separated out.</p>
+</section>
+
+<figure class="fig l-page" id="fig-extension">
+  <div class="fig-panel">
+    <div class="fig-head">
+      <div class="fig-title">Later coaches did not build better players <span class="fig-flag">Not pre-registered</span></div>
+      <p class="fig-text">Each column holds the exam scores of players built by coaches picked at that generation, with the mean and its 95% interval. Thin lines join runs from the same source run. Where one coach node was picked more than once, the points are marked as the same coach.</p>
+      <p class="fig-hint">Hover over or tap a point to see its source run and coach node.</p>
+    </div>
+    <div class="mount" data-fig="extension"><div class="mount-status">Loading figure…</div></div>
+  </div>
+  <figcaption><b>Figure 6</b>: Exam score by the generation the coach was picked at. Generation 0 is the six I<sub>0</sub> runs, and generation 12 is the five I<sub>g</sub> runs, a different set of source runs from 20 and 40. Source: <span class="src">summary.json</span> (<span class="src">extension</span>).</figcaption>
+</figure>
+
+<!-- ============================ 7. Transcripts ============================ -->
+<section class="l-body" aria-labelledby="transcripts">
+  <h2 id="transcripts"><span class="h-num">7</span>Reading the transcripts</h2>
+  <p>Scores say what happened, and transcripts show how. For the player, a transcript is the prompt it built and the answer the model returned. Some edited players add a second "refine" or "verify" call. For the coach, a transcript is its conversation with its tools: reading reports, listing files, running the player, writing a diff.</p>
+  <p>Two limits shape what you can see.<sup class="fn" id="fnref-11"><a href="#fn-11">11</a></sup><span class="sidenote" id="fn-11"><span class="sn-num">11</span>The harness saved player transcripts only for practice test inputs the player <i>failed</i>, 1,513 of them. Solved inputs appear here as answer-only replays. No exam transcripts are shown, since the exam stayed sealed from coaches.</span> First, the harness saved player transcripts only when the player got the input wrong. Second, a transcript holds the visible prompt and answer only. The model's hidden reasoning was never recorded, so we cannot say <i>why</i> it answered as it did. We can only see what it said.</p>
+</section>
+
+<figure class="fig l-wide" id="fig-transcripts">
+  <div class="fig-panel">
+    <div class="fig-head">
+      <div class="fig-title">What the player and the coach actually said</div>
+      <p class="fig-text">Choose a player transcript to see its prompt and answer next to the puzzle, or a coach transcript to follow its tool calls for one generation. Long turns are clipped and can be expanded.</p>
+      <p class="fig-hint">Use ← and → to step through turns.</p>
+    </div>
+    <div class="mount" data-fig="transcripts"><div class="mount-status">Loading figure…</div></div>
+  </div>
+  <figcaption><b>Figure 7</b>: Transcript reader for 60 failed player inputs and 12 coach generations. Prompt grids are drawn from <span class="src">tasks.json</span> instead of the elided text. No hidden reasoning is recorded. Source: <span class="src">transcripts.json</span>.</figcaption>
+</figure>
+
+<!-- ============================ 8. Diff audit ============================ -->
+<section class="l-body" aria-labelledby="audit">
+  <h2 id="audit"><span class="h-num">8</span>What the evolved coaches changed</h2>
+  <p>If evolved coaches had learned something specific about ARC, it should show in their code. We compared all 21 picked coaches with I<sub>0</sub>: the 5 from the main test and 16 from the extension, picked at generations 6, 20, 30 and 40. Two independent judges tagged every changed piece of code (a "hunk") as either ARC-specific or general. They agreed on every hunk.</p>
+  <p>Only <span data-v="int:diff_audit_summary.arc_specific">3</span> of <span data-v="int:diff_audit_summary.hunks">32</span> hunks were ARC-specific. Two came from the same coach, the <code>source_s3</code> I<sub>g</sub>. It wrote its own run's scores into its prompt ("gen_1 scored 0.96, while gen_2 scored 0.84…") and warned against "hardcoded colors, shapes, or grid dimensions". The third, in a <code>source_s4</code> coach picked at generation 30, pointed the coach at the evaluation log folder. That coach was stored but never tested.</p>
+  <p>The other <span data-v="int:diff_audit_summary.general">29</span> were bookkeeping and advice. Typical edits added a helper that reads past evaluation reports, lists failed tasks and flags regressions. Others added prompt text such as "be evidence-driven, compare with the parent, make one focused change, don't hard-code answers". A few were plumbing: one fixed the git diff helper to skip bytecode files, and one made the bash tool keep a persistent shell.</p>
+</section>
+
+<figure class="fig l-page" id="fig-audit">
+  <div class="fig-panel">
+    <div class="fig-head">
+      <div class="fig-title">Most coach edits were bookkeeping and advice: 3 of 32 changes were ARC-specific</div>
+      <p class="fig-text">Each row is one changed hunk in a picked coach, grouped by pick, with the judges' tag and reason. The three ARC-specific hunks are open.</p>
+      <p class="fig-hint">Filter to ARC-specific hunks only, or open any row to read its diff.</p>
+    </div>
+    <div class="mount" data-fig="audit"><div class="mount-status">Loading figure…</div></div>
+  </div>
+  <figcaption><b>Figure 8</b>: Diff audit of every picked coach against I<sub>0</sub>. Both judges agreed on all 32 tags. Source: <span class="src">trees.json</span> (<span class="src">diff_audit</span>, from <span class="src">exp/results/diff_audit.json</span>).</figcaption>
+</figure>
+
+<!-- ============================ 9. Caveats ============================ -->
+<section class="l-body" aria-labelledby="caveats">
+  <h2 id="caveats"><span class="h-num">9</span>Caveats and what went wrong</h2>
+  <ul class="caveats">
+    <li><b>The original coach needed adapting.</b> With the repository's verbatim instruction, the model only asked clarifying questions. One sentence ("work autonomously") was added and tool-call parsing was loosened. Both groups started from this adapted coach (DECISIONS 14, 15).</li>
+    <li><b>The original coach often made no edit.</b> It ended 11 of its first 31 coaching steps without one, mostly from tool-call format problems. This was left unchanged, as pre-registered (DECISIONS 27).</li>
+    <li><b>Harness bugs.</b> One bug broke the first two original-coach pay-off runs (the "pilot") before any coach ran, and both restarted with new seeds. Another discarded coach edits that created a <code>.gitignore</code> file. <code>payoff_I0_2</code> was restarted a second time, and <code>source_s6</code> kept its run but lost one of its 12 generations (DECISIONS 23, 24).</li>
+    <li><b>Some coach edits broke the player.</b> One edit, for example, passed an argument the function did not accept, and the player scored 0. These count as real outcomes (DECISIONS 32).</li>
+    <li><b>Timeouts were re-run.</b> An early 30-minute limit per test input cut off 49 B0 and xhigh inputs. All of them were re-run under a 2–3 hour limit, and no final score includes a timeout. xhigh was 39.9% before the re-runs and <span data-v="pct:xhigh.score">41.1%</span> after (DECISIONS 26, 29).</li>
+    <li><b>Infrastructure.</b> There were 6 VM restarts and some dropped network calls. All runs resumed from logs, only in-flight work was redone, and no result was lost (DECISIONS 28, 35, 39).</li>
+    <li><b>Timing.</b> Some steps started before earlier ones finished. Pay-off runs, for example, began before the pilot exams were scored. No result from one step chose anything in another (DECISIONS 22, 31).</li>
+    <li><b>Small samples and noise.</b> There were 6, 5, 4 and 4 runs per group. One fixed coach (<code>source_s1</code> node 1) built players that scored 26.0%, 27.8% and 36.0% across three runs.</li>
+    <li><b>An unedited final player.</b> In <code>source_s4</code>'s generation-20 extension run, the final player was the unedited A<sub>0</sub>. That score measures A<sub>0</sub>, not the coach.</li>
+    <li><b>Transcripts are partial.</b> They were saved only for failed practice inputs, and they contain no hidden reasoning.</li>
+  </ul>
+</section>
+
+<!-- ============================ 10. Cost ============================ -->
+<section class="l-body" aria-labelledby="cost">
+  <h2 id="cost"><span class="h-num">10</span>Cost</h2>
+  <p>The study cost <span data-v="usd:spend.total">$152.23</span> in model calls. Almost all of it went to players, which are cheap per call but make many calls. Coaches cost <span data-v="usd:spend.by_role.meta">$4.19</span> in total. They used about <span data-v="tokens:derived.metaTokI0">350k</span> tokens per round in the original-coach runs and about <span data-v="tokens:derived.metaTokIg">188k</span> in the evolved-coach runs. The original hard stop was $150 <a class="cite" href="#ref-design">[2]</a>, and it was raised to $200 before the extension.</p>
+  <div class="costbar" role="img" aria-label="Share of spend: players about 97%, coaches about 3%"><span class="c-task" data-bar="spend.by_role.task" data-of="spend.total"></span><span class="c-meta" data-bar="spend.by_role.meta" data-of="spend.total"></span></div>
+  <p class="caption">Players <span data-v="usd:spend.by_role.task">$148.03</span> · coaches <span data-v="usd:spend.by_role.meta">$4.19</span>. The coach share is the thin dark sliver at the right.</p>
+  <div class="table-wrap">
+    <table class="t">
+      <thead><tr><th scope="col">phase</th><th scope="col" class="r">player</th><th scope="col" class="r">coach</th></tr></thead>
+      <tbody>
+        <tr><td>Held-out exams, all coached runs</td><td class="r m" data-v="usd:spend.by_phase_role.0.cost">$80.86</td><td class="r m">—</td></tr>
+        <tr><td>Source runs (evolution)</td><td class="r m" data-v="usd:spend.by_phase_role.1.cost">$23.03</td><td class="r m" data-v="usd:spend.by_phase_role.7.cost">$2.25</td></tr>
+        <tr><td>Pay-off runs (8 rounds each)</td><td class="r m" data-v="usd:spend.by_phase_role.2.cost">$12.02</td><td class="r m" data-v="usd:spend.by_phase_role.9.cost">$1.17</td></tr>
+        <tr><td>B0 baseline, 3 exam passes</td><td class="r m" data-v="usd:spend.by_phase_role.3.cost">$8.76</td><td class="r m">—</td></tr>
+        <tr><td>Re-scoring finalists</td><td class="r m" data-v="usd:spend.by_phase_role.4.cost">$7.72</td><td class="r m">—</td></tr>
+        <tr><td>Extension test runs</td><td class="r m" data-v="usd:spend.by_phase_role.5.cost">$6.95</td><td class="r m" data-v="usd:spend.by_phase_role.12.cost">$0.69</td></tr>
+        <tr><td>xhigh reference pass</td><td class="r m" data-v="usd:spend.by_phase_role.6.cost">$5.75</td><td class="r m">—</td></tr>
+        <tr><td>Initial A<sub>0</sub> scoring</td><td class="r m" data-v="usd:spend.by_phase_role.8.cost">$1.32</td><td class="r m">—</td></tr>
+        <tr><td>Transplant checks</td><td class="r m" data-v="usd:spend.by_phase_role.10.cost">$0.81</td><td class="r m" data-v="usd:spend.by_phase_role.14.cost">$0.04</td></tr>
+        <tr><td>Screen (100 tasks × 3 calls)</td><td class="r m" data-v="usd:spend.by_phase_role.11.cost">$0.71</td><td class="r m">—</td></tr>
+        <tr><td>Smoke test and probe</td><td class="r m" data-v="usd:spend.by_phase_role.13.cost">$0.08</td><td class="r m" data-v="usd:spend.by_phase_role.15.cost">$0.03</td></tr>
+        <tr class="total"><td>Total</td><td class="r m" data-v="usd:spend.by_role.task">$148.03</td><td class="r m" data-v="usd:spend.by_role.meta">$4.19</td></tr>
+      </tbody>
+      <caption>Spend by phase and role from the gateway ledger (<span class="src">summary.json</span> → <span class="src">spend</span>). Phases under one cent are omitted from the rows but included in the totals. Grand total <span data-v="usd:spend.total">$152.23</span>.</caption>
+    </table>
+  </div>
+</section>
+
+<!-- ============================ Appendix ============================ -->
+<section class="l-body appendix" aria-labelledby="appendix">
+  <h2 id="appendix"><span class="h-num">A</span>Appendix: every experiment, fact and design choice</h2>
+  <p>This list mirrors the appendix of <code>WRITEUP.md</code>. Open a section to read it.</p>
+
+  <details>
+    <summary>Design, fixed before results <span class="muted">· 15 items</span></summary>
+    <div class="body"><ul>
+      <li><b>Question.</b> Given equal compute for the pay-off, does a coach that evolved itself build a better player than the original coach?</li>
+      <li><b>Pre-registration.</b> <code>DESIGN.md</code>, <code>splits.json</code> and <code>analysis.py</code> were committed at <code>f577cc7</code> before any pay-off result existed. The extension plan, <code>DESIGN_v2.md</code>, was committed at <code>991a237</code> before any extension test run.</li>
+      <li><b>Model.</b> gpt-6-luna through the OpenAI Responses API, for both roles. Player effort was high. Coach effort was also high (the user changed it from max). There was one extra A<sub>0</sub> pass at xhigh.</li>
+      <li><b>Player budget.</b> At most 2 model calls and 2 answers per test input. A test input counts as solved if either answer matches the true grid exactly.</li>
+      <li><b>Coach budget.</b> 600k tokens per coaching round.</li>
+      <li><b>Spending cap.</b> A $150 hard stop, raised by the user to $200 before the extension.</li>
+      <li><b>Prices.</b> Input $0.10 per million tokens, cached input $0.01 per million, output $0.50 per million. Reasoning tokens are billed as output.</li>
+      <li><b>Enforcement.</b> The gateway (<code>arcexp/gateway.py</code>) is the only route to the API, and no agent can edit it. It enforces the caps, keeps a ledger by role, and refuses every call once the spending cap is reached.</li>
+      <li><b>Sandbox.</b> Every test input runs as an unprivileged user with no network, in a fresh temporary directory, and cannot see the answers. An isolation check ran before every phase and passed every time.</li>
+      <li><b>Time limit.</b> 3 hours per test input for every arm, never reached in the end. An early 30-minute limit was replaced, and the inputs it cut off were re-run.</li>
+      <li><b>Splits.</b> Seed 20261117, ARC-AGI-2 commit <code>f3283f7</code>. The held-out exam is all 120 public evaluation tasks (167 test inputs). The screen used 100 training tasks, each given 3 single A<sub>0</sub> calls. The two practice sets (source and pay-off) have 25 tasks each and are disjoint. They were drawn from screen tasks solved once or twice, using all 38 such tasks plus 6 always-solved and 6 never-solved fillers.</li>
+      <li><b>Scoring.</b> The exam score is averaged over the 120 tasks. A task with several test inputs gives partial credit.</li>
+      <li><b>Final player of a run.</b> Re-score the two best players on the pay-off set, counting any valid node including the unedited A<sub>0</sub>. Keep the one with the higher mean of loop score and re-score. Give it the exam exactly once.</li>
+      <li><b>Pick rules.</b> I<sub>g</sub> is the coach, among those whose code differs from I<sub>0</sub> (compared as parsed ASTs) and that had at least one scored child, whose children improved most on average. Ties go to the earlier generation. The extension rule also requires at least 3 descendants. If no coach qualifies, it falls back to the changed coach with the most descendants.</li>
+      <li><b>Freeze mode and statistics.</b> In pay-off and test runs the coach's code is locked. Statistics are 95% Welch t-intervals on per-run exam scores, and the headline is the first matching row of a pre-written list.</li>
+    </ul></div>
+  </details>
+
+  <details>
+    <summary>Experiments run, in order <span class="muted">· 16 steps</span></summary>
+    <div class="body"><ol>
+      <li><b>Smoke test.</b> 10 tasks end to end plus one coaching round. It measured prices of $0.0028 per player call and $0.007 per coaching round, which set the "Full" design: 6 source seeds, 12 generations, 6 I<sub>0</sub> runs and 8 rounds per pay-off run.</li>
+      <li><b>Screen.</b> 100 training tasks × 3 single calls, used to build the practice sets.</li>
+      <li><b>B0.</b> The plain player A<sub>0</sub>, two attempts, on the exam 3 times: <span data-v="pct:B0.reps.0">30.1%</span>, <span data-v="pct:B0.reps.1">27.9%</span> and <span data-v="pct:B0.reps.2">29.7%</span>, mean <span data-v="pct:B0.mean">29.3%</span>, SD <span data-v="pp:sd.B0">1.2</span> points. The gate (15–50%) passed.</li>
+      <li><b>xhigh check.</b> A<sub>0</sub> at xhigh effort, one exam pass: <span data-v="pct:xhigh.score">41.1%</span>. It was 39.9% before re-running the inputs that had hit the old 30-minute limit.</li>
+      <li><b>Pilot.</b> The first two I<sub>0</sub> pay-off runs, 8 rounds each, then the exam: <span data-v="pct:I0_runs.payoff_I0_1">26.9%</span> and <span data-v="pct:I0_runs.payoff_I0_2">29.4%</span>. The gate passed. A harness bug crashed the first attempt before any coach ran, and both runs restarted with new seeds (DECISIONS 23).</li>
+      <li><b>Source runs.</b> 6 seeds (s1–s6), with coach and player both evolving for 12 generations on the source set. Coach code changed in <span data-v="int:derived.selfEditGens">21</span> of <span data-v="int:derived.totalGens">72</span> generations. Per seed: s1 1, s2 4, s3 5, s4 1, s5 7, s6 3.</li>
+      <li><b>I<sub>g</sub> selection.</b> 5 of 6 seeds had a qualifying evolved coach, created at generation 1 (s1), 5 (s2), 3 (s3), 6 (s5) and 4 (s6). Seed s4 had none, because its only coach edit had no scored child.</li>
+      <li><b>Transplant check.</b> Each I<sub>g</sub> ran one trial round starting from A<sub>0</sub>, and all passed.</li>
+      <li><b>Pay-off runs.</b> A frozen coach got 8 rounds from A<sub>0</sub> on the pay-off set, then one exam. The other four I<sub>0</sub> runs scored <span data-v="pct:I0_runs.payoff_I0_3">30.4%</span>, <span data-v="pct:I0_runs.payoff_I0_4">30.4%</span>, <span data-v="pct:I0_runs.payoff_I0_5">31.4%</span> and <span data-v="pct:I0_runs.payoff_I0_6">29.4%</span>. With the pilot, the six I<sub>0</sub> runs average <span data-v="pct:I0_mean">29.7%</span>. The five I<sub>g</sub> runs scored <span data-v="pct:Ig_runs.payoff_Ig_source_s1">26.0%</span> (s1), <span data-v="pct:Ig_runs.payoff_Ig_source_s2">27.4%</span> (s2), <span data-v="pct:Ig_runs.payoff_Ig_source_s3">31.0%</span> (s3), <span data-v="pct:Ig_runs.payoff_Ig_source_s5">27.2%</span> (s5) and <span data-v="pct:Ig_runs.payoff_Ig_source_s6">27.9%</span> (s6), averaging <span data-v="pct:Ig_mean">27.9%</span>. <code>payoff_I0_2</code> was restarted once more after a sanitizer bug dropped a coach edit (DECISIONS 24).</li>
+      <li><b>Pre-registered analysis.</b> <i>G</i> = <span data-v="pts:G.est">+0.4</span> points <span data-v="ci:G">[−1.9, +2.8]</span>. <i>Δ</i> = <span data-v="pts:Delta.est">−1.8</span> points <span data-v="ci:Delta">[−4.2, +0.6]</span>. I<sub>g</sub> minus B0 = <span data-v="pts:Ig_gain_over_B0.est">−1.4</span> points <span data-v="ci:Ig_gain_over_B0">[−4.0, +1.3]</span>. Headline (row 2): "Neither improver beat two plain attempts on ARC-AGI-2."</li>
+      <li><b>Extension: evolution continued.</b> Seeds 0–3 (source_s1–s4) were run on to 40 generations.</li>
+      <li><b>Extension picks.</b> Coaches were picked at generations 6, 20, 30 and 40. Those at 6 and 30 were stored and transplant-checked but not tested. Generation-20 / generation-40 picks were: seed 0 (s1) node 1 / node 1, seed 1 (s2) node 9 / node 5, seed 2 (s3) node 9 / node 9, and seed 3 (s4) node 12 / node 13.</li>
+      <li><b>Extension test runs.</b> 8 runs under the same rules as the pay-off runs. Generation 20 / generation 40 scored: seed 0 27.8% / 36.0%, seed 1 31.5% / 31.5%, seed 2 31.8% / 24.9%, and seed 3 27.9% / 28.9%. In seed 3's generation-20 run, the final player was the unedited A<sub>0</sub>.</li>
+      <li><b>Extension analysis.</b> Means at generations 0 / 12 / 20 / 40 were <span data-v="pct:extension.per_generation.0.mean">29.7%</span> / <span data-v="pct:extension.per_generation.12.mean">27.9%</span> / <span data-v="pct:extension.per_generation.20.mean">29.8%</span> / <span data-v="pct:extension.per_generation.40.mean">30.3%</span>. Generation 40 minus generation 0 = <span data-v="pts:extension.gen40_minus_gen0.est">+0.6</span> points <span data-v="ci:extension.gen40_minus_gen0">[−6.5, +7.8]</span>, flat within the interval. The mean paired change was <span data-v="pts:extension.paired_changes.12->20.mean">+2.3</span> points from generation 12 to 20, and <span data-v="pts:extension.paired_changes.20->40.mean">+0.6</span> from 20 to 40.</li>
+      <li><b>Pick-rule comparison at generation 12.</b> The extension rule and the committed rule agree for seeds 0–2. For seed 3, the committed rule picks no coach, and the extension rule falls back to node 6, a coach with no descendants.</li>
+      <li><b>Diff audit of every picked coach.</b> <span data-v="int:diff_audit_summary.hunks">32</span> changed hunks: <span data-v="int:diff_audit_summary.arc_specific">3</span> ARC-specific and <span data-v="int:diff_audit_summary.general">29</span> general. Two judges agreed on every hunk.</li>
+    </ol></div>
+  </details>
+
+  <details>
+    <summary>Facts worth remembering <span class="muted">· 7 items</span></summary>
+    <div class="body"><ul>
+      <li><b>Spend.</b> <span data-v="usd:spend.total">$152.23</span> in total: players <span data-v="usd:spend.by_role.task">$148.03</span>, coaches <span data-v="usd:spend.by_role.meta">$4.19</span>.</li>
+      <li><b>Coach tokens per round.</b> About <span data-v="tokens:derived.metaTokI0">350k</span> for I<sub>0</sub> and <span data-v="tokens:derived.metaTokIg">188k</span> for I<sub>g</sub>.</li>
+      <li><b>Player tokens per practice-task evaluation.</b> About <span data-v="tokens:derived.taskTokI0">27.0k</span> under I<sub>0</sub> and <span data-v="tokens:derived.taskTokIg">23.5k</span> under I<sub>g</sub>.</li>
+      <li><b>Noise.</b> The run-to-run SD was <span data-v="pp:sd.B0">1.2</span> points for B0, <span data-v="pp:sd.I0">1.5</span> for I<sub>0</sub> and <span data-v="pp:sd.Ig">1.9</span> for I<sub>g</sub>. One fixed coach varied by about 10 points across re-runs.</li>
+      <li><b>The biggest lever was reasoning effort, not coaching.</b> xhigh scored <span data-v="pct:xhigh.score">41.1%</span>, against <span data-v="pct:B0.mean">29.3%</span> for B0, about 12 points more. No coach could change effort, because the gateway fixed it.</li>
+      <li><b>The original coach needed two small adaptations to work at all</b> (DECISIONS 14–15): an instruction to work autonomously, and looser tool-call parsing. Even then, it ended 11 of its first 31 rounds without an edit.</li>
+      <li><b>Run conditions.</b> There were 6 VM restarts. All runs resumed from logs, no result was lost, and no final score in any arm includes a timeout. Every deviation is recorded in <code>DECISIONS.md</code> (items 1–40), and every coach's code is in <code>exp/archive_export/</code>.</li>
+    </ul></div>
+  </details>
+</section>
+
+<!-- ============================ References ============================ -->
+<section class="l-body refs" aria-labelledby="references">
+  <h2 id="references">References and notes</h2>
+  <ol>
+    <li id="ref-arc">ARC Prize Foundation. <i>ARC-AGI-2</i>, public evaluation set, commit <code>f3283f7</code>. <a href="https://github.com/arcprize/ARC-AGI-2">github.com/arcprize/ARC-AGI-2</a></li>
+    <li id="ref-design"><code>DESIGN.md</code>, the pre-registered design, with <code>splits.json</code> and <code>analysis.py</code>, committed at <code>f577cc7</code> before any pay-off result.</li>
+    <li id="ref-welch">B. L. Welch (1947). The generalization of "Student's" problem when several different population variances are involved. <i>Biometrika</i> 34(1–2), 28–35.</li>
+    <li id="ref-design2"><code>DESIGN_v2.md</code>, the extension plan, committed at <code>991a237</code> after the main result and before any extension test run.</li>
+    <li id="ref-decisions"><code>DECISIONS.md</code>, items 1–40: every deviation, bug and re-run, numbered. "DECISIONS n" in the text refers to item n.</li>
+  </ol>
+  <p class="caption">Design references for this page: Distill's <a href="https://distill.pub/2021/gnn-intro/">"A Gentle Introduction to Graph Neural Networks"</a> and the Transformer Circuits thread, e.g. <a href="https://transformer-circuits.pub/2025/attribution-graphs/biology.html">"On the Biology of a Large Language Model"</a>.</p>
+</section>
+
+</main>
+
+<footer class="ex-footer l-body">
+  <p>Every number on this page is read from <code>explorer/data/*.json</code>. Those files were built from the experiment's own records by <code>arcexp/build_explorer_data.py</code>, and every held-out score was recomputed from result rows and checked against the reported value.</p>
+  <h2>Files in the repository</h2>
+  <ul>
+    <li><code>WRITEUP.md</code> · the written report</li>
+    <li><code>RESULTS.md</code> · all numbers, with analysis output</li>
+    <li><code>DESIGN.md</code> · pre-registered design (f577cc7)</li>
+    <li><code>DESIGN_v2.md</code> · extension plan (991a237)</li>
+    <li><code>DECISIONS.md</code> · deviations, bugs, re-runs (1–40)</li>
+    <li><code>REPRODUCE.md</code> · how to re-run</li>
+    <li><code>exp/results/analysis.json</code> · pre-registered estimates</li>
+    <li><code>exp/results/ext_analysis.json</code> · extension estimates</li>
+    <li><code>exp/results/final_runs.jsonl</code> · exam score per run</li>
+    <li><code>exp/results/diff_audit.json</code> · hunk-by-hunk audit</li>
+    <li><code>exp/results/ig_selection.json</code> · I<sub>g</sub> picks</li>
+    <li><code>exp/results/ext_picks.json</code> · extension picks</li>
+    <li><code>exp/results/pick_rule_comparison_g12.json</code></li>
+    <li><code>exp/results/extension_plot.png</code></li>
+    <li><code>exp/archive_export/</code> · every coach's code</li>
+    <li><code>arcexp/gateway.py</code> · budget gateway</li>
+    <li><code>arcexp/arc_eval.py</code> · scoring</li>
+    <li><code>arcexp/build_explorer_data.py</code> · builds this page's data</li>
+    <li><code>explorer/data/manifest.json</code> · field-by-field data notes</li>
+  </ul>
+</footer>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="js/core.js" charset="utf-8"></script>
+<script src="js/fig-setup.js" charset="utf-8"></script>
+<script src="js/fig-puzzle.js" charset="utf-8"></script>
+<script src="js/fig-tree.js" charset="utf-8"></script>
+<script src="js/fig-results.js" charset="utf-8"></script>
+<script src="js/fig-extension.js" charset="utf-8"></script>
+<script src="js/fig-replay.js" charset="utf-8"></script>
+<script src="js/fig-transcripts.js" charset="utf-8"></script>
+<script src="js/fig-audit.js" charset="utf-8"></script>

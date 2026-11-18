@@ -231,6 +231,7 @@ def main():
     ig_sel = lj(os.path.join(RES, "ig_selection.json"))
     ext_picks = lj(os.path.join(RES, "ext_picks.json"))
     diff_audit = lj(os.path.join(RES, "diff_audit.json"))
+    diff_hunks = lj(os.path.join(RES, "diff_hunks.json"))  # audited hunk text (coach code vs I_0), same order as diff_audit
     final_runs = {r["run"]: r for r in analysis["final_runs"]}
     final_runs_file = {}
     for r in rj(os.path.join(RES, "final_runs.jsonl")):
@@ -405,9 +406,14 @@ def main():
         audit = []
         for key, v in diff_audit.items():
             if key == f"A_gen12:{run}" or key.startswith(f"ext:{run}_g"):
-                for h in v["hunks"]:
+                dh = diff_hunks.get(key) or {}
+                dh_hunks = dh.get("hunks") or []
+                for j, h in enumerate(v["hunks"]):
+                    txt = dh_hunks[j].get("text") if j < len(dh_hunks) and dh_hunks[j].get("file") == h.get("file") else None
                     audit.append({"pick": key, "file": h.get("file"), "idx": h.get("idx"), "tag": h.get("tag"),
-                                  "agreement": h.get("agreement"), "reason": scrub((h.get("reasons") or [""])[0])})
+                                  "agreement": h.get("agreement"), "reason": scrub((h.get("reasons") or [""])[0]),
+                                  "node": None if dh.get("node") is None else str(dh.get("node")),
+                                  "text": scrub(txt)})
 
         trees[run] = {
             "run": run,
@@ -949,7 +955,7 @@ FIELD_DOCS = {
         "trees[run].frozen_paths": "paths the coach could not change (non-empty for pay-off runs: frozen coach)",
         "trees[run].coach_origin": "for pay-off/extension runs: which source node the frozen coach came from, the selection rule, source_lineage {depth, cum_meta_tokens, cum_meta_calls, cum_meta_cost} of that coach, and its practice score",
         "trees[run].final": "final player selection: final_node, candidates, combined scores, held-out score",
-        "trees[run].diff_audit": "audited coach-edit hunks for picks from this source run: {pick, file, idx, tag: general|ARC-specific, agreement, reason}",
+        "trees[run].diff_audit": "audited coach-edit hunks for picks from this source run: {pick, file, idx, tag: general|ARC-specific, agreement, reason, node (picked node id), text (the audited hunk: picked coach's code vs I_0, from exp/results/diff_hunks.json)}",
         "node.id": "'initial' or generation number as string",
         "node.generation": "same as id ('initial' or int)",
         "node.parent / children": "tree edges (string ids)",
