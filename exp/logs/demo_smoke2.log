@@ -1,0 +1,4 @@
+[eval] {'phase': 'demo_eval_smoke2', 'arm': 'demo', 'seed': 'smoke2', 'iteration': 'rep1'} round 0: 1 test inputs to run (0 cached)
+[demo eval smoke2] rep 1: score 1.000 on 1 tasks (missing 0)
+{'demo_spent': 0.0021799, 'demo_reserved': 0.0, 'demo_cap': 8.0, 'summary_mode': 'detailed'}
+__JOB_DONE__

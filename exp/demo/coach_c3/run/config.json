@@ -1,0 +1,18 @@
+{
+  "name": "demo_c3",
+  "phase": "demo_coach_c3",
+  "arm": "I0",
+  "seed": "c3",
+  "task_set": "source",
+  "max_generation": 1,
+  "template_dir": "agent_template",
+  "freeze_paths": [
+    "meta_agent.py",
+    "run_meta_agent.py",
+    "agent",
+    "utils"
+  ],
+  "rng_seed": 0,
+  "workers": 8,
+  "root_commit": "438f87e212ea57e038b453442af421b24b09aa74"
+}

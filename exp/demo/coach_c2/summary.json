@@ -1,0 +1,10 @@
+{
+  "tag": "c2",
+  "baseline_score": 0.68,
+  "child_score": 0.0,
+  "patch_bytes": 2389,
+  "meta_token": "f8319040f7106138bf16b9f376f71a31",
+  "meta_calls": 10,
+  "meta_rc": 0,
+  "finished": 1795033614.93602
+}

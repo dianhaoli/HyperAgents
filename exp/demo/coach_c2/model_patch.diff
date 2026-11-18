@@ -1,0 +1,46 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..c011ee0 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,13 +50,28 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, attempt=0):
++    """Build an ARC prompt; the second attempt uses an independent verification strategy."""
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "Analyze the examples as constraints, not as isolated pictures. Identify the background, "
++        "objects or repeated patterns, and what changes between each input and output. Consider "
++        "positions, shapes, colors, symmetry, movement, and grid boundaries. Before answering, "
++        "check that your proposed rule reproduces every training output exactly, then apply that same "
++        "rule to the test input. Do not guess a familiar rule unless it fits all examples.",
+         "",
+     ]
++    if attempt == 1:
++        parts.extend([
++            "Independent verification pass: reconsider the examples from scratch and test competing "
++            "interpretations against every pair. In particular, check whether the rule acts on whole "
++            "objects or individual cells, whether it depends on absolute position or relative shape, "
++            "and whether unchanged cells must be preserved. Use the interpretation that explains all "
++            "examples with the fewest special cases.",
++            "",
++        ])
+     for i, pair in enumerate(inputs["train"], 1):
+         parts.append(f"## Example {i}")
+         h, w = len(pair["input"]), len(pair["input"][0])
+@@ -153,9 +168,9 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        for attempt in range(2):
+             try:
+-                g = self.solve_once(inputs)
++                g = self.solve_once(inputs, attempt=attempt)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

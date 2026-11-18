@@ -1,0 +1,18 @@
+{
+  "tag": "smoke",
+  "code": "A0",
+  "tasks": [
+    "a9f96cdd"
+  ],
+  "reps": [
+    {
+      "rep": 1,
+      "score": 1.0,
+      "missing": 0,
+      "per_task": {
+        "a9f96cdd": 1.0
+      }
+    }
+  ],
+  "finished": 1795032708.9226282
+}

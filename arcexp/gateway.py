@@ -12,6 +12,10 @@ Fixed here and nowhere else (agents cannot edit this file):
   * tokens are revoked by the host as soon as their sandbox exits (no reuse/stashing)
   * global hard stop: refuse every call once settled spend + reserved worst case would exceed $150
   * token & dollar ledger by role (append-only JSONL)
+  * opt-in TRACE (DECISIONS 41, demo only, not part of the results): tokens whose scope phase starts with
+    "demo" (or registered with "trace": true) get one JSON line per call in exp/demo/traces.jsonl (input as sent,
+    visible output, reasoning summary, usage, cost), share a combined demo budget of DEMO_CAP_USD and request
+    reasoning summary DEMO_SUMMARY. Every other token is handled exactly as before (no new files or fields).
 """
 import http.server
 import json
@@ -32,14 +36,24 @@ TASK_MAX_CALLS = 2
 META_MAX_TOKENS = 600_000
 MAX_OUTPUT_TOKENS = {"task": 64000, "task_xhigh": 64000, "meta": 64000, "probe": 2000}
 REQUEST_TIMEOUT = 3600
+DEMO_CAP_USD = 8.0  # combined budget of all traced (demo) tokens; the global cap still applies
+DEMO_SUMMARY = os.environ.get("ARCGW_DEMO_SUMMARY", "detailed")  # "auto" returned no summary text (smoke test)
+TRACE_FIELD_MAX = 60_000
 
 RUN_DIR = os.environ.get("ARCGW_RUN_DIR", "/run/arcgw")
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LEDGER = os.environ.get("ARCGW_LEDGER", os.path.join(REPO, "exp", "ledger", "calls.jsonl"))
 TOKENS_FILE = os.path.join(REPO, "exp", "ledger", "tokens.jsonl")
+TRACE_FILE = os.path.join(REPO, "exp", "demo", "traces.jsonl")
 
 lock = threading.Lock()
 state = {"spent": 0.0, "reserved": 0.0, "by_role": {}, "tokens": {}}
+demo = {"spent": 0.0, "reserved": 0.0}
+trace_lock = threading.Lock()
+
+
+def is_traced(t):
+    return bool(t.get("trace")) or str((t.get("scope") or {}).get("phase", "")).startswith("demo")
 
 
 def new_tok():
@@ -67,7 +81,7 @@ def load_state():
                     state["tokens"].setdefault(r["token"], new_tok())["revoked"] = True
                     continue
                 t = state["tokens"].setdefault(r["token"], new_tok())
-                t.update({k: v for k, v in r.items() if k in ("role", "scope", "effort_role")})
+                t.update({k: v for k, v in r.items() if k in ("role", "scope", "effort_role", "trace")})
     if os.path.exists(LEDGER):
         with open(LEDGER) as f:
             for line in f:
@@ -83,6 +97,8 @@ def load_state():
                 if not tok:
                     continue
                 t = state["tokens"].setdefault(tok, new_tok())
+                if is_traced(t) or str((r.get("scope") or {}).get("phase", "")).startswith("demo"):
+                    demo["spent"] += c
                 if r.get("error"):
                     if r.get("client_error"):
                         t["calls"] += 1
@@ -116,7 +132,24 @@ class UpstreamError(Exception):
         self.client = client
 
 
-def call_openai(messages, effort, max_out):
+def _trunc(x):
+    if isinstance(x, str) and len(x) > TRACE_FIELD_MAX:
+        h = TRACE_FIELD_MAX // 2
+        return x[:h] + f"\n...[TRACE TRUNCATED: {len(x) - 2 * h} of {len(x)} chars omitted]...\n" + x[-h:], True
+    return x, False
+
+
+def _summary_from_response(d):
+    parts = []
+    for o in d.get("output", []) or []:
+        if o.get("type") == "reasoning":
+            for s in o.get("summary", []) or []:
+                if s.get("text"):
+                    parts.append(s["text"])
+    return parts
+
+
+def call_openai(messages, effort, max_out, trace=None):
     inp = []
     for m in messages:
         role = m.get("role", "user")
@@ -133,10 +166,24 @@ def call_openai(messages, effort, max_out):
     # is discarded; agents receive exactly the same message text as before.
     body = {"model": MODEL, "input": inp, "reasoning": {"effort": effort, "summary": "auto"},
             "max_output_tokens": max_out, "store": False, "stream": True}
+    if trace is not None:  # demo tokens only
+        body["reasoning"]["summary"] = DEMO_SUMMARY
+        trace["summary_mode"] = DEMO_SUMMARY
+        trace["input"] = []
+        for m in inp:
+            c, cut = _trunc(m["content"])
+            trace["input"].append(dict(m, content=c, **({"truncated": True, "orig_chars": len(m["content"])} if cut else {})))
+        trace["event_types"] = {}
+        trace["summary_deltas"] = {}
+        trace["summary_done"] = {}
     last_err = None
     for attempt in range(7):
         started = False
         flagged_retry = False
+        if trace is not None:  # a retried attempt starts a fresh summary
+            trace["attempt"] = attempt
+            trace["summary_deltas"] = {}
+            trace["summary_done"] = {}
         try:
             with requests.post("https://api.openai.com/v1/responses", json=body, stream=True,
                                timeout=(30, 300)) as r:  # read timeout = max silence between events
@@ -157,6 +204,14 @@ def call_openai(messages, effort, max_out):
                     except Exception:
                         continue
                     et = ev.get("type", "")
+                    if trace is not None:
+                        trace["event_types"][et] = trace["event_types"].get(et, 0) + 1
+                        if et.startswith("response.reasoning_summary_text."):
+                            k = f"{ev.get('item_id')}:{ev.get('summary_index')}"
+                            if et.endswith(".delta"):
+                                trace["summary_deltas"][k] = trace["summary_deltas"].get(k, "") + (ev.get("delta") or "")
+                            elif et.endswith(".done"):
+                                trace["summary_done"][k] = ev.get("text") or ""
                     if et in ("response.completed", "response.incomplete"):
                         return ev["response"]
                     if et in ("response.failed", "error"):
@@ -227,6 +282,10 @@ class AgentHandler(http.server.BaseHTTPRequestHandler):
             with lock:
                 return self._send(200, {"spent": state["spent"], "reserved": state["reserved"],
                                         "by_role": state["by_role"], "cap": GLOBAL_CAP_USD})
+        if self.admin and self.path == "/demo_status":
+            with lock:
+                return self._send(200, {"demo_spent": demo["spent"], "demo_reserved": demo["reserved"],
+                                        "demo_cap": DEMO_CAP_USD, "summary_mode": DEMO_SUMMARY})
         if self.admin and self.path.startswith("/token/"):
             tok = self.path.split("/token/")[1]
             with lock:
@@ -241,9 +300,11 @@ class AgentHandler(http.server.BaseHTTPRequestHandler):
         if self.admin and self.path == "/register":
             rec = {"token": body["token"], "role": body["role"], "scope": body.get("scope", {}),
                    "effort_role": body.get("effort_role", body["role"]), "registered_at": time.time()}
+            if body.get("trace"):
+                rec["trace"] = True  # demo-only opt-in; absent for every other token
             with lock:
                 t = state["tokens"].setdefault(rec["token"], new_tok())
-                t.update({k: rec[k] for k in ("role", "scope", "effort_role")})
+                t.update({k: rec[k] for k in ("role", "scope", "effort_role", "trace") if k in rec})
                 t["revoked"] = False
                 with open(TOKENS_FILE, "a") as f:
                     f.write(json.dumps(rec) + "\n")
@@ -288,12 +349,21 @@ class AgentHandler(http.server.BaseHTTPRequestHandler):
             if state["spent"] + state["reserved"] + worst > GLOBAL_CAP_USD:
                 t["refused_global"] += 1
                 return self._send(402, {"error": "GLOBAL BUDGET EXHAUSTED ($150). All calls refused."})
+            traced = is_traced(t)
+            if traced and demo["spent"] + demo["reserved"] + worst > DEMO_CAP_USD:
+                t["refused_global"] += 1
+                trace_write(tok, t, None, {"status": "refused_demo_cap", "demo_spent": demo["spent"]})
+                return self._send(402, {"error": f"DEMO BUDGET EXHAUSTED (${DEMO_CAP_USD}). Demo calls refused."})
             t["busy"] = True
             t["calls"] += 1
             state["reserved"] += worst
+            if traced:
+                demo["reserved"] += worst
+                t["trace_n"] = t.get("trace_n", 0) + 1
+                tr = {"call_index": t["trace_n"], "max_output_tokens": max_out}
         t0 = time.time()
         try:
-            d = call_openai(msgs, EFFORT[eff_role], max_out)
+            d = call_openai(msgs, EFFORT[eff_role], max_out, trace=tr if traced else None)
         except UpstreamError as e:
             with lock:
                 t["busy"] = False
@@ -312,6 +382,12 @@ class AgentHandler(http.server.BaseHTTPRequestHandler):
                 ledger_write({"ts": time.time(), "token": tok, "role": role, "scope": t.get("scope", {}),
                               "error": str(e)[:500], "possibly_billed": e.possibly_billed, "client_error": e.client,
                               "cost": c, "total_tokens": 0})
+                if traced:
+                    demo["reserved"] -= worst
+                    demo["spent"] += c
+                    tr.update(status="error", error=str(e)[:2000], possibly_billed=e.possibly_billed,
+                              client_error=e.client, cost=c, dur=time.time() - t0, effort=EFFORT[eff_role])
+                    trace_write(tok, t, None, tr)
             return self._send(502, {"error": f"upstream error: {e}"})
         usage = d.get("usage") or {}
         c = cost_of(usage)
@@ -331,8 +407,38 @@ class AgentHandler(http.server.BaseHTTPRequestHandler):
             state["by_role"][role] = state["by_role"].get(role, 0.0) + c
             t["tokens_used"] += usage.get("total_tokens", 0)
             ledger_write(rec)
+            if traced:
+                demo["reserved"] -= worst
+                demo["spent"] += c
+                tr.update(effort=EFFORT[eff_role], effort_echo=rec["effort_echo"], model=rec["model"],
+                          status=d.get("status"), incomplete_details=d.get("incomplete_details"),
+                          output_text=text, usage=usage, cost=c, dur=rec["dur"],
+                          reasoning_summary_from_response=_summary_from_response(d),
+                          output_items=[{"type": o.get("type"), "keys": sorted(o.keys()),
+                                         "n_summary": len(o.get("summary") or []) if o.get("type") == "reasoning" else None}
+                                        for o in d.get("output", []) or []])
+                trace_write(tok, t, d, tr)
         return self._send(200, {"text": text, "usage": usage, "status": d.get("status"),
                                 "effort": rec["effort_echo"], "model": rec["model"]})
+
+
+def trace_write(tok, t, d, tr):
+    """Demo tokens only (caller holds `lock`). One JSON line per call in exp/demo/traces.jsonl."""
+    stream_parts = tr.pop("summary_done", None) or {}
+    for k, v in (tr.pop("summary_deltas", None) or {}).items():
+        stream_parts.setdefault(k, v)
+    parts = [stream_parts[k] for k in stream_parts]
+    from_resp = tr.pop("reasoning_summary_from_response", None) or []
+    rec = {"ts": time.time(), "token": tok, "role": t.get("role"), "scope": t.get("scope", {}),
+           "model": MODEL if d is None else d.get("model")}
+    rec.update(tr)
+    rec["reasoning_summary"] = "\n\n".join(parts or from_resp)
+    rec["reasoning_summary_parts"] = len(parts or from_resp)
+    rec["reasoning_summary_source"] = "stream" if parts else ("response" if from_resp else None)
+    with trace_lock:
+        os.makedirs(os.path.dirname(TRACE_FILE), exist_ok=True)
+        with open(TRACE_FILE, "a") as f:
+            f.write(json.dumps(rec) + "\n")
 
 
 class AdminHandler(AgentHandler):

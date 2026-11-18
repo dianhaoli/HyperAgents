@@ -1,0 +1,94 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..4fbcd22 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -55,6 +55,10 @@ def build_prompt(inputs):
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "Work out the rule from all demonstration pairs, not just one. Check that it reproduces every "
++        "demonstration exactly before applying it. Track object shapes, positions, colors, and grid "
++        "dimensions carefully; the output dimensions may differ from the input. Do not copy a "
++        "demonstration output or assume that background cells should all be zero.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -72,9 +76,10 @@ def build_prompt(inputs):
+     parts.append(grid_to_text(t))
+     parts.append("")
+     parts.append(
+-        "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+-        "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+-        "Put nothing else inside the tags."
++        "Give exactly one candidate output grid for the test input. Check that it is rectangular and "
++        "that every cell is an integer from 0 to 9. End your response with the grid inside "
++        "<answer></answer> tags as a JSON list of rows, for example:\n"
++        "<answer>[[0, 1, 2], [3, 4, 5]]</answer>\nPut nothing else inside the tags."
+     )
+     return "\n".join(parts)
+ 
+@@ -137,13 +142,16 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def _solve_prompt(self, prompt):
++        """Make one model call and return both its parsed grid and raw response."""
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+-        return parse_grid(text)
++        return parse_grid(text), text
++
++    def solve_once(self, inputs):
++        """One direct model response -> one parsed grid (or None)."""
++        return self._solve_prompt(build_prompt(inputs))[0]
+ 
+     def forward(self, inputs):
+         """
+@@ -153,12 +161,35 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
+-            try:
+-                g = self.solve_once(inputs)
+-            except Exception as e:
+-                self.log(f"Error: {e}")
+-                g = None
+-            if g is not None:
+-                answers.append(g)
++        try:
++            first_grid, _ = self._solve_prompt(build_prompt(inputs))
++            if first_grid is not None:
++                answers.append(first_grid)
++        except Exception as e:
++            self.log(f"Error on first attempt: {e}")
++
++        # The gateway permits two calls. Use the second for a fresh verification pass rather than
++        # wasting it on the same prompt: explicitly test the first hypothesis against the examples
++        # and ask for a corrected (or independently derived) second candidate.
++        review_prompt = build_prompt(inputs)
++        if answers:
++            candidate = json.dumps(answers[0], separators=(",", ":"))
++            review_prompt += (
++                "\n\nA previous attempt proposed this test grid: " + candidate + "\n"
++                "Independently infer the rule again and verify whether this candidate follows from "
++                "every training pair. Look especially for a missed object, color, or dimension "
++                "change. If the candidate is supported, it is fine to return it again; otherwise "
++                "return a corrected or better alternative in the required answer tags."
++            )
++        else:
++            review_prompt += (
++                "\n\nThis is a fresh attempt. Carefully infer and verify the rule using all "
++                "training pairs, then return the best test grid in the required answer tags."
++            )
++        try:
++            second_grid, _ = self._solve_prompt(review_prompt)
++            if second_grid is not None and second_grid not in answers:
++                answers.append(second_grid)
++        except Exception as e:
++            self.log(f"Error on second attempt: {e}")
+         return answers, []

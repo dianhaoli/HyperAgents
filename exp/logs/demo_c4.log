@@ -1,0 +1,6 @@
+[demo coach c4] A_0 practice score 0.680
+{'gen_output_dir': '/home/user/HyperAgents/exp/demo/coach_c4/run/generate_demo_c4/gen_1', 'current_genid': 1, 'parent_genid': 'initial', 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 1 completed, parent 1
+{"tag": "c4", "baseline_score": 0.68, "child_score": 0.72, "patch_bytes": 4640, "meta_token": "05077a2107dddf3ab6e1597218ce1891", "meta_calls": 10, "meta_rc": 0, "finished": 1795034268.7985706}
+{'demo_spent': 0.3737269999999999, 'demo_reserved': -1.734723475976807e-16, 'demo_cap': 8.0, 'summary_mode': 'detailed'}
+__JOB_DONE__

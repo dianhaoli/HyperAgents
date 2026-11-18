@@ -206,3 +206,15 @@ The user allowed deviations from the prompt's design where clearly better; each 
     seed 2 (source_s3): both pick node 3 (same).
     seed 3 (source_s4): committed rule picks none (no changed coach with a scored child); the extension rule's fallback
     picks node 6 (0 descendants; tied with node 12 at 0 and broken by the earlier generation). Different.
+41. **Traced demo (not part of results).** Requested after the experiment finished, to show what the player and the
+    coach actually think on a few example rollouts. The gateway (`arcexp/gateway.py`) has an opt-in trace: only tokens
+    whose scope phase starts with `demo` (or that the admin socket registers with `"trace": true`) are traced. Each of
+    their calls appends one line to `exp/demo/traces.jsonl` with the input as sent (any single text field over 60 KB
+    keeps head and tail, marked), the visible output, the reasoning *summary* collected from the stream
+    (`response.reasoning_summary_text.*` events, else the summary items of the final response), usage, cost and errors.
+    Demo tokens share a combined demo budget of **$8** (calls beyond it are refused); the $200 global cap still
+    applies and demo calls are ledgered like any other call (phase `demo_*`). For every non-demo token the request,
+    ledger rows, token records and returned text are unchanged (no new files or fields). `arcexp/demo_trace.py`
+    reuses the real sandbox, per-token caps, host-side scoring and run_loop/generate_loop (one coach generation of
+    I_0 from A_0 on the source practice set, meta files frozen as in the pay-off runs). Its results go to
+    `exp/demo/results/`, never `exp/results/`, and no analysis file reads `exp/demo/`.

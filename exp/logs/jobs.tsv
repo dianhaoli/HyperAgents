@@ -41,3 +41,13 @@ final_ext_source_s3_g40	10	python3 -m arcexp.phases final --run ext_source_s3_g4
 run_ext_source_s1_g40	16	python3 -m arcexp.run_loop --config /home/user/HyperAgents/exp/runs/ext_source_s1_g40/config.json > /home/user/HyperAgents/exp/runs/ext_source_s1_g40/run.log 2>&1
 final_ext_source_s2_g40	10	python3 -m arcexp.phases final --run ext_source_s2_g40
 final_ext_source_s1_g40	10	python3 -m arcexp.phases final --run ext_source_s1_g40
+demo_smoke	1	python3 -m arcexp.demo_trace eval --code A0 --tasks a9f96cdd --reps 1 --tag smoke
+demo_smoke2	1	python3 -m arcexp.demo_trace eval --code A0 --tasks 9caf5b84 --reps 1 --tag smoke2
+demo_base		python3 -m arcexp.demo_trace eval --code A0 --tasks source --reps 1 --tag base --workers 8
+demo_c1		python3 -m arcexp.demo_trace coach --from A0 --tag c1 --baseline base --workers 8
+demo_c2		python3 -m arcexp.demo_trace coach --from A0 --tag c2 --baseline base --workers 8
+demo_c3		python3 -m arcexp.demo_trace coach --from A0 --tag c3 --baseline base --workers 8
+demo_c4		python3 -m arcexp.demo_trace coach --from A0 --tag c4 --baseline base --workers 8
+demo_c4_eval		python3 -m arcexp.demo_trace eval --code exp/demo/coach_c4/player_code --tasks source --reps 1 --tag c4_eval --workers 8
+demo_rpA0		python3 -m arcexp.demo_trace eval --code A0 --tasks a9f96cdd,a78176bb,d9f24cd1,b15fca0b --reps 3 --tag rpA0 --workers 8
+demo_rpC4		python3 -m arcexp.demo_trace eval --code exp/demo/coach_c4/player_code --tasks a9f96cdd,a78176bb,d9f24cd1,b15fca0b --reps 3 --tag rpC4 --workers 8
