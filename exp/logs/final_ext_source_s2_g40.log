@@ -7,3 +7,5 @@ ext_source_s2_g40 cand gen_6: loop score 0.700 rescore 0.640 combined 0.670
 ext_source_s2_g40 cand gen_1: loop score 0.740 rescore 0.720 combined 0.730
 ext_source_s2_g40 cand gen_6: loop score 0.700 rescore 0.640 combined 0.670
 [eval] {'phase': 'heldout', 'arm': 'g40', 'seed': 1, 'iteration': 1} round 0: 6 test inputs to run (161 cached)
+{"run": "ext_source_s2_g40", "arm": "g40", "seed": 1, "source_seed": null, "node_scores": {"initial": 0.62, "1": 0.74, "2": 0.66, "3": 0.52, "4": 0.66, "5": 0.54, "6": 0.7}, "candidates": ["1", "6"], "combined": {"1": 0.73, "6": 0.6699999999999999}, "final_node": "1", "heldout": 0.3152777777777778, "heldout_missing": 0, "n_accepted": 6}
+__JOB_DONE__

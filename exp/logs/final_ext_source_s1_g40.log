@@ -6,3 +6,7 @@ ext_source_s1_g40 cand gen_5: loop score 0.680 rescore 0.660 combined 0.670
 ext_source_s1_g40 cand gen_8: loop score 0.700 rescore 0.680 combined 0.690
 ext_source_s1_g40 cand gen_5: loop score 0.680 rescore 0.660 combined 0.670
 [eval] {'phase': 'heldout', 'arm': 'g40', 'seed': 0, 'iteration': 8} round 0: 33 test inputs to run (134 cached)
+[eval] {'phase': 'heldout', 'arm': 'g40', 'seed': 0, 'iteration': 8} round 1: 3 test inputs to run (164 cached)
+ext_source_s1_g40 cand gen_8: loop score 0.700 rescore 0.680 combined 0.690
+ext_source_s1_g40 cand gen_5: loop score 0.680 rescore 0.660 combined 0.670
+[eval] {'phase': 'heldout', 'arm': 'g40', 'seed': 0, 'iteration': 8} round 0: 3 test inputs to run (164 cached)
