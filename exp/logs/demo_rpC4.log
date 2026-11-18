@@ -3,3 +3,6 @@
 [eval] {'phase': 'demo_eval_rpC4', 'arm': 'demo', 'seed': 'rpC4', 'iteration': 'rep2'} round 0: 4 test inputs to run (0 cached)
 [demo eval rpC4] rep 2: score 0.500 on 4 tasks (missing 0)
 [eval] {'phase': 'demo_eval_rpC4', 'arm': 'demo', 'seed': 'rpC4', 'iteration': 'rep3'} round 0: 4 test inputs to run (0 cached)
+[demo eval rpC4] rep 3: score 0.500 on 4 tasks (missing 0)
+{'demo_spent': 0.6878348199999996, 'demo_reserved': 0.032110399999999796, 'demo_cap': 8.0, 'summary_mode': 'detailed'}
+__JOB_DONE__

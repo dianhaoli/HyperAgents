@@ -24206,3 +24206,10 @@
 {"event": "revoke", "token": "a99b6381102f360f7804f5b9802b2288", "ts": 1795035573.556229}
 {"event": "revoke", "token": "d1e000cd4bf2cba8d8aef2e8075081c1", "ts": 1795035598.7194107}
 {"event": "revoke", "token": "fe4a23f1eca18fd8620f4c99d5615eac", "ts": 1795035783.6643062}
+{"event": "revoke", "token": "8ef702c4bee3023baa6cf9c6052dd58d", "ts": 1795035870.153741}
+{"event": "revoke", "token": "a000ec6ffcd37acdc6637bb64350751c", "ts": 1795035880.6570165}
+{"token": "5df5cfbeb401796e4eae06d82dbd02e9", "role": "task", "scope": {"phase": "demo_eval_rpA0", "arm": "demo", "seed": "rpA0", "iteration": "rep3", "task": "a9f96cdd", "test_input": 0}, "effort_role": "task", "registered_at": 1795035880.6689398}
+{"token": "f92d7b179bced8e6ec3bc609ab10afc0", "role": "task", "scope": {"phase": "demo_eval_rpA0", "arm": "demo", "seed": "rpA0", "iteration": "rep3", "task": "a78176bb", "test_input": 0}, "effort_role": "task", "registered_at": 1795035880.6728451}
+{"token": "8d50a1e0cd373dcbead7af09f7de402c", "role": "task", "scope": {"phase": "demo_eval_rpA0", "arm": "demo", "seed": "rpA0", "iteration": "rep3", "task": "d9f24cd1", "test_input": 0}, "effort_role": "task", "registered_at": 1795035880.6733794}
+{"token": "6e2e0cbc3772613ca06bd47d348705bd", "role": "task", "scope": {"phase": "demo_eval_rpA0", "arm": "demo", "seed": "rpA0", "iteration": "rep3", "task": "b15fca0b", "test_input": 0}, "effort_role": "task", "registered_at": 1795035880.6735954}
+{"event": "revoke", "token": "5df5cfbeb401796e4eae06d82dbd02e9", "ts": 1795035891.8301773}
