@@ -7,3 +7,7 @@ __pycache__/
 exp/runs/*/generate_*/gen_initial/hyperagents/
 exp/runs/*/final_agents/
 exp/demo/**/hyperagents/
+exp/crashed/payoff_I0_1__harness_nonce_bug/generate_payoff_I0_1/gen_initial/hyperagents/
+exp/crashed/payoff_I0_2__harness_nonce_bug/generate_payoff_I0_2/gen_initial/hyperagents/
+exp/crashed/payoff_I0_2__sanitizer_dropped_gitignore_patch_gen7/generate_payoff_I0_2/gen_initial/hyperagents/
+exp/demo/**/.git/
