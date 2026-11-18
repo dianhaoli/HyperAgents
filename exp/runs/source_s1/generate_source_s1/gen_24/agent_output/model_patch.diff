@@ -1,0 +1,40 @@
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+index e69de29..281d5fc 100644
+Binary files a/__pycache__/task_agent.cpython-313.pyc and b/__pycache__/task_agent.cpython-313.pyc differ
+diff --git a/task_agent.py b/task_agent.py
+index 929efef..1f39863 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -187,18 +187,24 @@ class TaskAgent:
+             # ARC error mode: a plausible global pattern is inferred, but individual cells
+             # are filled or left untouched without checking those decisions against all demos.
+             candidate_audit = _training_change_audit(inputs["test_input"], candidate)
++            # Put the derivation instructions before revealing the candidate. The prior
++            # ordering showed a plausible grid before asking for independent rule checking,
++            # which can anchor the verifier on a bad first-pass hypothesis.
+             prompt += (
+-                "\n\nCheck this first-pass candidate against the demonstrations; it is a "
+-                "hypothesis, not a trusted answer: "
++                "\n\nBefore considering the candidate below, independently derive one "
++                "concrete rule from all training pairs and check that it reproduces each "
++                "demonstrated output. Apply that rule to the test input to form your own "
++                "expected grid. Then compare the candidate against that independently "
++                "derived result; do not accept it merely because it looks plausible or "
++                "repeats a pattern. For a same-size grid, explain to yourself why each "
++                "changed cell changes and why every unchanged cell stays unchanged. "
++                "Check the rule's bounds and dimensions; do not extend a pattern or fill "
++                "a cell just to complete a shape. Correct unjustified edits and omissions.\n\n"
++                "Untrusted first-pass candidate: "
+                 f"{json.dumps(candidate)}\n"
+                 "Candidate edit audit (test input -> candidate; coordinates are zero-based): "
+                 f"{candidate_audit}\n"
+-                "Derive the rule from every training pair before deciding. For a same-size "
+-                "candidate, account for every listed edit and also verify that every cell "
+-                "not listed remains unchanged for a reason supported by the demonstrations. "
+-                "Do not extend a pattern beyond its demonstrated bounds or fill a cell just "
+-                "because it appears to complete a shape. Correct any unjustified edits or "
+-                "omissions, and return the verified grid in <answer> tags only."
++                "Return the verified grid in <answer> tags only."
+             )
+         elif independent:
+             prompt += (
