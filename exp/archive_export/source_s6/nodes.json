@@ -1,0 +1,170 @@
+{
+ "initial": {
+  "generation": "initial",
+  "parent": null,
+  "children": [
+   1,
+   5,
+   11
+  ],
+  "loop_score_on_set": 0.72,
+  "valid_parent": true,
+  "patch_file": null,
+  "snapshot": null,
+  "code_dir": "archive_export/source_s6/code/gen_initial",
+  "coach_files_changed_vs_I0": []
+ },
+ "1": {
+  "generation": 1,
+  "parent": "initial",
+  "children": [
+   2,
+   3,
+   4
+  ],
+  "loop_score_on_set": 0.76,
+  "valid_parent": true,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_1/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s6/snapshots/gen_1.tar.gz",
+  "code_dir": "archive_export/source_s6/code/gen_1",
+  "coach_files_changed_vs_I0": []
+ },
+ "2": {
+  "generation": 2,
+  "parent": 1,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_2/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "3": {
+  "generation": 3,
+  "parent": 1,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_3/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "4": {
+  "generation": 4,
+  "parent": 1,
+  "children": [
+   7,
+   9,
+   10
+  ],
+  "loop_score_on_set": 0.8,
+  "valid_parent": true,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_4/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s6/snapshots/gen_4.tar.gz",
+  "code_dir": "archive_export/source_s6/code/gen_4",
+  "coach_files_changed_vs_I0": [
+   "utils/git_utils.py"
+  ]
+ },
+ "5": {
+  "generation": 5,
+  "parent": "initial",
+  "children": [
+   6
+  ],
+  "loop_score_on_set": 0.84,
+  "valid_parent": true,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_5/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s6/snapshots/gen_5.tar.gz",
+  "code_dir": "archive_export/source_s6/code/gen_5",
+  "coach_files_changed_vs_I0": []
+ },
+ "6": {
+  "generation": 6,
+  "parent": 5,
+  "children": [
+   8
+  ],
+  "loop_score_on_set": 0.8,
+  "valid_parent": true,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_6/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s6/snapshots/gen_6.tar.gz",
+  "code_dir": "archive_export/source_s6/code/gen_6",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "7": {
+  "generation": 7,
+  "parent": 4,
+  "children": [
+   12
+  ],
+  "loop_score_on_set": 0.76,
+  "valid_parent": true,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_7/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s6/snapshots/gen_7.tar.gz",
+  "code_dir": "archive_export/source_s6/code/gen_7",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py",
+   "utils/git_utils.py"
+  ]
+ },
+ "8": {
+  "generation": 8,
+  "parent": 6,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_8/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "9": {
+  "generation": 9,
+  "parent": 4,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_9/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "10": {
+  "generation": 10,
+  "parent": 4,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_10/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "11": {
+  "generation": 11,
+  "parent": "initial",
+  "children": [],
+  "loop_score_on_set": 0.88,
+  "valid_parent": true,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_11/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s6/snapshots/gen_11.tar.gz",
+  "code_dir": "archive_export/source_s6/code/gen_11",
+  "coach_files_changed_vs_I0": null
+ },
+ "12": {
+  "generation": 12,
+  "parent": 7,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s6/generate_source_s6/gen_12/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ }
+}
