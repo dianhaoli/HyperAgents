@@ -152,7 +152,7 @@
       /* ---------- skeleton ---------- */
       node.innerHTML = '';
       var root = EX.h('div', { 'class': 'fx-tree' }, node);
-      EX.h('p', { 'class': 'fxt-intro' }, root, 'Six independent tries of the same self-improvement loop. Each started from the same coach and player, and each evolved differently.');
+      EX.h('p', { 'class': 'fxt-intro' }, root, 'Six independent tries of the same self-improvement loop. Each started from the same coach and player, and each evolved differently. All six ran 12 generations; runs 1 to 4 were then extended to 40, as planned in the follow-up design (fixed before any follow-up result).');
       var chipRow = EX.h('div', { 'class': 'fxt-chips', role: 'group', 'aria-label': 'Self-improvement run' }, root);
       var chipNoteEl = EX.h('p', { 'class': 'fxt-chipnote', 'aria-live': 'polite' }, root);
       var chips = {};
@@ -218,7 +218,7 @@
         EX.s('text', { 'class': 'axt', x: W - m.r, y: H - 2, 'text-anchor': 'end' }, ax, 'Generation');
         if(t.max_generation < maxG){
           EX.s('rect', { 'class': 'nodata', x: X(t.max_generation) + 10, y: plotTop, width: X(maxG) - X(t.max_generation) - 10, height: plotH }, ax);
-          EX.s('text', { 'class': 'axt', x: (X(t.max_generation) + X(maxG)) / 2 + 5, y: Y(0.625), 'text-anchor': 'middle' }, ax, 'run ' + runNo(run) + ' stopped at gen ' + t.max_generation);
+          EX.s('text', { 'class': 'axt', x: (X(t.max_generation) + X(maxG)) / 2 + 5, y: Y(0.625), 'text-anchor': 'middle' }, ax, 'run ' + runNo(run) + ' was not extended past gen ' + t.max_generation);
         }
         // failed-checks strip
         EX.s('line', { 'class': 'strip', x1: m.l, x2: X(t.max_generation), y1: stripY, y2: stripY }, ax);
