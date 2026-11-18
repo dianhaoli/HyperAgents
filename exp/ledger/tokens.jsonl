@@ -15178,3 +15178,4 @@
 {"token": "79cda9b5677fd8ea2ae106a7ba12042c", "role": "task", "scope": {"phase": "rescore", "arm": "g20", "seed": 3, "iteration": "initial", "task": "e73095fd", "test_input": 0}, "effort_role": "task", "registered_at": 1794961545.741011}
 {"event": "revoke", "token": "1eb65cc2b124493a3f601e6c85f3c68f", "ts": 1794961548.7120569}
 {"token": "ba28b108dfde6b14419aea78017ff9a5", "role": "meta", "scope": {"phase": "source", "arm": "I0src", "seed": 1, "iteration": 21, "run": "source_s1"}, "effort_role": "meta", "registered_at": 1794961549.8542054}
+{"token": "c12deb94b08be1b8dc6a1e5cd7a5a617", "role": "meta", "scope": {"phase": "ext_payoff", "arm": "g20", "seed": 0, "iteration": 1, "run": "ext_source_s1_g20"}, "effort_role": "meta", "registered_at": 1794961556.1009943}
