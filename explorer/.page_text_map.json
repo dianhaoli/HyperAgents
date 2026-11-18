@@ -1,0 +1,4136 @@
+{
+"index_sha": "02ea8900e6e76a35848cef2da44a55ddd01e0b2202199391b0ca33c9e03baf54",
+"dv": {
+"{{int:sets.heldout_tasks}}": "<span data-v=\"int:sets.heldout_tasks\">120</span>",
+"{{usd:spend.total}}": "<span data-v=\"usd:spend.total\">$152.23</span>",
+"{{int:sets.source_practice_tasks}}": "<span data-v=\"int:sets.source_practice_tasks\">25</span>",
+"{{int:sets.heldout_test_inputs}}": "<span data-v=\"int:sets.heldout_test_inputs\">167</span>",
+"{{int:n_source_seeds}}": "<span data-v=\"int:n_source_seeds\">6</span>",
+"{{int:derived.sourceGens}}": "<span data-v=\"int:derived.sourceGens\">12</span>",
+"{{int:derived.rounds}}": "<span data-v=\"int:derived.rounds\">8</span>",
+"{{int:sets.payoff_practice_tasks}}": "<span data-v=\"int:sets.payoff_practice_tasks\">25</span>",
+"{{ci:G}}": "<span data-v=\"ci:G\">[&#8722;1.9, +2.8]</span>",
+"{{ci:Ig_gain_over_B0}}": "<span data-v=\"ci:Ig_gain_over_B0\">[&#8722;4.0, +1.3]</span>",
+"{{pts:Delta.est}}": "<span data-v=\"pts:Delta.est\">&#8722;1.8</span>",
+"{{ci:Delta}}": "<span data-v=\"ci:Delta\">[&#8722;4.2, +0.6]</span>",
+"{{pts:G.est}}": "<span data-v=\"pts:G.est\">+0.4</span>",
+"{{pts:Ig_gain_over_B0.est}}": "<span data-v=\"pts:Ig_gain_over_B0.est\">&#8722;1.4</span>",
+"{{pp0:derived.xhighGain}}": "<span data-v=\"pp0:derived.xhighGain\">12</span>",
+"{{int:derived.selfEditGens}}": "<span data-v=\"int:derived.selfEditGens\">21</span>",
+"{{int:derived.totalGens}}": "<span data-v=\"int:derived.totalGens\">72</span>",
+"{{int:extension.per_generation.40.n}}": "<span data-v=\"int:extension.per_generation.40.n\">4</span>",
+"{{int:derived.extMaxGen}}": "<span data-v=\"int:derived.extMaxGen\">40</span>",
+"{{pct:derived.sameCoach.g12}}": "<span data-v=\"pct:derived.sameCoach.g12\">26.0%</span>",
+"{{pct:derived.sameCoach.g20}}": "<span data-v=\"pct:derived.sameCoach.g20\">27.8%</span>",
+"{{pct:derived.sameCoach.g40}}": "<span data-v=\"pct:derived.sameCoach.g40\">36.0%</span>",
+"{{pts:extension.gen40_minus_gen0.est}}": "<span data-v=\"pts:extension.gen40_minus_gen0.est\">+0.6</span>",
+"{{ci:extension.gen40_minus_gen0}}": "<span data-v=\"ci:extension.gen40_minus_gen0\">[&#8722;6.5, +7.8]</span>",
+"{{pp0:derived.sameCoachSpread}}": "<span data-v=\"pp0:derived.sameCoachSpread\">10</span>",
+"{{usd:spend.by_role.task}}": "<span data-v=\"usd:spend.by_role.task\">$148.03</span>",
+"{{usd:spend.by_role.meta}}": "<span data-v=\"usd:spend.by_role.meta\">$4.19</span>",
+"{{tokens:derived.metaTokI0}}": "<span data-v=\"tokens:derived.metaTokI0\">350k</span>",
+"{{tokens:derived.metaTokIg}}": "<span data-v=\"tokens:derived.metaTokIg\">188k</span>",
+"{{pct:xhigh.score}}": "<span data-v=\"pct:xhigh.score\">41.1%</span>",
+"{{num2:derived.untouchedWin.untouched}}": "<span data-v=\"num2:derived.untouchedWin.untouched\">0.70</span>",
+"{{num2:derived.untouchedWin.edited}}": "<span data-v=\"num2:derived.untouchedWin.edited\">0.66</span>",
+"{{pct:B0.reps.0}}": "<span data-v=\"pct:B0.reps.0\">30.1%</span>",
+"{{pct:B0.reps.1}}": "<span data-v=\"pct:B0.reps.1\">27.9%</span>",
+"{{pct:B0.reps.2}}": "<span data-v=\"pct:B0.reps.2\">29.7%</span>",
+"{{pct:B0.mean}}": "<span data-v=\"pct:B0.mean\">29.3%</span>",
+"{{pct:I0_runs.payoff_I0_1}}": "<span data-v=\"pct:I0_runs.payoff_I0_1\">26.9%</span>",
+"{{pct:I0_runs.payoff_I0_2}}": "<span data-v=\"pct:I0_runs.payoff_I0_2\">29.4%</span>",
+"{{pct:I0_runs.payoff_I0_3}}": "<span data-v=\"pct:I0_runs.payoff_I0_3\">30.4%</span>",
+"{{pct:I0_runs.payoff_I0_4}}": "<span data-v=\"pct:I0_runs.payoff_I0_4\">30.4%</span>",
+"{{pct:I0_runs.payoff_I0_5}}": "<span data-v=\"pct:I0_runs.payoff_I0_5\">31.4%</span>",
+"{{pct:I0_runs.payoff_I0_6}}": "<span data-v=\"pct:I0_runs.payoff_I0_6\">29.4%</span>",
+"{{pct:I0_mean}}": "<span data-v=\"pct:I0_mean\">29.7%</span>",
+"{{pct:Ig_runs.payoff_Ig_source_s1}}": "<span data-v=\"pct:Ig_runs.payoff_Ig_source_s1\">26.0%</span>",
+"{{pct:Ig_runs.payoff_Ig_source_s2}}": "<span data-v=\"pct:Ig_runs.payoff_Ig_source_s2\">27.4%</span>",
+"{{pct:Ig_runs.payoff_Ig_source_s3}}": "<span data-v=\"pct:Ig_runs.payoff_Ig_source_s3\">31.0%</span>",
+"{{pct:Ig_runs.payoff_Ig_source_s5}}": "<span data-v=\"pct:Ig_runs.payoff_Ig_source_s5\">27.2%</span>",
+"{{pct:Ig_runs.payoff_Ig_source_s6}}": "<span data-v=\"pct:Ig_runs.payoff_Ig_source_s6\">27.9%</span>",
+"{{pct:Ig_mean}}": "<span data-v=\"pct:Ig_mean\">27.9%</span>",
+"{{raw:headline}}": "<span data-v=\"raw:headline\">Neither improver beat two plain attempts on ARC-AGI-2</span>",
+"{{pct:extension.per_generation.0.mean}}": "<span data-v=\"pct:extension.per_generation.0.mean\">29.7%</span>",
+"{{pct:extension.per_generation.12.mean}}": "<span data-v=\"pct:extension.per_generation.12.mean\">27.9%</span>",
+"{{pct:extension.per_generation.20.mean}}": "<span data-v=\"pct:extension.per_generation.20.mean\">29.8%</span>",
+"{{pct:extension.per_generation.40.mean}}": "<span data-v=\"pct:extension.per_generation.40.mean\">30.3%</span>",
+"{{int:diff_audit_summary.hunks}}": "<span data-v=\"int:diff_audit_summary.hunks\">32</span>",
+"{{int:diff_audit_summary.arc_specific}}": "<span data-v=\"int:diff_audit_summary.arc_specific\">3</span>",
+"{{int:diff_audit_summary.general}}": "<span data-v=\"int:diff_audit_summary.general\">29</span>"
+},
+"blocks": [
+{
+"id": "top.h11",
+"section": "Top",
+"tag": "h1",
+"start": 1286,
+"end": 1331,
+"orig_inner": "Can an AI coach teach itself to coach better?",
+"md": "Can an AI coach teach itself to coach better?"
+},
+{
+"id": "top.p1",
+"section": "Top",
+"tag": "p",
+"start": 1364,
+"end": 1573,
+"orig_inner": "An AI <b>coach</b> rewrites the code of a puzzle-solving AI, the <b>player</b>, to make it better. We let the coach rewrite <i>itself</i> too, then tested whether the self-improved coach trains better players.",
+"md": "An AI **coach** rewrites the code of a puzzle-solving AI, the **player**, to make it better. We let the coach rewrite *itself* too, then tested whether the self-improved coach trains better players."
+},
+{
+"id": "top.p2",
+"section": "Top",
+"tag": "p",
+"start": 1585,
+"end": 1792,
+"orig_inner": "It does not. On an exam of <span data-v=\"int:sets.heldout_tasks\">120</span> unseen puzzles, coached players scored about the same as an uncoached one. Letting the model simply think longer beat all coaching.",
+"md": "It does not. On an exam of {{int:sets.heldout_tasks}} unseen puzzles, coached players scored about the same as an uncoached one. Letting the model simply think longer beat all coaching."
+},
+{
+"id": "top.p3",
+"section": "Top",
+"tag": "p",
+"start": 2978,
+"end": 3080,
+"orig_inner": "Average exam score: share of the <span data-v=\"int:sets.heldout_tasks\">120</span> exam puzzles solved.",
+"md": "Average exam score: share of the {{int:sets.heldout_tasks}} exam puzzles solved."
+},
+{
+"id": "top.p4",
+"section": "Top",
+"tag": "p",
+"start": 3113,
+"end": 3270,
+"orig_inner": "Model: gpt-6-luna. Every player gets at most 2 model calls and 2 answers per puzzle. Total cost <span data-v=\"usd:spend.total\">$152.23</span>. November 2026.",
+"md": "Model: gpt-6-luna. Every player gets at most 2 model calls and 2 answers per puzzle. Total cost {{usd:spend.total}}. November 2026."
+},
+{
+"id": "top.p5",
+"section": "Top",
+"tag": "p",
+"start": 3293,
+"end": 3481,
+"orig_inner": "Jump to: <a href=\"#results\">The result</a> &#183; <a href=\"#watch\">Watch them answer</a> &#183; <a href=\"#demo\">Inside one coaching round</a> &#183; <a href=\"#explore\">Explore the data</a>",
+"md": "Jump to: [The result](#results) \u00b7 [Watch them answer](#watch) \u00b7 [Inside one coaching round](#demo) \u00b7 [Explore the data](#explore)"
+},
+{
+"id": "1-the-setup.h21",
+"section": "1. The setup",
+"tag": "h2",
+"start": 3651,
+"end": 3660,
+"orig_inner": "The setup",
+"md": "The setup"
+},
+{
+"id": "1-the-setup.p1",
+"section": "1. The setup",
+"tag": "p",
+"start": 3671,
+"end": 4248,
+"orig_inner": "The player is a short program that solves a puzzle with at most two model calls.<sup class=\"fn\" id=\"fnref-1\"><a href=\"#fn-1\">1</a></sup><span class=\"sidenote\" id=\"fn-1\"><span class=\"sn-num\">1</span>\"Player\" and \"coach\" are the repository's <i>task agent</i> and <i>meta agent</i>. Both use the same model.</span> The coach looks at how the player did on <span data-v=\"int:sets.source_practice_tasks\">25</span> practice puzzles and edits the player's code. One such round is a <b>generation</b>. In step 1, the coach may also edit its own code, so it can get better at coaching.",
+"md": "The player is a short program that solves a puzzle with at most two model calls.[^1] The coach looks at how the player did on {{int:sets.source_practice_tasks}} practice puzzles and edits the player's code. One such round is a **generation**. In step 1, the coach may also edit its own code, so it can get better at coaching."
+},
+{
+"id": "1-the-setup.title1",
+"section": "1. The setup",
+"tag": "title",
+"start": 4390,
+"end": 4458,
+"orig_inner": "A coach edits the player's code. Then we let the coach edit its own.",
+"md": "A coach edits the player's code. Then we let the coach edit its own."
+},
+{
+"id": "1-the-setup.p2",
+"section": "1. The setup",
+"tag": "p",
+"start": 4491,
+"end": 4599,
+"orig_inner": "Step 1: the coach improves itself over many generations. Step 2: we freeze it and test it on a fresh player.",
+"md": "Step 1: the coach improves itself over many generations. Step 2: we freeze it and test it on a fresh player."
+},
+{
+"id": "1-the-setup.figcaption1",
+"section": "1. The setup",
+"tag": "figcaption",
+"start": 4738,
+"end": 4780,
+"orig_inner": "<b>Figure 1</b>: how the experiment works.",
+"md": "**Figure 1**: how the experiment works."
+},
+{
+"id": "1-the-setup.p3",
+"section": "1. The setup",
+"tag": "p",
+"start": 4835,
+"end": 5999,
+"orig_inner": "We ran step 1 <span data-v=\"int:n_source_seeds\">6</span> times for <span data-v=\"int:derived.sourceGens\">12</span> generations each. To test a coach, we froze it (either the original coach or the self-improved one from each run<sup class=\"fn\" id=\"fnref-2\"><a href=\"#fn-2\">2</a></sup><span class=\"sidenote\" id=\"fn-2\"><span class=\"sn-num\">2</span>From each run we took the self-edited coach whose players improved most on practice. The rule was fixed before any exam result existed <a class=\"cite\" href=\"#ref-design\">[2]</a>.</span>) and gave it a fresh, untouched player and <span data-v=\"int:derived.rounds\">8</span> rounds on another <span data-v=\"int:sets.payoff_practice_tasks\">25</span> practice puzzles. The finished player then sat the exam once: <span data-v=\"int:sets.heldout_tasks\">120</span> puzzles it had never seen.<sup class=\"fn\" id=\"fnref-3\"><a href=\"#fn-3\">3</a></sup><span class=\"sidenote\" id=\"fn-3\"><span class=\"sn-num\">3</span>The 120 public ARC-AGI-2 evaluation tasks <a class=\"cite\" href=\"#ref-arc\">[1]</a>, with <span data-v=\"int:sets.heldout_test_inputs\">167</span> test inputs. A puzzle with several test inputs gives partial credit.</span>",
+"md": "We ran step 1 {{int:n_source_seeds}} times for {{int:derived.sourceGens}} generations each. To test a coach, we froze it (either the original coach or the self-improved one from each run[^2]) and gave it a fresh, untouched player and {{int:derived.rounds}} rounds on another {{int:sets.payoff_practice_tasks}} practice puzzles. The finished player then sat the exam once: {{int:sets.heldout_tasks}} puzzles it had never seen.[^3]"
+},
+{
+"id": "1-the-setup.p4",
+"section": "1. The setup",
+"tag": "p",
+"start": 6009,
+"end": 6521,
+"orig_inner": "For comparison, the uncoached player also sat the exam as it was, and once with the model set to <b>think longer</b> (reasoning effort one step higher), still with two calls and two answers per puzzle. No coach could change that setting.<sup class=\"fn\" id=\"fnref-4\"><a href=\"#fn-4\">4</a></sup><span class=\"sidenote\" id=\"fn-4\"><span class=\"sn-num\">4</span>A gateway no agent could edit fixed the model, its reasoning effort (<i>high</i>; <i>xhigh</i> for the think-longer run), the call cap and the budget.</span>",
+"md": "For comparison, the uncoached player also sat the exam as it was, and once with the model set to **think longer** (reasoning effort one step higher), still with two calls and two answers per puzzle. No coach could change that setting.[^4]"
+},
+{
+"id": "2-puzzles.h21",
+"section": "2. Puzzles",
+"tag": "h2",
+"start": 6684,
+"end": 6710,
+"orig_inner": "What the puzzles look like",
+"md": "What the puzzles look like"
+},
+{
+"id": "2-puzzles.p1",
+"section": "2. Puzzles",
+"tag": "p",
+"start": 6721,
+"end": 6853,
+"orig_inner": "Each puzzle shows a few input&#8594;output examples. You find the rule and paint the output for a new input, cell for cell. Try one.",
+"md": "Each puzzle shows a few input\u2192output examples. You find the rule and paint the output for a new input, cell for cell. Try one."
+},
+{
+"id": "2-puzzles.title1",
+"section": "2. Puzzles",
+"tag": "title",
+"start": 6995,
+"end": 7050,
+"orig_inner": "Find the rule from the examples, then paint the answer.",
+"md": "Find the rule from the examples, then paint the answer."
+},
+{
+"id": "2-puzzles.p2",
+"section": "2. Puzzles",
+"tag": "p",
+"start": 7083,
+"end": 7173,
+"orig_inner": "Pick a colour, click cells to paint, then press Check. You get two tries, like the player.",
+"md": "Pick a colour, click cells to paint, then press Check. You get two tries, like the player."
+},
+{
+"id": "2-puzzles.figcaption1",
+"section": "2. Puzzles",
+"tag": "figcaption",
+"start": 7313,
+"end": 7400,
+"orig_inner": "<b>Figure 2</b>: an exam puzzle from ARC-AGI-2 <a class=\"cite\" href=\"#ref-arc\">[1]</a>.",
+"md": "**Figure 2**: an exam puzzle from ARC-AGI-2 [[1]](#ref-arc \"cite\")."
+},
+{
+"id": "3-result.h21",
+"section": "3. Result",
+"tag": "h2",
+"start": 7572,
+"end": 7582,
+"orig_inner": "The result",
+"md": "The result"
+},
+{
+"id": "3-result.p1",
+"section": "3. Result",
+"tag": "p",
+"start": 7593,
+"end": 8555,
+"orig_inner": "Players trained by the original coach scored <span data-v=\"pts:G.est\">+0.4</span> points above the uncoached player, and players trained by a self-improved coach <span data-v=\"pts:Ig_gain_over_B0.est\">&#8722;1.4</span> points. Both differences are smaller than the noise between runs.<sup class=\"fn\" id=\"fnref-5\"><a href=\"#fn-5\">5</a></sup><span class=\"sidenote\" id=\"fn-5\"><span class=\"sn-num\">5</span>95% intervals: original coach minus no coach <span data-v=\"ci:G\">[&#8722;1.9, +2.8]</span> points; self-improved minus no coach <span data-v=\"ci:Ig_gain_over_B0\">[&#8722;4.0, +1.3]</span>; self-improved minus original <span data-v=\"pts:Delta.est\">&#8722;1.8</span> <span data-v=\"ci:Delta\">[&#8722;4.2, +0.6]</span>. All include zero. Welch t-intervals <a class=\"cite\" href=\"#ref-welch\">[3]</a>; the headline was pre-registered <a class=\"cite\" href=\"#ref-design\">[2]</a>.</span> Thinking longer added about <span data-v=\"pp0:derived.xhighGain\">12</span> points.",
+"md": "Players trained by the original coach scored {{pts:G.est}} points above the uncoached player, and players trained by a self-improved coach {{pts:Ig_gain_over_B0.est}} points. Both differences are smaller than the noise between runs.[^5] Thinking longer added about {{pp0:derived.xhighGain}} points."
+},
+{
+"id": "3-result.title1",
+"section": "3. Result",
+"tag": "title",
+"start": 8699,
+"end": 8787,
+"orig_inner": "Coached players scored the same as an uncoached one. Thinking longer scored much higher.",
+"md": "Coached players scored the same as an uncoached one. Thinking longer scored much higher."
+},
+{
+"id": "3-result.p2",
+"section": "3. Result",
+"tag": "p",
+"start": 8820,
+"end": 8912,
+"orig_inner": "Each dot is one finished player's exam score; the bar marks the average. Hover or tap a dot.",
+"md": "Each dot is one finished player's exam score; the bar marks the average. Hover or tap a dot."
+},
+{
+"id": "3-result.figcaption1",
+"section": "3. Result",
+"tag": "figcaption",
+"start": 9053,
+"end": 9134,
+"orig_inner": "<b>Figure 3</b>: exam scores of every finished player. Think longer was run once.",
+"md": "**Figure 3**: exam scores of every finished player. Think longer was run once."
+},
+{
+"id": "4-generations.h21",
+"section": "4. Generations",
+"tag": "h2",
+"start": 9319,
+"end": 9345,
+"orig_inner": "Did more generations help?",
+"md": "Did more generations help?"
+},
+{
+"id": "4-generations.p1",
+"section": "4. Generations",
+"tag": "p",
+"start": 9356,
+"end": 9954,
+"orig_inner": "Coaches rarely changed themselves. Their own code changed in only <span data-v=\"int:derived.selfEditGens\">21</span> of <span data-v=\"int:derived.totalGens\">72</span> generations. In a follow-up that was not pre-registered <a class=\"cite\" href=\"#ref-design2\">[4]</a>, <span data-v=\"int:extension.per_generation.40.n\">4</span> runs continued to generation <span data-v=\"int:derived.extMaxGen\">40</span>, and we tested coaches picked at generations 20 and 40 too. Later picks were often the very same code: in run 1, the coach picked at generations 12, 20 and 40 was one version, made at generation 1.",
+"md": "Coaches rarely changed themselves. Their own code changed in only {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations. In a follow-up that was not pre-registered [[4]](#ref-design2 \"cite\"), {{int:extension.per_generation.40.n}} runs continued to generation {{int:derived.extMaxGen}}, and we tested coaches picked at generations 20 and 40 too. Later picks were often the very same code: in run 1, the coach picked at generations 12, 20 and 40 was one version, made at generation 1."
+},
+{
+"id": "4-generations.p2",
+"section": "4. Generations",
+"tag": "p",
+"start": 9964,
+"end": 10239,
+"orig_inner": "Its three tests scored <span data-v=\"pct:derived.sameCoach.g12\">26.0%</span>, <span data-v=\"pct:derived.sameCoach.g20\">27.8%</span> and <span data-v=\"pct:derived.sameCoach.g40\">36.0%</span>. That spread is pure noise, and it is larger than any difference between generations.",
+"md": "Its three tests scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}}. That spread is pure noise, and it is larger than any difference between generations."
+},
+{
+"id": "4-generations.title1",
+"section": "4. Generations",
+"tag": "title",
+"start": 10387,
+"end": 10433,
+"orig_inner": "Coaches from later generations were no better.",
+"md": "Coaches from later generations were no better."
+},
+{
+"id": "4-generations.p3",
+"section": "4. Generations",
+"tag": "p",
+"start": 10466,
+"end": 10583,
+"orig_inner": "Each dot is one finished player; the line joins the averages. The button rings one coach that was tested three times.",
+"md": "Each dot is one finished player; the line joins the averages. The button rings one coach that was tested three times."
+},
+{
+"id": "4-generations.figcaption1",
+"section": "4. Generations",
+"tag": "figcaption",
+"start": 10728,
+"end": 11072,
+"orig_inner": "<b>Figure 4</b>: exam score by the generation the coach was picked at. Generation 40 minus generation 0: <span data-v=\"pts:extension.gen40_minus_gen0.est\">+0.6</span> points, 95% interval <span data-v=\"ci:extension.gen40_minus_gen0\">[&#8722;6.5, +7.8]</span>. Generations 20 and 40 are the follow-up <a class=\"cite\" href=\"#ref-design2\">[4]</a>.",
+"md": "**Figure 4**: exam score by the generation the coach was picked at. Generation 40 minus generation 0: {{pts:extension.gen40_minus_gen0.est}} points, 95% interval {{ci:extension.gen40_minus_gen0}}. Generations 20 and 40 are the follow-up [[4]](#ref-design2 \"cite\")."
+},
+{
+"id": "5-watch.h21",
+"section": "5. Watch",
+"tag": "h2",
+"start": 11239,
+"end": 11256,
+"orig_inner": "Watch them answer",
+"md": "Watch them answer"
+},
+{
+"id": "5-watch.p1",
+"section": "5. Watch",
+"tag": "p",
+"start": 11267,
+"end": 11375,
+"orig_inner": "Here are real exam answers, side by side. Some misses are a single cell off; others are far from the answer.",
+"md": "Here are real exam answers, side by side. Some misses are a single cell off; others are far from the answer."
+},
+{
+"id": "5-watch.title1",
+"section": "5. Watch",
+"tag": "title",
+"start": 11517,
+"end": 11597,
+"orig_inner": "Same puzzle, four kinds of player: some misses are one cell off, others far off.",
+"md": "Same puzzle, four kinds of player: some misses are one cell off, others far off."
+},
+{
+"id": "5-watch.p2",
+"section": "5. Watch",
+"tag": "p",
+"start": 11630,
+"end": 11716,
+"orig_inner": "The correct answer first, then each player's two tries. Press Next for another puzzle.",
+"md": "The correct answer first, then each player's two tries. Press Next for another puzzle."
+},
+{
+"id": "5-watch.figcaption1",
+"section": "5. Watch",
+"tag": "figcaption",
+"start": 11855,
+"end": 12073,
+"orig_inner": "<b>Figure 5</b>: one run of each kind, answering the puzzle's first test input; \"solved by k of n\" counts every run of that kind. Shown: puzzles where the four disagree, those only the think-longer player solved first.",
+"md": "**Figure 5**: one run of each kind, answering the puzzle's first test input; \"solved by k of n\" counts every run of that kind. Shown: puzzles where the four disagree, those only the think-longer player solved first."
+},
+{
+"id": "6-inside-one-round-demo.h21",
+"section": "6. Inside one round (demo)",
+"tag": "h2",
+"start": 12256,
+"end": 12281,
+"orig_inner": "Inside one coaching round",
+"md": "Inside one coaching round"
+},
+{
+"id": "6-inside-one-round-demo.p1",
+"section": "6. Inside one round (demo)",
+"tag": "p",
+"start": 12292,
+"end": 13348,
+"orig_inner": "The study did not record what the model was thinking. So we re-ran one coaching round with the model's reasoning summaries saved, and you can follow what the player and the coach were thinking, step by step. This is a separate illustrative run, not part of the results. These are not the model's raw thoughts: the API returns a summary of the hidden reasoning, which can run to thousands of words and can be lossy or garbled, and only some calls returned one.<sup class=\"fn\" id=\"fnref-6\"><a href=\"#fn-6\">6</a></sup><span class=\"sidenote\" id=\"fn-6\"><span class=\"sn-num\">6</span>Same model, reasoning effort, call cap and practice puzzles as in the study. One difference: the demo asked for &#8220;detailed&#8221; reasoning summaries, the study for &#8220;auto&#8221; (which returned none in a short test). We show the only round, of several tried, that changed the player without breaking it, and two puzzles picked to illustrate: one the edit fixed and one it did not. Runs are not deterministic, so each player was run on each puzzle several times.</span>",
+"md": "The study did not record what the model was thinking. So we re-ran one coaching round with the model's reasoning summaries saved, and you can follow what the player and the coach were thinking, step by step. This is a separate illustrative run, not part of the results. These are not the model's raw thoughts: the API returns a summary of the hidden reasoning, which can run to thousands of words and can be lossy or garbled, and only some calls returned one.[^6]"
+},
+{
+"id": "6-inside-one-round-demo.title1",
+"section": "6. Inside one round (demo)",
+"tag": "title",
+"start": 13489,
+"end": 13618,
+"orig_inner": "The coach turned the player's second try into a self-check. In repeat runs, one puzzle was solved more often and the other never.",
+"md": "The coach turned the player's second try into a self-check. In repeat runs, one puzzle was solved more often and the other never."
+},
+{
+"id": "6-inside-one-round-demo.p2",
+"section": "6. Inside one round (demo)",
+"tag": "p",
+"start": 13651,
+"end": 13753,
+"orig_inner": "Pick a puzzle, then step through: the player tries, the coach reads and edits, the player tries again.",
+"md": "Pick a puzzle, then step through: the player tries, the coach reads and edits, the player tries again."
+},
+{
+"id": "6-inside-one-round-demo.figcaption1",
+"section": "6. Inside one round (demo)",
+"tag": "figcaption",
+"start": 13891,
+"end": 14196,
+"orig_inner": "<b>Figure 6</b>: a traced re-run of one coaching round on the practice puzzles, made after the study. &#8220;Reasoning summary&#8221; is the summary of the model's hidden reasoning that the API returned; commands and outputs are as the coach saw them, with long outputs shortened. Not part of the results.",
+"md": "**Figure 6**: a traced re-run of one coaching round on the practice puzzles, made after the study. \u201cReasoning summary\u201d is the summary of the model's hidden reasoning that the API returned; commands and outputs are as the coach saw them, with long outputs shortened. Not part of the results."
+},
+{
+"id": "7-takeaways.h21",
+"section": "7. Takeaways",
+"tag": "h2",
+"start": 14385,
+"end": 14402,
+"orig_inner": "What to take away",
+"md": "What to take away"
+},
+{
+"id": "7-takeaways.li1",
+"section": "7. Takeaways",
+"tag": "li",
+"start": 14423,
+"end": 14518,
+"orig_inner": "No coach, original or self-improved, trained a player that beat the uncoached one on this exam.",
+"md": "No coach, original or self-improved, trained a player that beat the uncoached one on this exam."
+},
+{
+"id": "7-takeaways.li2",
+"section": "7. Takeaways",
+"tag": "li",
+"start": 14532,
+"end": 14657,
+"orig_inner": "Letting the model think longer was worth about <span data-v=\"pp0:derived.xhighGain\">12</span> points; no coaching came close.",
+"md": "Letting the model think longer was worth about {{pp0:derived.xhighGain}} points; no coaching came close."
+},
+{
+"id": "7-takeaways.li3",
+"section": "7. Takeaways",
+"tag": "li",
+"start": 14671,
+"end": 14866,
+"orig_inner": "Coaches seldom rewrote themselves, and testing one unchanged coach three times moved its score by <span data-v=\"pp0:derived.sameCoachSpread\">10</span> points, so small differences here are noise.",
+"md": "Coaches seldom rewrote themselves, and testing one unchanged coach three times moved its score by {{pp0:derived.sameCoachSpread}} points, so small differences here are noise."
+},
+{
+"id": "7-takeaways.li4",
+"section": "7. Takeaways",
+"tag": "li",
+"start": 14880,
+"end": 15175,
+"orig_inner": "Up close, a coach's edit can be sensible and still help only some puzzles: in the traced round, the player with a self-check on its second try solved one puzzle more often and another one never. That is one round, so it illustrates how coaching works; it is not evidence about how well it works.",
+"md": "Up close, a coach's edit can be sensible and still help only some puzzles: in the traced round, the player with a self-check on its second try solved one puzzle more often and another one never. That is one round, so it illustrates how coaching works; it is not evidence about how well it works."
+},
+{
+"id": "7-takeaways.p1",
+"section": "7. Takeaways",
+"tag": "p",
+"start": 15194,
+"end": 15411,
+"orig_inner": "Below, you can browse every run, every exam answer and every change a coach made to itself (<a href=\"#audit\">Code changes</a>). The caveats, costs and full method are under <a href=\"#numbers\">Numbers &amp; method</a>.",
+"md": "Below, you can browse every run, every exam answer and every change a coach made to itself ([Code changes](#audit)). The caveats, costs and full method are under [Numbers & method](#numbers)."
+},
+{
+"id": "7-explore.h21",
+"section": "7. Explore",
+"tag": "h2",
+"start": 15610,
+"end": 15626,
+"orig_inner": "Explore the data",
+"md": "Explore the data"
+},
+{
+"id": "7-explore.p1",
+"section": "7. Explore",
+"tag": "p",
+"start": 15658,
+"end": 15703,
+"orig_inner": "Everything behind Figures 1 to 5. Pick a tab.",
+"md": "Everything behind Figures 1 to 5. Pick a tab."
+},
+{
+"id": "7-explore.p2",
+"section": "7. Explore",
+"tag": "p",
+"start": 16717,
+"end": 16817,
+"orig_inner": "How practice score changed, version by version. Pick a dot to follow its coach and see what changed.",
+"md": "How practice score changed, version by version. Pick a dot to follow its coach and see what changed."
+},
+{
+"id": "7-explore.figcaption1",
+"section": "7. Explore",
+"tag": "figcaption",
+"start": 17014,
+"end": 17174,
+"orig_inner": "Practice score: share of the 25 practice puzzles solved. A tested coach was frozen and used to train a fresh player for 8 rounds; that player then sat the exam.",
+"md": "Practice score: share of the 25 practice puzzles solved. A tested coach was frozen and used to train a fresh player for 8 rounds; that player then sat the exam."
+},
+{
+"id": "7-explore.p3",
+"section": "7. Explore",
+"tag": "p",
+"start": 17348,
+"end": 17433,
+"orig_inner": "All 120 exam puzzles. Pick one to see each run's two answers next to the correct one.",
+"md": "All 120 exam puzzles. Pick one to see each run's two answers next to the correct one."
+},
+{
+"id": "7-explore.figcaption2",
+"section": "7. Explore",
+"tag": "figcaption",
+"start": 17634,
+"end": 17756,
+"orig_inner": "Answer grids were kept for 17 of the 23 exam runs; for the other six (follow-up runs 2 to 4) only right or wrong was kept.",
+"md": "Answer grids were kept for 17 of the 23 exam runs; for the other six (follow-up runs 2 to 4) only right or wrong was kept."
+},
+{
+"id": "7-explore.p4",
+"section": "7. Explore",
+"tag": "p",
+"start": 17940,
+"end": 17985,
+"orig_inner": "What the player and the coach actually wrote.",
+"md": "What the player and the coach actually wrote."
+},
+{
+"id": "7-explore.figcaption3",
+"section": "7. Explore",
+"tag": "figcaption",
+"start": 18196,
+"end": 18336,
+"orig_inner": "Player transcripts were saved only for failed practice answers. Long prompts are shortened. The model's hidden reasoning was never recorded.",
+"md": "Player transcripts were saved only for failed practice answers. Long prompts are shortened. The model's hidden reasoning was never recorded."
+},
+{
+"id": "7-explore.p5",
+"section": "7. Explore",
+"tag": "p",
+"start": 18508,
+"end": 18620,
+"orig_inner": "Every change the tested coaches made to their own code, and whether it was general or specific to these puzzles.",
+"md": "Every change the tested coaches made to their own code, and whether it was general or specific to these puzzles."
+},
+{
+"id": "7-explore.figcaption4",
+"section": "7. Explore",
+"tag": "figcaption",
+"start": 18819,
+"end": 18908,
+"orig_inner": "Each picked coach compared with the original coach; each change was judged by two judges.",
+"md": "Each picked coach compared with the original coach; each change was judged by two judges."
+},
+{
+"id": "7-explore.p6",
+"section": "7. Explore",
+"tag": "p",
+"start": 19084,
+"end": 19137,
+"orig_inner": "The statistics, the cost, the caveats and the method.",
+"md": "The statistics, the cost, the caveats and the method."
+},
+{
+"id": "7-explore.figcaption5",
+"section": "7. Explore",
+"tag": "figcaption",
+"start": 19355,
+"end": 19490,
+"orig_inner": "Exam score of every finished player, also against the tokens it used, and the pre-registered comparisons as 95% intervals against zero.",
+"md": "Exam score of every finished player, also against the tokens it used, and the pre-registered comparisons as 95% intervals against zero."
+},
+{
+"id": "7-explore.h31",
+"section": "7. Explore",
+"tag": "h3",
+"start": 19570,
+"end": 19574,
+"orig_inner": "Cost",
+"md": "Cost"
+},
+{
+"id": "7-explore.p7",
+"section": "7. Explore",
+"tag": "p",
+"start": 19589,
+"end": 19972,
+"orig_inner": "The study cost <span data-v=\"usd:spend.total\">$152.23</span> in model calls: players <span data-v=\"usd:spend.by_role.task\">$148.03</span>, coaches <span data-v=\"usd:spend.by_role.meta\">$4.19</span>. A coach used about <span data-v=\"tokens:derived.metaTokI0\">350k</span> tokens per round (original coach) or <span data-v=\"tokens:derived.metaTokIg\">188k</span> (self-improved coaches).",
+"md": "The study cost {{usd:spend.total}} in model calls: players {{usd:spend.by_role.task}}, coaches {{usd:spend.by_role.meta}}. A coach used about {{tokens:derived.metaTokI0}} tokens per round (original coach) or {{tokens:derived.metaTokIg}} (self-improved coaches)."
+},
+{
+"id": "7-explore.th1",
+"section": "7. Explore",
+"tag": "th",
+"start": 20071,
+"end": 20076,
+"orig_inner": "Phase",
+"md": "Phase"
+},
+{
+"id": "7-explore.th2",
+"section": "7. Explore",
+"tag": "th",
+"start": 20107,
+"end": 20113,
+"orig_inner": "Player",
+"md": "Player"
+},
+{
+"id": "7-explore.th3",
+"section": "7. Explore",
+"tag": "th",
+"start": 20144,
+"end": 20149,
+"orig_inner": "Coach",
+"md": "Coach"
+},
+{
+"id": "7-explore.td1",
+"section": "7. Explore",
+"tag": "td",
+"start": 20206,
+"end": 20232,
+"orig_inner": "Exams, all coached players",
+"md": "Exams, all coached players"
+},
+{
+"id": "7-explore.td2",
+"section": "7. Explore",
+"tag": "td",
+"start": 20293,
+"end": 20299,
+"orig_inner": "$80.86",
+"md": "$80.86"
+},
+{
+"id": "7-explore.td3",
+"section": "7. Explore",
+"tag": "td",
+"start": 20351,
+"end": 20380,
+"orig_inner": "Step 1: self-improvement runs",
+"md": "Step 1: self-improvement runs"
+},
+{
+"id": "7-explore.td4",
+"section": "7. Explore",
+"tag": "td",
+"start": 20441,
+"end": 20447,
+"orig_inner": "$23.03",
+"md": "$23.03"
+},
+{
+"id": "7-explore.td5",
+"section": "7. Explore",
+"tag": "td",
+"start": 20508,
+"end": 20513,
+"orig_inner": "$2.25",
+"md": "$2.25"
+},
+{
+"id": "7-explore.td6",
+"section": "7. Explore",
+"tag": "td",
+"start": 20544,
+"end": 20577,
+"orig_inner": "Step 2: test runs (8 rounds each)",
+"md": "Step 2: test runs (8 rounds each)"
+},
+{
+"id": "7-explore.td7",
+"section": "7. Explore",
+"tag": "td",
+"start": 20638,
+"end": 20644,
+"orig_inner": "$12.02",
+"md": "$12.02"
+},
+{
+"id": "7-explore.td8",
+"section": "7. Explore",
+"tag": "td",
+"start": 20705,
+"end": 20710,
+"orig_inner": "$1.17",
+"md": "$1.17"
+},
+{
+"id": "7-explore.td9",
+"section": "7. Explore",
+"tag": "td",
+"start": 20741,
+"end": 20758,
+"orig_inner": "No coach, 3 exams",
+"md": "No coach, 3 exams"
+},
+{
+"id": "7-explore.td10",
+"section": "7. Explore",
+"tag": "td",
+"start": 20819,
+"end": 20824,
+"orig_inner": "$8.76",
+"md": "$8.76"
+},
+{
+"id": "7-explore.td11",
+"section": "7. Explore",
+"tag": "td",
+"start": 20876,
+"end": 20896,
+"orig_inner": "Re-scoring finalists",
+"md": "Re-scoring finalists"
+},
+{
+"id": "7-explore.td12",
+"section": "7. Explore",
+"tag": "td",
+"start": 20957,
+"end": 20962,
+"orig_inner": "$7.72",
+"md": "$7.72"
+},
+{
+"id": "7-explore.td13",
+"section": "7. Explore",
+"tag": "td",
+"start": 21014,
+"end": 21033,
+"orig_inner": "Follow-up test runs",
+"md": "Follow-up test runs"
+},
+{
+"id": "7-explore.td14",
+"section": "7. Explore",
+"tag": "td",
+"start": 21094,
+"end": 21099,
+"orig_inner": "$6.95",
+"md": "$6.95"
+},
+{
+"id": "7-explore.td15",
+"section": "7. Explore",
+"tag": "td",
+"start": 21161,
+"end": 21166,
+"orig_inner": "$0.69",
+"md": "$0.69"
+},
+{
+"id": "7-explore.td16",
+"section": "7. Explore",
+"tag": "td",
+"start": 21197,
+"end": 21217,
+"orig_inner": "Think longer, 1 exam",
+"md": "Think longer, 1 exam"
+},
+{
+"id": "7-explore.td17",
+"section": "7. Explore",
+"tag": "td",
+"start": 21278,
+"end": 21283,
+"orig_inner": "$5.75",
+"md": "$5.75"
+},
+{
+"id": "7-explore.td18",
+"section": "7. Explore",
+"tag": "td",
+"start": 21335,
+"end": 21362,
+"orig_inner": "Scoring the starting player",
+"md": "Scoring the starting player"
+},
+{
+"id": "7-explore.td19",
+"section": "7. Explore",
+"tag": "td",
+"start": 21423,
+"end": 21428,
+"orig_inner": "$1.32",
+"md": "$1.32"
+},
+{
+"id": "7-explore.td20",
+"section": "7. Explore",
+"tag": "td",
+"start": 21480,
+"end": 21497,
+"orig_inner": "Transplant checks",
+"md": "Transplant checks"
+},
+{
+"id": "7-explore.td21",
+"section": "7. Explore",
+"tag": "td",
+"start": 21559,
+"end": 21564,
+"orig_inner": "$0.81",
+"md": "$0.81"
+},
+{
+"id": "7-explore.td22",
+"section": "7. Explore",
+"tag": "td",
+"start": 21626,
+"end": 21631,
+"orig_inner": "$0.04",
+"md": "$0.04"
+},
+{
+"id": "7-explore.td23",
+"section": "7. Explore",
+"tag": "td",
+"start": 21662,
+"end": 21679,
+"orig_inner": "Screening puzzles",
+"md": "Screening puzzles"
+},
+{
+"id": "7-explore.td24",
+"section": "7. Explore",
+"tag": "td",
+"start": 21741,
+"end": 21746,
+"orig_inner": "$0.71",
+"md": "$0.71"
+},
+{
+"id": "7-explore.td25",
+"section": "7. Explore",
+"tag": "td",
+"start": 21798,
+"end": 21808,
+"orig_inner": "Smoke test",
+"md": "Smoke test"
+},
+{
+"id": "7-explore.td26",
+"section": "7. Explore",
+"tag": "td",
+"start": 21870,
+"end": 21875,
+"orig_inner": "$0.08",
+"md": "$0.08"
+},
+{
+"id": "7-explore.td27",
+"section": "7. Explore",
+"tag": "td",
+"start": 21937,
+"end": 21942,
+"orig_inner": "$0.03",
+"md": "$0.03"
+},
+{
+"id": "7-explore.td28",
+"section": "7. Explore",
+"tag": "td",
+"start": 21987,
+"end": 21992,
+"orig_inner": "Total",
+"md": "Total"
+},
+{
+"id": "7-explore.td29",
+"section": "7. Explore",
+"tag": "td",
+"start": 22045,
+"end": 22052,
+"orig_inner": "$148.03",
+"md": "$148.03"
+},
+{
+"id": "7-explore.td30",
+"section": "7. Explore",
+"tag": "td",
+"start": 22105,
+"end": 22110,
+"orig_inner": "$4.19",
+"md": "$4.19"
+},
+{
+"id": "7-explore.caption1",
+"section": "7. Explore",
+"tag": "caption",
+"start": 22159,
+"end": 22272,
+"orig_inner": "Spend by phase from the gateway ledger. Phases under one cent are left out of the rows but counted in the totals.",
+"md": "Spend by phase from the gateway ledger. Phases under one cent are left out of the rows but counted in the totals."
+},
+{
+"id": "7-explore.h32",
+"section": "7. Explore",
+"tag": "h3",
+"start": 22337,
+"end": 22344,
+"orig_inner": "Caveats",
+"md": "Caveats"
+},
+{
+"id": "7-explore.li1",
+"section": "7. Explore",
+"tag": "li",
+"start": 22389,
+"end": 22711,
+"orig_inner": "<b>Noise.</b> There were only 3 to 6 runs per group. One unchanged coach scored <span data-v=\"pct:derived.sameCoach.g12\">26.0%</span>, <span data-v=\"pct:derived.sameCoach.g20\">27.8%</span> and <span data-v=\"pct:derived.sameCoach.g40\">36.0%</span> in three tests, and several later picks were the same code as earlier ones.",
+"md": "**Noise.** There were only 3 to 6 runs per group. One unchanged coach scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}} in three tests, and several later picks were the same code as earlier ones."
+},
+{
+"id": "7-explore.li2",
+"section": "7. Explore",
+"tag": "li",
+"start": 22729,
+"end": 22991,
+"orig_inner": "<b>The original coach needed adapting.</b> With the repository's instruction as written, the model only asked clarifying questions. We added one sentence (\"work autonomously\") and loosened tool-call parsing. Both kinds of coach started from this adapted version.",
+"md": "**The original coach needed adapting.** With the repository's instruction as written, the model only asked clarifying questions. We added one sentence (\"work autonomously\") and loosened tool-call parsing. Both kinds of coach started from this adapted version."
+},
+{
+"id": "7-explore.li3",
+"section": "7. Explore",
+"tag": "li",
+"start": 23009,
+"end": 23185,
+"orig_inner": "<b>The original coach often made no edit.</b> It ended 11 of its first 31 rounds without one, mostly from tool-call format problems. This was left as it was, as pre-registered.",
+"md": "**The original coach often made no edit.** It ended 11 of its first 31 rounds without one, mostly from tool-call format problems. This was left as it was, as pre-registered."
+},
+{
+"id": "7-explore.li4",
+"section": "7. Explore",
+"tag": "li",
+"start": 23203,
+"end": 23347,
+"orig_inner": "<b>Some coach edits broke the player.</b> One edit passed an argument the function did not accept, and that player scored 0. Such results count.",
+"md": "**Some coach edits broke the player.** One edit passed an argument the function did not accept, and that player scored 0. Such results count."
+},
+{
+"id": "7-explore.li5",
+"section": "7. Explore",
+"tag": "li",
+"start": 23365,
+"end": 23761,
+"orig_inner": "<b>Re-runs.</b> Harness bugs forced restarts of two original-coach test runs (one of them twice) and cost one self-improvement run a generation. An early 30-minute limit cut off 49 exam answers for the no-coach and think-longer players; all were re-run under a 2 to 3 hour limit (think longer: 39.9% before, <span data-v=\"pct:xhigh.score\">41.1%</span> after). Six machine restarts lost no result.",
+"md": "**Re-runs.** Harness bugs forced restarts of two original-coach test runs (one of them twice) and cost one self-improvement run a generation. An early 30-minute limit cut off 49 exam answers for the no-coach and think-longer players; all were re-run under a 2 to 3 hour limit (think longer: 39.9% before, {{pct:xhigh.score}} after). Six machine restarts lost no result."
+},
+{
+"id": "7-explore.li6",
+"section": "7. Explore",
+"tag": "li",
+"start": 23779,
+"end": 24115,
+"orig_inner": "<b>An untouched final player.</b> In one follow-up test (generation-20 coach, run 4), the untouched starting player beat the best edited finalist on practice (<span data-v=\"num2:derived.untouchedWin.untouched\">0.70</span> vs <span data-v=\"num2:derived.untouchedWin.edited\">0.66</span>), so that exam score is the untouched player's own.",
+"md": "**An untouched final player.** In one follow-up test (generation-20 coach, run 4), the untouched starting player beat the best edited finalist on practice ({{num2:derived.untouchedWin.untouched}} vs {{num2:derived.untouchedWin.edited}}), so that exam score is the untouched player's own."
+},
+{
+"id": "7-explore.li7",
+"section": "7. Explore",
+"tag": "li",
+"start": 24133,
+"end": 24262,
+"orig_inner": "<b>Transcripts are partial.</b> They were saved only for failed practice answers (1,513 of them) and contain no hidden reasoning.",
+"md": "**Transcripts are partial.** They were saved only for failed practice answers (1,513 of them) and contain no hidden reasoning."
+},
+{
+"id": "7-explore.p8",
+"section": "7. Explore",
+"tag": "p",
+"start": 24308,
+"end": 24425,
+"orig_inner": "Every deviation, bug and re-run is logged in <code>DECISIONS.md</code> <a class=\"cite\" href=\"#ref-decisions\">[5]</a>.",
+"md": "Every deviation, bug and re-run is logged in `DECISIONS.md` [[5]](#ref-decisions \"cite\")."
+},
+{
+"id": "7-explore.h33",
+"section": "7. Explore",
+"tag": "h3",
+"start": 24455,
+"end": 24469,
+"orig_inner": "Method in full",
+"md": "Method in full"
+},
+{
+"id": "7-explore.summary1",
+"section": "7. Explore",
+"tag": "summary",
+"start": 24537,
+"end": 24569,
+"orig_inner": "Design, fixed before the results",
+"md": "Design, fixed before the results"
+},
+{
+"id": "7-explore.li8",
+"section": "7. Explore",
+"tag": "li",
+"start": 24625,
+"end": 24741,
+"orig_inner": "<b>Question.</b> With equal compute, does a coach that evolved itself train a better player than the original coach?",
+"md": "**Question.** With equal compute, does a coach that evolved itself train a better player than the original coach?"
+},
+{
+"id": "7-explore.li9",
+"section": "7. Explore",
+"tag": "li",
+"start": 24761,
+"end": 25032,
+"orig_inner": "<b>Pre-registration.</b> <code>DESIGN.md</code>, <code>splits.json</code> and <code>analysis.py</code> were committed at <code>f577cc7</code> before any test result existed; the follow-up plan, <code>DESIGN_v2.md</code>, at <code>991a237</code> before any follow-up test.",
+"md": "**Pre-registration.** `DESIGN.md`, `splits.json` and `analysis.py` were committed at `f577cc7` before any test result existed; the follow-up plan, `DESIGN_v2.md`, at `991a237` before any follow-up test."
+},
+{
+"id": "7-explore.li10",
+"section": "7. Explore",
+"tag": "li",
+"start": 25052,
+"end": 25198,
+"orig_inner": "<b>Model.</b> gpt-6-luna through the OpenAI Responses API, for player and coach. Reasoning effort high for both; the think-longer exam used xhigh.",
+"md": "**Model.** gpt-6-luna through the OpenAI Responses API, for player and coach. Reasoning effort high for both; the think-longer exam used xhigh."
+},
+{
+"id": "7-explore.li11",
+"section": "7. Explore",
+"tag": "li",
+"start": 25218,
+"end": 25355,
+"orig_inner": "<b>Player budget.</b> At most 2 model calls and 2 answers per test input. A test input counts as solved if either answer matches exactly.",
+"md": "**Player budget.** At most 2 model calls and 2 answers per test input. A test input counts as solved if either answer matches exactly."
+},
+{
+"id": "7-explore.li12",
+"section": "7. Explore",
+"tag": "li",
+"start": 25375,
+"end": 25427,
+"orig_inner": "<b>Coach budget.</b> 600k tokens per coaching round.",
+"md": "**Coach budget.** 600k tokens per coaching round."
+},
+{
+"id": "7-explore.li13",
+"section": "7. Explore",
+"tag": "li",
+"start": 25447,
+"end": 25584,
+"orig_inner": "<b>Spending cap.</b> $150, raised to $200 before the follow-up. Prices: input $0.10, cached input $0.01, output $0.50 per million tokens.",
+"md": "**Spending cap.** $150, raised to $200 before the follow-up. Prices: input $0.10, cached input $0.01, output $0.50 per million tokens."
+},
+{
+"id": "7-explore.li14",
+"section": "7. Explore",
+"tag": "li",
+"start": 25604,
+"end": 25762,
+"orig_inner": "<b>Enforcement.</b> A gateway (<code>arcexp/gateway.py</code>) that no agent can edit is the only route to the model. It enforces the caps and keeps a ledger.",
+"md": "**Enforcement.** A gateway (`arcexp/gateway.py`) that no agent can edit is the only route to the model. It enforces the caps and keeps a ledger."
+},
+{
+"id": "7-explore.li15",
+"section": "7. Explore",
+"tag": "li",
+"start": 25782,
+"end": 25913,
+"orig_inner": "<b>Sandbox.</b> Every test input runs as an unprivileged user with no network, in a fresh directory, without access to the answers.",
+"md": "**Sandbox.** Every test input runs as an unprivileged user with no network, in a fresh directory, without access to the answers."
+},
+{
+"id": "7-explore.li16",
+"section": "7. Explore",
+"tag": "li",
+"start": 25933,
+"end": 26139,
+"orig_inner": "<b>Puzzle sets.</b> ARC-AGI-2 commit <code>f3283f7</code>, seed 20261117. The exam is all 120 public evaluation tasks (167 test inputs). The two practice sets have 25 training tasks each and do not overlap.",
+"md": "**Puzzle sets.** ARC-AGI-2 commit `f3283f7`, seed 20261117. The exam is all 120 public evaluation tasks (167 test inputs). The two practice sets have 25 training tasks each and do not overlap."
+},
+{
+"id": "7-explore.li17",
+"section": "7. Explore",
+"tag": "li",
+"start": 26159,
+"end": 26270,
+"orig_inner": "<b>Score.</b> Share of test inputs solved within each task, averaged over the 120 tasks (task-averaged pass@2).",
+"md": "**Score.** Share of test inputs solved within each task, averaged over the 120 tasks (task-averaged pass@2)."
+},
+{
+"id": "7-explore.li18",
+"section": "7. Explore",
+"tag": "li",
+"start": 26290,
+"end": 26450,
+"orig_inner": "<b>Final player of a run.</b> The two best players are re-scored on practice, the untouched starting player included; the better one sits the exam exactly once.",
+"md": "**Final player of a run.** The two best players are re-scored on practice, the untouched starting player included; the better one sits the exam exactly once."
+},
+{
+"id": "7-explore.li19",
+"section": "7. Explore",
+"tag": "li",
+"start": 26470,
+"end": 26688,
+"orig_inner": "<b>Picking a self-improved coach.</b> Among coaches whose code differs from the original and that have at least one scored child, take the one whose children improved most on average; ties go to the earlier generation.",
+"md": "**Picking a self-improved coach.** Among coaches whose code differs from the original and that have at least one scored child, take the one whose children improved most on average; ties go to the earlier generation."
+},
+{
+"id": "7-explore.li20",
+"section": "7. Explore",
+"tag": "li",
+"start": 26708,
+"end": 26834,
+"orig_inner": "<b>Statistics.</b> 95% Welch t-intervals on per-run exam scores. The headline is the first matching row of a pre-written list.",
+"md": "**Statistics.** 95% Welch t-intervals on per-run exam scores. The headline is the first matching row of a pre-written list."
+},
+{
+"id": "7-explore.summary2",
+"section": "7. Explore",
+"tag": "summary",
+"start": 26910,
+"end": 26932,
+"orig_inner": "What was run, in order",
+"md": "What was run, in order"
+},
+{
+"id": "7-explore.li21",
+"section": "7. Explore",
+"tag": "li",
+"start": 26988,
+"end": 27225,
+"orig_inner": "<b>No coach.</b> The starting player sat the exam 3 times: <span data-v=\"pct:B0.reps.0\">30.1%</span>, <span data-v=\"pct:B0.reps.1\">27.9%</span>, <span data-v=\"pct:B0.reps.2\">29.7%</span> (average <span data-v=\"pct:B0.mean\">29.3%</span>).",
+"md": "**No coach.** The starting player sat the exam 3 times: {{pct:B0.reps.0}}, {{pct:B0.reps.1}}, {{pct:B0.reps.2}} (average {{pct:B0.mean}})."
+},
+{
+"id": "7-explore.li22",
+"section": "7. Explore",
+"tag": "li",
+"start": 27245,
+"end": 27357,
+"orig_inner": "<b>Think longer.</b> The starting player at xhigh effort, one exam: <span data-v=\"pct:xhigh.score\">41.1%</span>.",
+"md": "**Think longer.** The starting player at xhigh effort, one exam: {{pct:xhigh.score}}."
+},
+{
+"id": "7-explore.li23",
+"section": "7. Explore",
+"tag": "li",
+"start": 27377,
+"end": 27687,
+"orig_inner": "<b>Step 1.</b> 6 self-improvement runs of 12 generations. The coach's own code changed in <span data-v=\"int:derived.selfEditGens\">21</span> of <span data-v=\"int:derived.totalGens\">72</span> generations (runs 1 to 6: 1, 4, 5, 1, 7, 3). Run 4 produced no qualifying coach, so 5 self-improved coaches were tested.",
+"md": "**Step 1.** 6 self-improvement runs of 12 generations. The coach's own code changed in {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations (runs 1 to 6: 1, 4, 5, 1, 7, 3). Run 4 produced no qualifying coach, so 5 self-improved coaches were tested."
+},
+{
+"id": "7-explore.li24",
+"section": "7. Explore",
+"tag": "li",
+"start": 27707,
+"end": 28520,
+"orig_inner": "<b>Step 2.</b> Original coach, 6 test runs: <span data-v=\"pct:I0_runs.payoff_I0_1\">26.9%</span>, <span data-v=\"pct:I0_runs.payoff_I0_2\">29.4%</span>, <span data-v=\"pct:I0_runs.payoff_I0_3\">30.4%</span>, <span data-v=\"pct:I0_runs.payoff_I0_4\">30.4%</span>, <span data-v=\"pct:I0_runs.payoff_I0_5\">31.4%</span>, <span data-v=\"pct:I0_runs.payoff_I0_6\">29.4%</span> (average <span data-v=\"pct:I0_mean\">29.7%</span>). Self-improved coaches from runs 1, 2, 3, 5, 6: <span data-v=\"pct:Ig_runs.payoff_Ig_source_s1\">26.0%</span>, <span data-v=\"pct:Ig_runs.payoff_Ig_source_s2\">27.4%</span>, <span data-v=\"pct:Ig_runs.payoff_Ig_source_s3\">31.0%</span>, <span data-v=\"pct:Ig_runs.payoff_Ig_source_s5\">27.2%</span>, <span data-v=\"pct:Ig_runs.payoff_Ig_source_s6\">27.9%</span> (average <span data-v=\"pct:Ig_mean\">27.9%</span>).",
+"md": "**Step 2.** Original coach, 6 test runs: {{pct:I0_runs.payoff_I0_1}}, {{pct:I0_runs.payoff_I0_2}}, {{pct:I0_runs.payoff_I0_3}}, {{pct:I0_runs.payoff_I0_4}}, {{pct:I0_runs.payoff_I0_5}}, {{pct:I0_runs.payoff_I0_6}} (average {{pct:I0_mean}}). Self-improved coaches from runs 1, 2, 3, 5, 6: {{pct:Ig_runs.payoff_Ig_source_s1}}, {{pct:Ig_runs.payoff_Ig_source_s2}}, {{pct:Ig_runs.payoff_Ig_source_s3}}, {{pct:Ig_runs.payoff_Ig_source_s5}}, {{pct:Ig_runs.payoff_Ig_source_s6}} (average {{pct:Ig_mean}})."
+},
+{
+"id": "7-explore.li25",
+"section": "7. Explore",
+"tag": "li",
+"start": 28540,
+"end": 28908,
+"orig_inner": "<b>Pre-registered analysis.</b> Original minus no coach <span data-v=\"pts:G.est\">+0.4</span> <span data-v=\"ci:G\">[&#8722;1.9, +2.8]</span>; self-improved minus original <span data-v=\"pts:Delta.est\">&#8722;1.8</span> <span data-v=\"ci:Delta\">[&#8722;4.2, +0.6]</span>. Headline: \"<span data-v=\"raw:headline\">Neither improver beat two plain attempts on ARC-AGI-2</span>.\"",
+"md": "**Pre-registered analysis.** Original minus no coach {{pts:G.est}} {{ci:G}}; self-improved minus original {{pts:Delta.est}} {{ci:Delta}}. Headline: \"{{raw:headline}}.\""
+},
+{
+"id": "7-explore.li26",
+"section": "7. Explore",
+"tag": "li",
+"start": 28928,
+"end": 29362,
+"orig_inner": "<b>Follow-up.</b> Runs 1 to 4 continued to 40 generations; coaches picked at generations 20 and 40 were tested under the same rules. Averages at generations 0, 12, 20, 40: <span data-v=\"pct:extension.per_generation.0.mean\">29.7%</span>, <span data-v=\"pct:extension.per_generation.12.mean\">27.9%</span>, <span data-v=\"pct:extension.per_generation.20.mean\">29.8%</span>, <span data-v=\"pct:extension.per_generation.40.mean\">30.3%</span>.",
+"md": "**Follow-up.** Runs 1 to 4 continued to 40 generations; coaches picked at generations 20 and 40 were tested under the same rules. Averages at generations 0, 12, 20, 40: {{pct:extension.per_generation.0.mean}}, {{pct:extension.per_generation.12.mean}}, {{pct:extension.per_generation.20.mean}}, {{pct:extension.per_generation.40.mean}}."
+},
+{
+"id": "7-explore.li27",
+"section": "7. Explore",
+"tag": "li",
+"start": 29382,
+"end": 29644,
+"orig_inner": "<b>Code audit.</b> <span data-v=\"int:diff_audit_summary.hunks\">32</span> changed blocks in the picked coaches: <span data-v=\"int:diff_audit_summary.arc_specific\">3</span> specific to these puzzles, <span data-v=\"int:diff_audit_summary.general\">29</span> general.",
+"md": "**Code audit.** {{int:diff_audit_summary.hunks}} changed blocks in the picked coaches: {{int:diff_audit_summary.arc_specific}} specific to these puzzles, {{int:diff_audit_summary.general}} general."
+},
+{
+"id": "7-explore.p9",
+"section": "7. Explore",
+"tag": "p",
+"start": 29733,
+"end": 29935,
+"orig_inner": "Every number on this page is read from <code>explorer/data/*.json</code>, built from the experiment's records by <code>arcexp/build_explorer_data.py</code>. The full write-up is <code>WRITEUP.md</code>.",
+"md": "Every number on this page is read from `explorer/data/*.json`, built from the experiment's records by `arcexp/build_explorer_data.py`. The full write-up is `WRITEUP.md`."
+},
+{
+"id": "references.h21",
+"section": "References",
+"tag": "h2",
+"start": 30131,
+"end": 30141,
+"orig_inner": "References",
+"md": "References"
+},
+{
+"id": "references.li1",
+"section": "References",
+"tag": "li",
+"start": 30175,
+"end": 30348,
+"orig_inner": "ARC Prize Foundation. <i>ARC-AGI-2</i>, public evaluation set, commit <code>f3283f7</code>. <a href=\"https://github.com/arcprize/ARC-AGI-2\">github.com/arcprize/ARC-AGI-2</a>",
+"md": "ARC Prize Foundation. *ARC-AGI-2*, public evaluation set, commit `f3283f7`. [github.com/arcprize/ARC-AGI-2](https://github.com/arcprize/ARC-AGI-2)"
+},
+{
+"id": "references.li2",
+"section": "References",
+"tag": "li",
+"start": 30378,
+"end": 30486,
+"orig_inner": "<code>DESIGN.md</code>, the pre-registered design, committed at <code>f577cc7</code> before any test result.",
+"md": "`DESIGN.md`, the pre-registered design, committed at `f577cc7` before any test result."
+},
+{
+"id": "references.li3",
+"section": "References",
+"tag": "li",
+"start": 30515,
+"end": 30680,
+"orig_inner": "B. L. Welch (1947). The generalization of \"Student's\" problem when several different population variances are involved. <i>Biometrika</i> 34(1&#8211;2), 28&#8211;35.",
+"md": "B. L. Welch (1947). The generalization of \"Student's\" problem when several different population variances are involved. *Biometrika* 34(1\u20132), 28\u201335."
+},
+{
+"id": "references.li4",
+"section": "References",
+"tag": "li",
+"start": 30711,
+"end": 30818,
+"orig_inner": "<code>DESIGN_v2.md</code>, the follow-up plan, committed at <code>991a237</code> before any follow-up test.",
+"md": "`DESIGN_v2.md`, the follow-up plan, committed at `991a237` before any follow-up test."
+},
+{
+"id": "references.li5",
+"section": "References",
+"tag": "li",
+"start": 30851,
+"end": 30910,
+"orig_inner": "<code>DECISIONS.md</code>: every deviation, bug and re-run.",
+"md": "`DECISIONS.md`: every deviation, bug and re-run."
+}
+],
+"fns": {
+"1": {
+"html": "\"Player\" and \"coach\" are the repository's <i>task agent</i> and <i>meta agent</i>. Both use the same model.",
+"md": "\"Player\" and \"coach\" are the repository's *task agent* and *meta agent*. Both use the same model."
+},
+"3": {
+"html": "The 120 public ARC-AGI-2 evaluation tasks <a class=\"cite\" href=\"#ref-arc\">[1]</a>, with <span data-v=\"int:sets.heldout_test_inputs\">167</span> test inputs. A puzzle with several test inputs gives partial credit.",
+"md": "The 120 public ARC-AGI-2 evaluation tasks [[1]](#ref-arc \"cite\"), with {{int:sets.heldout_test_inputs}} test inputs. A puzzle with several test inputs gives partial credit."
+},
+"2": {
+"html": "From each run we took the self-edited coach whose players improved most on practice. The rule was fixed before any exam result existed <a class=\"cite\" href=\"#ref-design\">[2]</a>.",
+"md": "From each run we took the self-edited coach whose players improved most on practice. The rule was fixed before any exam result existed [[2]](#ref-design \"cite\")."
+},
+"4": {
+"html": "A gateway no agent could edit fixed the model, its reasoning effort (<i>high</i>; <i>xhigh</i> for the think-longer run), the call cap and the budget.",
+"md": "A gateway no agent could edit fixed the model, its reasoning effort (*high*; *xhigh* for the think-longer run), the call cap and the budget."
+},
+"5": {
+"html": "95% intervals: original coach minus no coach <span data-v=\"ci:G\">[&#8722;1.9, +2.8]</span> points; self-improved minus no coach <span data-v=\"ci:Ig_gain_over_B0\">[&#8722;4.0, +1.3]</span>; self-improved minus original <span data-v=\"pts:Delta.est\">&#8722;1.8</span> <span data-v=\"ci:Delta\">[&#8722;4.2, +0.6]</span>. All include zero. Welch t-intervals <a class=\"cite\" href=\"#ref-welch\">[3]</a>; the headline was pre-registered <a class=\"cite\" href=\"#ref-design\">[2]</a>.",
+"md": "95% intervals: original coach minus no coach {{ci:G}} points; self-improved minus no coach {{ci:Ig_gain_over_B0}}; self-improved minus original {{pts:Delta.est}} {{ci:Delta}}. All include zero. Welch t-intervals [[3]](#ref-welch \"cite\"); the headline was pre-registered [[2]](#ref-design \"cite\")."
+},
+"6": {
+"html": "Same model, reasoning effort, call cap and practice puzzles as in the study. One difference: the demo asked for &#8220;detailed&#8221; reasoning summaries, the study for &#8220;auto&#8221; (which returned none in a short test). We show the only round, of several tried, that changed the player without breaking it, and two puzzles picked to illustrate: one the edit fixed and one it did not. Runs are not deterministic, so each player was run on each puzzle several times.",
+"md": "Same model, reasoning effort, call cap and practice puzzles as in the study. One difference: the demo asked for \u201cdetailed\u201d reasoning summaries, the study for \u201cauto\u201d (which returned none in a short test). We show the only round, of several tried, that changed the player without breaking it, and two puzzles picked to illustrate: one the edit fixed and one it did not. Runs are not deterministic, so each player was run on each puzzle several times."
+}
+},
+"js": [
+{
+"id": "js:core.js:23:2",
+"file": "core.js",
+"line": 23,
+"lit": "Self-improved coach",
+"text": "Self-improved coach"
+},
+{
+"id": "js:core.js:23:3",
+"file": "core.js",
+"line": 23,
+"lit": "Think longer (no coach)",
+"text": "Think longer (no coach)"
+},
+{
+"id": "js:core.js:80:0",
+"file": "core.js",
+"line": 80,
+"lit": "http://www.w3.org/2000/svg",
+"text": "http://www.w3.org/2000/svg"
+},
+{
+"id": "js:core.js:116:0",
+"file": "core.js",
+"line": 116,
+"lit": "(prefers-reduced-motion: reduce)",
+"text": "(prefers-reduced-motion: reduce)"
+},
+{
+"id": "js:core.js:193:1",
+"file": "core.js",
+"line": 193,
+"lit": "Think longer, no coach",
+"text": "Think longer, no coach"
+},
+{
+"id": "js:core.js:194:1",
+"file": "core.js",
+"line": 194,
+"lit": "Self-improved coach",
+"text": "Self-improved coach"
+},
+{
+"id": "js:core.js:195:2",
+"file": "core.js",
+"line": 195,
+"lit": "Self-improvement run",
+"text": "Self-improvement run"
+},
+{
+"id": "js:core.js:209:2",
+"file": "core.js",
+"line": 209,
+"lit": "Self-improved coach",
+"text": "Self-improved coach"
+},
+{
+"id": "js:core.js:210:2",
+"file": "core.js",
+"line": 210,
+"lit": "Think longer, no coach",
+"text": "Think longer, no coach"
+},
+{
+"id": "js:core.js:210:3",
+"file": "core.js",
+"line": 210,
+"lit": "Self-improvement run",
+"text": "Self-improvement run"
+},
+{
+"id": "js:core.js:224:0",
+"file": "core.js",
+"line": 224,
+"lit": "No coach, run ",
+"text": "No coach, run "
+},
+{
+"id": "js:core.js:225:1",
+"file": "core.js",
+"line": 225,
+"lit": "Think longer, no coach",
+"text": "Think longer, no coach"
+},
+{
+"id": "js:core.js:226:0",
+"file": "core.js",
+"line": 226,
+"lit": "Original coach, run ",
+"text": "Original coach, run "
+},
+{
+"id": "js:core.js:227:0",
+"file": "core.js",
+"line": 227,
+"lit": "Self-improved coach from run ",
+"text": "Self-improved coach from run "
+},
+{
+"id": "js:core.js:228:1",
+"file": "core.js",
+"line": 228,
+"lit": " coach from run ",
+"text": " coach from run "
+},
+{
+"id": "js:core.js:229:0",
+"file": "core.js",
+"line": 229,
+"lit": "Self-improvement run ",
+"text": "Self-improvement run "
+},
+{
+"id": "js:core.js:266:0",
+"file": "core.js",
+"line": 266,
+"lit": "(prefers-color-scheme: dark)",
+"text": "(prefers-color-scheme: dark)"
+},
+{
+"id": "js:core.js:277:0",
+"file": "core.js",
+"line": 277,
+"lit": "(prefers-color-scheme: dark)",
+"text": "(prefers-color-scheme: dark)"
+},
+{
+"id": "js:core.js:516:1",
+"file": "core.js",
+"line": 516,
+"lit": "This figure could not be drawn. ",
+"text": "This figure could not be drawn. "
+},
+{
+"id": "js:core.js:517:1",
+"file": "core.js",
+"line": 517,
+"lit": "The text around it still holds; reloading the page may help. ",
+"text": "The text around it still holds; reloading the page may help. "
+},
+{
+"id": "js:fig-setup.js:43:0",
+"file": "fig-setup.js",
+"line": 43,
+"lit": "trains a fresh player, ",
+"text": "trains a fresh player, "
+},
+{
+"id": "js:fig-setup.js:46:0",
+"file": "fig-setup.js",
+"line": 46,
+"lit": "Diagram. Step 1, the coach improves itself: the coach edits the player\\'s code, the player plays ",
+"text": "Diagram. Step 1, the coach improves itself: the coach edits the player's code, the player plays "
+},
+{
+"id": "js:fig-setup.js:47:0",
+"file": "fig-setup.js",
+"line": 47,
+"lit": ", the scores go back to the coach, and the coach also rewrites itself; repeated for ",
+"text": ", the scores go back to the coach, and the coach also rewrites itself; repeated for "
+},
+{
+"id": "js:fig-setup.js:48:0",
+"file": "fig-setup.js",
+"line": 48,
+"lit": " generations. Step 2, we test it: the self-improved coach, or the original coach, is frozen and ",
+"text": " generations. Step 2, we test it: the self-improved coach, or the original coach, is frozen and "
+},
+{
+"id": "js:fig-setup.js:49:0",
+"file": "fig-setup.js",
+"line": 49,
+"lit": "; that player sits the ",
+"text": "; that player sits the "
+},
+{
+"id": "js:fig-setup.js:49:3",
+"file": "fig-setup.js",
+"line": 49,
+"lit": ". For comparison, an uncoached player sat the same exam, both normally and thinking longer.",
+"text": ". For comparison, an uncoached player sat the same exam, both normally and thinking longer."
+},
+{
+"id": "js:fig-setup.js:92:1",
+"file": "fig-setup.js",
+"line": 92,
+"lit": "Step 1 \u00b7 The coach improves itself",
+"text": "Step 1 \u00b7 The coach improves itself"
+},
+{
+"id": "js:fig-setup.js:93:1",
+"file": "fig-setup.js",
+"line": 93,
+"lit": "Step 2 \u00b7 We test it",
+"text": "Step 2 \u00b7 We test it"
+},
+{
+"id": "js:fig-setup.js:111:0",
+"file": "fig-setup.js",
+"line": 111,
+"lit": "Self-improved coach",
+"text": "Self-improved coach"
+},
+{
+"id": "js:fig-setup.js:127:1",
+"file": "fig-setup.js",
+"line": 127,
+"lit": "Step 1 \u00b7 The coach improves itself",
+"text": "Step 1 \u00b7 The coach improves itself"
+},
+{
+"id": "js:fig-setup.js:144:1",
+"file": "fig-setup.js",
+"line": 144,
+"lit": "Step 2 \u00b7 We test it",
+"text": "Step 2 \u00b7 We test it"
+},
+{
+"id": "js:fig-setup.js:145:0",
+"file": "fig-setup.js",
+"line": 145,
+"lit": "Self-improved coach",
+"text": "Self-improved coach"
+},
+{
+"id": "js:fig-setup.js:148:1",
+"file": "fig-setup.js",
+"line": 148,
+"lit": "trains a fresh player,",
+"text": "trains a fresh player,"
+},
+{
+"id": "js:fig-puzzle.js:128:4",
+"file": "fig-puzzle.js",
+"line": 128,
+"lit": "Copy test input",
+"text": "Copy test input"
+},
+{
+"id": "js:fig-puzzle.js:130:4",
+"file": "fig-puzzle.js",
+"line": 130,
+"lit": "Show the answer",
+"text": "Show the answer"
+},
+{
+"id": "js:fig-puzzle.js:134:3",
+"file": "fig-puzzle.js",
+"line": 134,
+"lit": "Keyboard: arrows move, Space paints, 0\u20139 pick a colour, F fills.",
+"text": "Keyboard: arrows move, Space paints, 0\u20139 pick a colour, F fills."
+},
+{
+"id": "js:fig-puzzle.js:192:0",
+"file": "fig-puzzle.js",
+"line": 192,
+"lit": "Test input (1 of ",
+"text": "Test input (1 of "
+},
+{
+"id": "js:fig-puzzle.js:216:3",
+"file": "fig-puzzle.js",
+"line": 216,
+"lit": ". Arrow keys move, Space paints, digits 0 to 9 pick a colour, F fills an area.",
+"text": ". Arrow keys move, Space paints, digits 0 to 9 pick a colour, F fills an area."
+},
+{
+"id": "js:fig-puzzle.js:332:1",
+"file": "fig-puzzle.js",
+"line": 332,
+"lit": " On your second try.",
+"text": " On your second try."
+},
+{
+"id": "js:fig-puzzle.js:333:0",
+"file": "fig-puzzle.js",
+"line": 333,
+"lit": "Here is the answer.",
+"text": "Here is the answer."
+},
+{
+"id": "js:fig-puzzle.js:334:1",
+"file": "fig-puzzle.js",
+"line": 334,
+"lit": ". That was your last try. Wrong cells are outlined in white below.",
+"text": ". That was your last try. Wrong cells are outlined in white below."
+},
+{
+"id": "js:fig-puzzle.js:354:0",
+"file": "fig-puzzle.js",
+"line": 354,
+"lit": "Loading how the AI players did\u2026",
+"text": "Loading how the AI players did\u2026"
+},
+{
+"id": "js:fig-puzzle.js:357:0",
+"file": "fig-puzzle.js",
+"line": 357,
+"lit": "How the AI players did could not be loaded.",
+"text": "How the AI players did could not be loaded."
+},
+{
+"id": "js:fig-puzzle.js:359:4",
+"file": "fig-puzzle.js",
+"line": 359,
+"lit": "See every run\u2019s answer \u2192",
+"text": "See every run\u2019s answer \u2192"
+},
+{
+"id": "js:fig-results.js:21:2",
+"file": "fig-results.js",
+"line": 21,
+"lit": "assets/fig-results.css",
+"text": "assets/fig-results.css"
+},
+{
+"id": "js:fig-results.js:34:2",
+"file": "fig-results.js",
+"line": 34,
+"lit": "Self-improved coach",
+"text": "Self-improved coach"
+},
+{
+"id": "js:fig-results.js:35:1",
+"file": "fig-results.js",
+"line": 35,
+"lit": "Think longer (no coach)",
+"text": "Think longer (no coach)"
+},
+{
+"id": "js:fig-results.js:45:0",
+"file": "fig-results.js",
+"line": 45,
+"lit": "No coach, run ",
+"text": "No coach, run "
+},
+{
+"id": "js:fig-results.js:47:0",
+"file": "fig-results.js",
+"line": 47,
+"lit": "Original coach, run ",
+"text": "Original coach, run "
+},
+{
+"id": "js:fig-results.js:48:0",
+"file": "fig-results.js",
+"line": 48,
+"lit": "Self-improved coach from ",
+"text": "Self-improved coach from "
+},
+{
+"id": "js:fig-results.js:142:2",
+"file": "fig-results.js",
+"line": 142,
+"lit": "Self-improved coach",
+"text": "Self-improved coach"
+},
+{
+"id": "js:fig-results.js:142:3",
+"file": "fig-results.js",
+"line": 142,
+"lit": "Think longer, no coach",
+"text": "Think longer, no coach"
+},
+{
+"id": "js:fig-results.js:146:1",
+"file": "fig-results.js",
+"line": 146,
+"lit": "Exam score of every finished player. ",
+"text": "Exam score of every finished player. "
+},
+{
+"id": "js:fig-results.js:180:0",
+"file": "fig-results.js",
+"line": 180,
+"lit": "Exam score (share of 120 puzzles solved)",
+"text": "Exam score (share of 120 puzzles solved)"
+},
+{
+"id": "js:fig-results.js:180:1",
+"file": "fig-results.js",
+"line": 180,
+"lit": "Exam score: share of the 120 exam puzzles solved in two tries",
+"text": "Exam score: share of the 120 exam puzzles solved in two tries"
+},
+{
+"id": "js:fig-results.js:266:2",
+"file": "fig-results.js",
+"line": 266,
+"lit": "Self-improved coach",
+"text": "Self-improved coach"
+},
+{
+"id": "js:fig-results.js:267:2",
+"file": "fig-results.js",
+"line": 267,
+"lit": "Think longer, no coach",
+"text": "Think longer, no coach"
+},
+{
+"id": "js:fig-results.js:325:3",
+"file": "fig-results.js",
+"line": 325,
+"lit": "No kind of coach differs detectably from no coach",
+"text": "No kind of coach differs detectably from no coach"
+},
+{
+"id": "js:fig-results.js:332:5",
+"file": "fig-results.js",
+"line": 332,
+"lit": "Exam score of every final player, grouped by arm",
+"text": "Exam score of every final player, grouped by arm"
+},
+{
+"id": "js:fig-results.js:444:3",
+"file": "fig-results.js",
+"line": 444,
+"lit": " tokens per test input",
+"text": " tokens per test input"
+},
+{
+"id": "js:fig-results.js:448:1",
+"file": "fig-results.js",
+"line": 448,
+"lit": " tokens per test input",
+"text": " tokens per test input"
+},
+{
+"id": "js:fig-results.js:449:1",
+"file": "fig-results.js",
+"line": 449,
+"lit": " score per 10k tokens",
+"text": " score per 10k tokens"
+},
+{
+"id": "js:fig-results.js:453:0",
+"file": "fig-results.js",
+"line": 453,
+"lit": "Hover over, focus or tap a dot to read its run. Click or press Enter to pin it.",
+"text": "Hover over, focus or tap a dot to read its run. Click or press Enter to pin it."
+},
+{
+"id": "js:fig-results.js:456:2",
+"file": "fig-results.js",
+"line": 456,
+"lit": " tokens per test input",
+"text": " tokens per test input"
+},
+{
+"id": "js:fig-results.js:549:0",
+"file": "fig-results.js",
+"line": 549,
+"lit": "Exam score against ledger tokens per test input, one mark per final player",
+"text": "Exam score against ledger tokens per test input, one mark per final player"
+},
+{
+"id": "js:fig-results.js:550:1",
+"file": "fig-results.js",
+"line": 550,
+"lit": "Exam score per 10k ledger tokens, one dot per final player, grouped by arm",
+"text": "Exam score per 10k ledger tokens, one dot per final player, grouped by arm"
+},
+{
+"id": "js:fig-results.js:551:0",
+"file": "fig-results.js",
+"line": 551,
+"lit": "Exam score of every final player, grouped by arm, with arm means and 95% intervals",
+"text": "Exam score of every final player, grouped by arm, with arm means and 95% intervals"
+},
+{
+"id": "js:fig-results.js:578:1",
+"file": "fig-results.js",
+"line": 578,
+"lit": "exam score (share of 120 puzzles solved)",
+"text": "exam score (share of 120 puzzles solved)"
+},
+{
+"id": "js:fig-results.js:578:3",
+"file": "fig-results.js",
+"line": 578,
+"lit": "exam score per 10k tokens",
+"text": "exam score per 10k tokens"
+},
+{
+"id": "js:fig-results.js:586:1",
+"file": "fig-results.js",
+"line": 586,
+"lit": "no-coach range \u00b7 mean ",
+"text": "no-coach range \u00b7 mean "
+},
+{
+"id": "js:fig-results.js:586:2",
+"file": "fig-results.js",
+"line": 586,
+"lit": "no-coach range \u00b7 mean ",
+"text": "no-coach range \u00b7 mean "
+},
+{
+"id": "js:fig-results.js:597:0",
+"file": "fig-results.js",
+"line": 597,
+"lit": "no-coach range \u00b7 mean ",
+"text": "no-coach range \u00b7 mean "
+},
+{
+"id": "js:fig-results.js:656:0",
+"file": "fig-results.js",
+"line": 656,
+"lit": "Tokens are the gateway ledger\u2019s player tokens for the exam run, divided by its 167 test inputs. ",
+"text": "Tokens are the gateway ledger\u2019s player tokens for the exam run, divided by its 167 test inputs. "
+},
+{
+"id": "js:fig-results.js:657:1",
+"file": "fig-results.js",
+"line": 657,
+"lit": "Bars: arm mean and a 95% interval, for display only; the pre-registered comparisons are the Welch intervals ",
+"text": "Bars: arm mean and a 95% interval, for display only; the pre-registered comparisons are the Welch intervals "
+},
+{
+"id": "js:fig-results.js:658:3",
+"file": "fig-results.js",
+"line": 658,
+"lit": ". Shaded band: the range of the three no-coach runs. Tied scores are nudged apart vertically.",
+"text": ". Shaded band: the range of the three no-coach runs. Tied scores are nudged apart vertically."
+},
+{
+"id": "js:fig-results.js:659:1",
+"file": "fig-results.js",
+"line": 659,
+"lit": "Each run\u2019s exam score divided by its tokens per test input, per 10k tokens. ",
+"text": "Each run\u2019s exam score divided by its tokens per test input, per 10k tokens. "
+},
+{
+"id": "js:fig-results.js:660:0",
+"file": "fig-results.js",
+"line": 660,
+"lit": "Bars: arm mean and 95% interval (display only); \u25c2 \u25b8 mark an interval that runs off the scale.",
+"text": "Bars: arm mean and 95% interval (display only); \u25c2 \u25b8 mark an interval that runs off the scale."
+},
+{
+"id": "js:fig-results.js:661:0",
+"file": "fig-results.js",
+"line": 661,
+"lit": "y: exam score. Bars: each arm\u2019s 95% interval for score, drawn at its mean token use (display only). Every player had the same two-call budget, so the arms sit in one cluster.",
+"text": "y: exam score. Bars: each arm\u2019s 95% interval for score, drawn at its mean token use (display only). Every player had the same two-call budget, so the arms sit in one cluster."
+},
+{
+"id": "js:fig-results.js:669:3",
+"file": "fig-results.js",
+"line": 669,
+"lit": "The pre-registered comparisons",
+"text": "The pre-registered comparisons"
+},
+{
+"id": "js:fig-results.js:670:3",
+"file": "fig-results.js",
+"line": 670,
+"lit": "Differences in exam score, in points, with 95% Welch intervals. An interval that crosses 0 cannot be told apart from no effect.",
+"text": "Differences in exam score, in points, with 95% Welch intervals. An interval that crosses 0 cannot be told apart from no effect."
+},
+{
+"id": "js:fig-results.js:672:2",
+"file": "fig-results.js",
+"line": 672,
+"lit": "Original coach vs no coach",
+"text": "Original coach vs no coach"
+},
+{
+"id": "js:fig-results.js:673:2",
+"file": "fig-results.js",
+"line": 673,
+"lit": "Self-improved vs original coach",
+"text": "Self-improved vs original coach"
+},
+{
+"id": "js:fig-results.js:674:0",
+"file": "fig-results.js",
+"line": 674,
+"lit": "Ig_gain_over_B0",
+"text": "Ig_gain_over_B0"
+},
+{
+"id": "js:fig-results.js:674:2",
+"file": "fig-results.js",
+"line": 674,
+"lit": "Self-improved coach vs no coach",
+"text": "Self-improved coach vs no coach"
+},
+{
+"id": "js:fig-results.js:690:3",
+"file": "fig-results.js",
+"line": 690,
+"lit": "Crosses 0: no detectable difference.",
+"text": "Crosses 0: no detectable difference."
+},
+{
+"id": "js:fig-extension.js:15:2",
+"file": "fig-extension.js",
+"line": 15,
+"lit": "assets/fig-extension.css",
+"text": "assets/fig-extension.css"
+},
+{
+"id": "js:fig-extension.js:91:7",
+"file": "fig-extension.js",
+"line": 91,
+"lit": "Highlight one coach tested three times",
+"text": "Highlight one coach tested three times"
+},
+{
+"id": "js:fig-extension.js:107:0",
+"file": "fig-extension.js",
+"line": 107,
+"lit": "Hide the highlight",
+"text": "Hide the highlight"
+},
+{
+"id": "js:fig-extension.js:107:1",
+"file": "fig-extension.js",
+"line": 107,
+"lit": "Highlight one coach tested three times",
+"text": "Highlight one coach tested three times"
+},
+{
+"id": "js:fig-extension.js:109:0",
+"file": "fig-extension.js",
+"line": 109,
+"lit": "Highlighted: the same coach code, scored ",
+"text": "Highlighted: the same coach code, scored "
+},
+{
+"id": "js:fig-extension.js:109:2",
+"file": "fig-extension.js",
+"line": 109,
+"lit": ". The spread is noise.",
+"text": ". The spread is noise."
+},
+{
+"id": "js:fig-extension.js:118:1",
+"file": "fig-extension.js",
+"line": 118,
+"lit": "Average exam score by the generation the coach was taken from: ",
+"text": "Average exam score by the generation the coach was taken from: "
+},
+{
+"id": "js:fig-extension.js:146:1",
+"file": "fig-extension.js",
+"line": 146,
+"lit": " (band: its 3 runs)",
+"text": " (band: its 3 runs)"
+},
+{
+"id": "js:fig-extension.js:151:1",
+"file": "fig-extension.js",
+"line": 151,
+"lit": " (band: its 3 runs)",
+"text": " (band: its 3 runs)"
+},
+{
+"id": "js:fig-extension.js:157:1",
+"file": "fig-extension.js",
+"line": 157,
+"lit": "Think longer, no coach ",
+"text": "Think longer, no coach "
+},
+{
+"id": "js:fig-extension.js:180:2",
+"file": "fig-extension.js",
+"line": 180,
+"lit": ". This run\\'s final player was the untouched starting player",
+"text": ". This run's final player was the untouched starting player"
+},
+{
+"id": "js:fig-extension.js:200:1",
+"file": "fig-extension.js",
+"line": 200,
+"lit": "Ringed: one unchanged coach,",
+"text": "Ringed: one unchanged coach,"
+},
+{
+"id": "js:fig-extension.js:201:2",
+"file": "fig-extension.js",
+"line": 201,
+"lit": "tested 3 times. The spread is noise.",
+"text": "tested 3 times. The spread is noise."
+},
+{
+"id": "js:fig-extension.js:202:0",
+"file": "fig-extension.js",
+"line": 202,
+"lit": "Ringed: one unchanged coach, tested 3 times. The spread is noise.",
+"text": "Ringed: one unchanged coach, tested 3 times. The spread is noise."
+},
+{
+"id": "js:fig-extension.js:221:2",
+"file": "fig-extension.js",
+"line": 221,
+"lit": "self-improved coach (main test)",
+"text": "self-improved coach (main test)"
+},
+{
+"id": "js:fig-extension.js:233:0",
+"file": "fig-extension.js",
+"line": 233,
+"lit": "Generation the coach was picked at",
+"text": "Generation the coach was picked at"
+},
+{
+"id": "js:fig-extension.js:233:1",
+"file": "fig-extension.js",
+"line": 233,
+"lit": "Picked at generation",
+"text": "Picked at generation"
+},
+{
+"id": "js:fig-watch.js:19:2",
+"file": "fig-watch.js",
+"line": 19,
+"lit": "assets/fig-watch.css",
+"text": "assets/fig-watch.css"
+},
+{
+"id": "js:fig-watch.js:26:1",
+"file": "fig-watch.js",
+"line": 26,
+"lit": "Self-improved coach",
+"text": "Self-improved coach"
+},
+{
+"id": "js:fig-watch.js:26:2",
+"file": "fig-watch.js",
+"line": 26,
+"lit": "payoff_Ig_source_s1",
+"text": "payoff_Ig_source_s1"
+},
+{
+"id": "js:fig-watch.js:39:0",
+"file": "fig-watch.js",
+"line": 39,
+"lit": "800px 0px 800px 0px",
+"text": "800px 0px 800px 0px"
+},
+{
+"id": "js:fig-watch.js:87:1",
+"file": "fig-watch.js",
+"line": 87,
+"lit": "Exam puzzle and answers. Left and right arrow keys change the puzzle.",
+"text": "Exam puzzle and answers. Left and right arrow keys change the puzzle."
+},
+{
+"id": "js:fig-watch.js:175:0",
+"file": "fig-watch.js",
+"line": 175,
+"lit": "Counts every exam run of this kind on this test input",
+"text": "Counts every exam run of this kind on this test input"
+},
+{
+"id": "js:fig-watch.js:188:1",
+"file": "fig-watch.js",
+"line": 188,
+"lit": "\u00d7 same as try 1",
+"text": "\u00d7 same as try 1"
+},
+{
+"id": "js:fig-watch.js:202:0",
+"file": "fig-watch.js",
+"line": 202,
+"lit": "Back to puzzle 1",
+"text": "Back to puzzle 1"
+},
+{
+"id": "js:fig-watch.js:230:4",
+"file": "fig-watch.js",
+"line": 230,
+"lit": "Open this puzzle in Exam answers \u2192",
+"text": "Open this puzzle in Exam answers \u2192"
+},
+{
+"id": "js:fig-watch.js:278:0",
+"file": "fig-watch.js",
+"line": 278,
+"lit": "No puzzle matched the selection rule.",
+"text": "No puzzle matched the selection rule."
+},
+{
+"id": "js:fig-demo.js:15:2",
+"file": "fig-demo.js",
+"line": 15,
+"lit": "assets/fig-demo.css",
+"text": "assets/fig-demo.css"
+},
+{
+"id": "js:fig-demo.js:20:1",
+"file": "fig-demo.js",
+"line": 20,
+"lit": "The player tries",
+"text": "The player tries"
+},
+{
+"id": "js:fig-demo.js:21:1",
+"file": "fig-demo.js",
+"line": 21,
+"lit": "The coach looks at the misses",
+"text": "The coach looks at the misses"
+},
+{
+"id": "js:fig-demo.js:22:1",
+"file": "fig-demo.js",
+"line": 22,
+"lit": "The coach thinks and edits",
+"text": "The coach thinks and edits"
+},
+{
+"id": "js:fig-demo.js:23:1",
+"file": "fig-demo.js",
+"line": 23,
+"lit": "The player tries again",
+"text": "The player tries again"
+},
+{
+"id": "js:fig-demo.js:24:1",
+"file": "fig-demo.js",
+"line": 24,
+"lit": "Did it hold up?",
+"text": "Did it hold up?"
+},
+{
+"id": "js:fig-demo.js:27:1",
+"file": "fig-demo.js",
+"line": 27,
+"lit": "Solved more often after the edit",
+"text": "Solved more often after the edit"
+},
+{
+"id": "js:fig-demo.js:28:1",
+"file": "fig-demo.js",
+"line": 28,
+"lit": "Still wrong after the edit",
+"text": "Still wrong after the edit"
+},
+{
+"id": "js:fig-demo.js:33:0",
+"file": "fig-demo.js",
+"line": 33,
+"lit": "Looks around the code",
+"text": "Looks around the code"
+},
+{
+"id": "js:fig-demo.js:33:1",
+"file": "fig-demo.js",
+"line": 33,
+"lit": "Reads the run log and the code",
+"text": "Reads the run log and the code"
+},
+{
+"id": "js:fig-demo.js:33:2",
+"file": "fig-demo.js",
+"line": 33,
+"lit": "Reads how practice runs are scored",
+"text": "Reads how practice runs are scored"
+},
+{
+"id": "js:fig-demo.js:34:0",
+"file": "fig-demo.js",
+"line": 34,
+"lit": "Opens the practice report",
+"text": "Opens the practice report"
+},
+{
+"id": "js:fig-demo.js:34:1",
+"file": "fig-demo.js",
+"line": 34,
+"lit": "Skims the failure logs",
+"text": "Skims the failure logs"
+},
+{
+"id": "js:fig-demo.js:34:2",
+"file": "fig-demo.js",
+"line": 34,
+"lit": "Rewrites the prompt and the second try",
+"text": "Rewrites the prompt and the second try"
+},
+{
+"id": "js:fig-demo.js:35:0",
+"file": "fig-demo.js",
+"line": 35,
+"lit": "Rewords the review instruction",
+"text": "Rewords the review instruction"
+},
+{
+"id": "js:fig-demo.js:35:1",
+"file": "fig-demo.js",
+"line": 35,
+"lit": "Checks that the code still compiles",
+"text": "Checks that the code still compiles"
+},
+{
+"id": "js:fig-demo.js:35:2",
+"file": "fig-demo.js",
+"line": 35,
+"lit": "Describes its change",
+"text": "Describes its change"
+},
+{
+"id": "js:fig-demo.js:36:0",
+"file": "fig-demo.js",
+"line": 36,
+"lit": "Says it is done",
+"text": "Says it is done"
+},
+{
+"id": "js:fig-demo.js:42:0",
+"file": "fig-demo.js",
+"line": 42,
+"lit": "The summaries weigh several ideas, among them a path between the two red (2) cells and filling the regions that the blue (1) lines wall off. The correct answer is one yellow (4) path that winds between the blue lines from one red cell to the other. Try 1 came close to it; try 2 filled larger areas.",
+"text": "The summaries weigh several ideas, among them a path between the two red (2) cells and filling the regions that the blue (1) lines wall off. The correct answer is one yellow (4) path that winds between the blue lines from one red cell to the other. Try 1 came close to it; try 2 filled larger areas."
+},
+{
+"id": "js:fig-demo.js:43:0",
+"file": "fig-demo.js",
+"line": 43,
+"lit": "This time the summaries lean on filling regions and outer strips walled off by the blue (1) lines. The answer paints yellow (4) down the right edge and in blocks on the left instead of one path between the red (2) cells, and the review returned the same grid.",
+"text": "This time the summaries lean on filling regions and outer strips walled off by the blue (1) lines. The answer paints yellow (4) down the right edge and in blocks on the left instead of one path between the red (2) cells, and the review returned the same grid."
+},
+{
+"id": "js:fig-demo.js:48:0",
+"file": "fig-demo.js",
+"line": 48,
+"lit": "Right now, there are two direct calls repeating the same prompt, so I want to change that.",
+"text": "Right now, there are two direct calls repeating the same prompt, so I want to change that."
+},
+{
+"id": "js:fig-demo.js:49:0",
+"file": "fig-demo.js",
+"line": 49,
+"lit": "Instead, I should ask the model to critique the first candidate and validate it against training pairs.",
+"text": "Instead, I should ask the model to critique the first candidate and validate it against training pairs."
+},
+{
+"id": "js:fig-demo.js:111:3",
+"file": "fig-demo.js",
+"line": 111,
+"lit": "Loading the traced run\u2026",
+"text": "Loading the traced run\u2026"
+},
+{
+"id": "js:fig-demo.js:165:3",
+"file": "fig-demo.js",
+"line": 165,
+"lit": "Its reasoning summary",
+"text": "Its reasoning summary"
+},
+{
+"id": "js:fig-demo.js:167:3",
+"file": "fig-demo.js",
+"line": 167,
+"lit": "No reasoning summary came back for this call (the API returns one for only some calls).",
+"text": "No reasoning summary came back for this call (the API returns one for only some calls)."
+},
+{
+"id": "js:fig-demo.js:181:3",
+"file": "fig-demo.js",
+"line": 181,
+"lit": "Reasoning summary, full text",
+"text": "Reasoning summary, full text"
+},
+{
+"id": "js:fig-demo.js:187:2",
+"file": "fig-demo.js",
+"line": 187,
+"lit": "code wrap fxd-code ",
+"text": "code wrap fxd-code "
+},
+{
+"id": "js:fig-demo.js:206:0",
+"file": "fig-demo.js",
+"line": 206,
+"lit": "\u00d7 same as try 1, so the player sent only one answer",
+"text": "\u00d7 same as try 1, so the player sent only one answer"
+},
+{
+"id": "js:fig-demo.js:206:1",
+"file": "fig-demo.js",
+"line": 206,
+"lit": "\u00d7 same as try 1",
+"text": "\u00d7 same as try 1"
+},
+{
+"id": "js:fig-demo.js:224:3",
+"file": "fig-demo.js",
+"line": 224,
+"lit": "Our reading of its summaries and answers (not the model\\'s words)",
+"text": "Our reading of its summaries and answers (not the model's words)"
+},
+{
+"id": "js:fig-demo.js:232:4",
+"file": "fig-demo.js",
+"line": 232,
+"lit": "Colour key: the number behind each colour",
+"text": "Colour key: the number behind each colour"
+},
+{
+"id": "js:fig-demo.js:269:0",
+"file": "fig-demo.js",
+"line": 269,
+"lit": ", and only one answer was sent",
+"text": ", and only one answer was sent"
+},
+{
+"id": "js:fig-demo.js:275:4",
+"file": "fig-demo.js",
+"line": 275,
+"lit": ": a review of try 1",
+"text": ": a review of try 1"
+},
+{
+"id": "js:fig-demo.js:287:3",
+"file": "fig-demo.js",
+"line": 287,
+"lit": "No model calls were recorded for this run.",
+"text": "No model calls were recorded for this run."
+},
+{
+"id": "js:fig-demo.js:292:0",
+"file": "fig-demo.js",
+"line": 292,
+"lit": "The player sees the examples and the test input, then gets two tries. Wrong cells are outlined.",
+"text": "The player sees the examples and the test input, then gets two tries. Wrong cells are outlined."
+},
+{
+"id": "js:fig-demo.js:303:0",
+"file": "fig-demo.js",
+"line": 303,
+"lit": "Before editing, the coach gets the practice report: which puzzles the player solved and a log of each miss. Here is what it actually looked at.",
+"text": "Before editing, the coach gets the practice report: which puzzles the player solved and a log of each miss. Here is what it actually looked at."
+},
+{
+"id": "js:fig-demo.js:305:3",
+"file": "fig-demo.js",
+"line": 305,
+"lit": "The practice report: ",
+"text": "The practice report: "
+},
+{
+"id": "js:fig-demo.js:306:4",
+"file": "fig-demo.js",
+"line": 306,
+"lit": "Practice puzzles, solved or missed",
+"text": "Practice puzzles, solved or missed"
+},
+{
+"id": "js:fig-demo.js:313:3",
+"file": "fig-demo.js",
+"line": 313,
+"lit": "The outlined square is this puzzle.",
+"text": "The outlined square is this puzzle."
+},
+{
+"id": "js:fig-demo.js:320:3",
+"file": "fig-demo.js",
+"line": 320,
+"lit": "What it looked at",
+"text": "What it looked at"
+},
+{
+"id": "js:fig-demo.js:321:0",
+"file": "fig-demo.js",
+"line": 321,
+"lit": "Each of the ",
+"text": "Each of the "
+},
+{
+"id": "js:fig-demo.js:321:1",
+"file": "fig-demo.js",
+"line": 321,
+"lit": " missed puzzles, this one included, has a log of the player\\'s prompts and answers. ",
+"text": " missed puzzles, this one included, has a log of the player's prompts and answers. "
+},
+{
+"id": "js:fig-demo.js:324:0",
+"file": "fig-demo.js",
+"line": 324,
+"lit": "The coach named ",
+"text": "The coach named "
+},
+{
+"id": "js:fig-demo.js:325:0",
+"file": "fig-demo.js",
+"line": 325,
+"lit": " in one command (turn ",
+"text": " in one command (turn "
+},
+{
+"id": "js:fig-demo.js:325:1",
+"file": "fig-demo.js",
+"line": 325,
+"lit": "), but from each it printed only the lines that start with \"Input:\" or \"Output:\" or contain \"Error:\"",
+"text": "), but from each it printed only the lines that start with \"Input:\" or \"Output:\" or contain \"Error:\""
+},
+{
+"id": "js:fig-demo.js:326:3",
+"file": "fig-demo.js",
+"line": 326,
+"lit": ", each cut to ",
+"text": ", each cut to "
+},
+{
+"id": "js:fig-demo.js:327:0",
+"file": "fig-demo.js",
+"line": 327,
+"lit": "A prompt runs over many lines, so it saw only its first line, the same opening sentence for every puzzle, and the start of each answer. ",
+"text": "A prompt runs over many lines, so it saw only its first line, the same opening sentence for every puzzle, and the start of each answer. "
+},
+{
+"id": "js:fig-demo.js:328:0",
+"file": "fig-demo.js",
+"line": 328,
+"lit": "It saw no examples, no test input and no correct answer, so these lines could not show it what went wrong.",
+"text": "It saw no examples, no test input and no correct answer, so these lines could not show it what went wrong."
+},
+{
+"id": "js:fig-demo.js:330:0",
+"file": "fig-demo.js",
+"line": 330,
+"lit": "No command that opened these logs was found in the trace.",
+"text": "No command that opened these logs was found in the trace."
+},
+{
+"id": "js:fig-demo.js:336:3",
+"file": "fig-demo.js",
+"line": 336,
+"lit": "Everything it printed from this puzzle\\'s log (line number, then the line)",
+"text": "Everything it printed from this puzzle's log (line number, then the line)"
+},
+{
+"id": "js:fig-demo.js:337:1",
+"file": "fig-demo.js",
+"line": 337,
+"lit": "What the coach saw of this puzzle\\'s log",
+"text": "What the coach saw of this puzzle's log"
+},
+{
+"id": "js:fig-demo.js:339:3",
+"file": "fig-demo.js",
+"line": 339,
+"lit": "The same command also printed the puzzle README, the helper code and lines of the scoring code. Its reasoning summary for that turn is mostly about those.",
+"text": "The same command also printed the puzzle README, the helper code and lines of the scoring code. Its reasoning summary for that turn is mostly about those."
+},
+{
+"id": "js:fig-demo.js:340:0",
+"file": "fig-demo.js",
+"line": 340,
+"lit": "Its reasoning summary in that turn",
+"text": "Its reasoning summary in that turn"
+},
+{
+"id": "js:fig-demo.js:341:3",
+"file": "fig-demo.js",
+"line": 341,
+"lit": "The command it ran",
+"text": "The command it ran"
+},
+{
+"id": "js:fig-demo.js:342:1",
+"file": "fig-demo.js",
+"line": 342,
+"lit": "Command in turn ",
+"text": "Command in turn "
+},
+{
+"id": "js:fig-demo.js:343:0",
+"file": "fig-demo.js",
+"line": 343,
+"lit": "Show everything the command printed",
+"text": "Show everything the command printed"
+},
+{
+"id": "js:fig-demo.js:344:4",
+"file": "fig-demo.js",
+"line": 344,
+"lit": ". The coach saw all of it.",
+"text": ". The coach saw all of it."
+},
+{
+"id": "js:fig-demo.js:345:2",
+"file": "fig-demo.js",
+"line": 345,
+"lit": "Output of turn ",
+"text": "Output of turn "
+},
+{
+"id": "js:fig-demo.js:353:0",
+"file": "fig-demo.js",
+"line": 353,
+"lit": "The coach edits the player\\'s code. First what it changed, then how it got there.",
+"text": "The coach edits the player's code. First what it changed, then how it got there."
+},
+{
+"id": "js:fig-demo.js:356:3",
+"file": "fig-demo.js",
+"line": 356,
+"lit": "What it changed",
+"text": "What it changed"
+},
+{
+"id": "js:fig-demo.js:358:3",
+"file": "fig-demo.js",
+"line": 358,
+"lit": "No summary of the edit was written.",
+"text": "No summary of the edit was written."
+},
+{
+"id": "js:fig-demo.js:359:3",
+"file": "fig-demo.js",
+"line": 359,
+"lit": "Our plain-language summary of the code change.",
+"text": "Our plain-language summary of the code change."
+},
+{
+"id": "js:fig-demo.js:363:3",
+"file": "fig-demo.js",
+"line": 363,
+"lit": "Why, in its reasoning summary (turn ",
+"text": "Why, in its reasoning summary (turn "
+},
+{
+"id": "js:fig-demo.js:368:3",
+"file": "fig-demo.js",
+"line": 368,
+"lit": "On the 25 practice puzzles the original player scored ",
+"text": "On the 25 practice puzzles the original player scored "
+},
+{
+"id": "js:fig-demo.js:369:0",
+"file": "fig-demo.js",
+"line": 369,
+"lit": ". In the round\\'s own check of the edited player it scored ",
+"text": ". In the round's own check of the edited player it scored "
+},
+{
+"id": "js:fig-demo.js:370:0",
+"file": "fig-demo.js",
+"line": 370,
+"lit": ": one puzzle more, from one run each, which is within run-to-run noise. In that check it ",
+"text": ": one puzzle more, from one run each, which is within run-to-run noise. In that check it "
+},
+{
+"id": "js:fig-demo.js:373:0",
+"file": "fig-demo.js",
+"line": 373,
+"lit": "Show code change",
+"text": "Show code change"
+},
+{
+"id": "js:fig-demo.js:382:3",
+"file": "fig-demo.js",
+"line": 382,
+"lit": "How it got there, in ",
+"text": "How it got there, in "
+},
+{
+"id": "js:fig-demo.js:383:3",
+"file": "fig-demo.js",
+"line": 383,
+"lit": "In each turn the coach reasons, then may run one command on the player\\'s code. Turn names are our labels for each command. Reasoning summaries are shown as the API returned them; they are lossy and sometimes garbled.",
+"text": "In each turn the coach reasons, then may run one command on the player's code. Turn names are our labels for each command. Reasoning summaries are shown as the API returned them; they are lossy and sometimes garbled."
+},
+{
+"id": "js:fig-demo.js:389:3",
+"file": "fig-demo.js",
+"line": 389,
+"lit": "No reasoning summary came back for this turn.",
+"text": "No reasoning summary came back for this turn."
+},
+{
+"id": "js:fig-demo.js:395:0",
+"file": "fig-demo.js",
+"line": 395,
+"lit": "Show the command and what it printed",
+"text": "Show the command and what it printed"
+},
+{
+"id": "js:fig-demo.js:395:1",
+"file": "fig-demo.js",
+"line": 395,
+"lit": "Show the command",
+"text": "Show the command"
+},
+{
+"id": "js:fig-demo.js:396:3",
+"file": "fig-demo.js",
+"line": 396,
+"lit": "The command it ran",
+"text": "The command it ran"
+},
+{
+"id": "js:fig-demo.js:397:1",
+"file": "fig-demo.js",
+"line": 397,
+"lit": "Command in turn ",
+"text": "Command in turn "
+},
+{
+"id": "js:fig-demo.js:399:3",
+"file": "fig-demo.js",
+"line": 399,
+"lit": "What it printed",
+"text": "What it printed"
+},
+{
+"id": "js:fig-demo.js:399:5",
+"file": "fig-demo.js",
+"line": 399,
+"lit": "; the coach saw all of it)",
+"text": "; the coach saw all of it)"
+},
+{
+"id": "js:fig-demo.js:400:1",
+"file": "fig-demo.js",
+"line": 400,
+"lit": "Output of turn ",
+"text": "Output of turn "
+},
+{
+"id": "js:fig-demo.js:404:0",
+"file": "fig-demo.js",
+"line": 404,
+"lit": "Show the reminder the harness sent back (the coach ran no command this turn)",
+"text": "Show the reminder the harness sent back (the coach ran no command this turn)"
+},
+{
+"id": "js:fig-demo.js:405:1",
+"file": "fig-demo.js",
+"line": 405,
+"lit": "Reminder after turn ",
+"text": "Reminder after turn "
+},
+{
+"id": "js:fig-demo.js:408:3",
+"file": "fig-demo.js",
+"line": 408,
+"lit": "The round ends here.",
+"text": "The round ends here."
+},
+{
+"id": "js:fig-demo.js:417:0",
+"file": "fig-demo.js",
+"line": 417,
+"lit": " made no edit",
+"text": " made no edit"
+},
+{
+"id": "js:fig-demo.js:418:0",
+"file": "fig-demo.js",
+"line": 418,
+"lit": " broke the player so that it scored 0",
+"text": " broke the player so that it scored 0"
+},
+{
+"id": "js:fig-demo.js:419:4",
+"file": "fig-demo.js",
+"line": 419,
+"lit": " coaching rounds for this demo. Of the other ",
+"text": " coaching rounds for this demo. Of the other "
+},
+{
+"id": "js:fig-demo.js:420:2",
+"file": "fig-demo.js",
+"line": 420,
+"lit": ". This is the only one that changed the player without breaking it.",
+"text": ". This is the only one that changed the player without breaking it."
+},
+{
+"id": "js:fig-demo.js:426:0",
+"file": "fig-demo.js",
+"line": 426,
+"lit": "The edited player gets the same puzzle and the same two tries. This is a separate run made after the round",
+"text": "The edited player gets the same puzzle and the same two tries. This is a separate run made after the round"
+},
+{
+"id": "js:fig-demo.js:427:1",
+"file": "fig-demo.js",
+"line": 427,
+"lit": " on the practice puzzles)",
+"text": " on the practice puzzles)"
+},
+{
+"id": "js:fig-demo.js:428:0",
+"file": "fig-demo.js",
+"line": 428,
+"lit": "; in the round\\'s own practice check (",
+"text": "; in the round's own practice check ("
+},
+{
+"id": "js:fig-demo.js:428:1",
+"file": "fig-demo.js",
+"line": 428,
+"lit": ") the edited player ",
+"text": ") the edited player "
+},
+{
+"id": "js:fig-demo.js:433:0",
+"file": "fig-demo.js",
+"line": 433,
+"lit": "[its first answer]",
+"text": "[its first answer]"
+},
+{
+"id": "js:fig-demo.js:437:3",
+"file": "fig-demo.js",
+"line": 437,
+"lit": "New since the edit: try 2 is a review. Its prompt ends with",
+"text": "New since the edit: try 2 is a review. Its prompt ends with"
+},
+{
+"id": "js:fig-demo.js:445:0",
+"file": "fig-demo.js",
+"line": 445,
+"lit": "Try 1 gave the same wrong grid as try 1 before the edit. It is a new call that happened to give the same answer.",
+"text": "Try 1 gave the same wrong grid as try 1 before the edit. It is a new call that happened to give the same answer."
+},
+{
+"id": "js:fig-demo.js:448:0",
+"file": "fig-demo.js",
+"line": 448,
+"lit": "Its closest answer is further off than before the edit: ",
+"text": "Its closest answer is further off than before the edit: "
+},
+{
+"id": "js:fig-demo.js:455:0",
+"file": "fig-demo.js",
+"line": 455,
+"lit": "Runs are not deterministic: the same player can solve a puzzle once and miss it the next time. So we ran each player on this puzzle ",
+"text": "Runs are not deterministic: the same player can solve a puzzle once and miss it the next time. So we ran each player on this puzzle "
+},
+{
+"id": "js:fig-demo.js:489:0",
+"file": "fig-demo.js",
+"line": 489,
+"lit": "The original player solved this puzzle in ",
+"text": "The original player solved this puzzle in "
+},
+{
+"id": "js:fig-demo.js:489:2",
+"file": "fig-demo.js",
+"line": 489,
+"lit": " runs; the edited player in ",
+"text": " runs; the edited player in "
+},
+{
+"id": "js:fig-demo.js:490:0",
+"file": "fig-demo.js",
+"line": 490,
+"lit": " Every one of the edited player\\'s solves came the same way: try 1 was wrong and the review in try 2 fixed it.",
+"text": " Every one of the edited player's solves came the same way: try 1 was wrong and the review in try 2 fixed it."
+},
+{
+"id": "js:fig-demo.js:497:0",
+"file": "fig-demo.js",
+"line": 497,
+"lit": " traced runs of the edited player, the review returned the same wrong grid as try 1, so it sent one answer instead of two.",
+"text": " traced runs of the edited player, the review returned the same wrong grid as try 1, so it sent one answer instead of two."
+},
+{
+"id": "js:fig-demo.js:498:0",
+"file": "fig-demo.js",
+"line": 498,
+"lit": " The original player\\'s ",
+"text": " The original player's "
+},
+{
+"id": "js:fig-demo.js:498:3",
+"file": "fig-demo.js",
+"line": 498,
+"lit": " came from its second try, an independent attempt that the edit replaced with the review.",
+"text": " came from its second try, an independent attempt that the edit replaced with the review."
+},
+{
+"id": "js:fig-demo.js:500:0",
+"file": "fig-demo.js",
+"line": 500,
+"lit": " The original player\\'s ",
+"text": " The original player's "
+},
+{
+"id": "js:fig-demo.js:500:3",
+"file": "fig-demo.js",
+"line": 500,
+"lit": " came on try 1.",
+"text": " came on try 1."
+},
+{
+"id": "js:fig-demo.js:504:3",
+"file": "fig-demo.js",
+"line": 504,
+"lit": "\"Round\\'s check\" is the edited player\\'s run in the coaching round\\'s own practice check (72% overall); only its score is shown here.",
+"text": "\"Round's check\" is the edited player's run in the coaching round's own practice check (72% overall); only its score is shown here."
+},
+{
+"id": "js:fig-demo.js:506:5",
+"file": "fig-demo.js",
+"line": 506,
+"lit": " runs each, and two puzzles picked to illustrate, this shows how the edit works, not whether it helps on average.",
+"text": " runs each, and two puzzles picked to illustrate, this shows how the edit works, not whether it helps on average."
+},
+{
+"id": "js:fig-demo.js:508:3",
+"file": "fig-demo.js",
+"line": 508,
+"lit": "This traced demo cost ",
+"text": "This traced demo cost "
+},
+{
+"id": "js:fig-demo.js:508:4",
+"file": "fig-demo.js",
+"line": 508,
+"lit": " in model calls. It is not part of the experiment\\'s results.",
+"text": " in model calls. It is not part of the experiment's results."
+},
+{
+"id": "js:fig-demo.js:523:0",
+"file": "fig-demo.js",
+"line": 523,
+"lit": "See the puzzle that stayed wrong \u2192",
+"text": "See the puzzle that stayed wrong \u2192"
+},
+{
+"id": "js:fig-demo.js:523:1",
+"file": "fig-demo.js",
+"line": 523,
+"lit": "Back to the start",
+"text": "Back to the start"
+},
+{
+"id": "js:fig-demo.js:543:1",
+"file": "fig-demo.js",
+"line": 543,
+"lit": "Notes on these traces",
+"text": "Notes on these traces"
+},
+{
+"id": "js:fig-tree.js:103:0",
+"file": "fig-tree.js",
+"line": 103,
+"lit": " generations \u00b7 the coach changed its own code in ",
+"text": " generations \u00b7 the coach changed its own code in "
+},
+{
+"id": "js:fig-tree.js:105:0",
+"file": "fig-tree.js",
+"line": 105,
+"lit": "no coach qualified for testing at gen ",
+"text": "no coach qualified for testing at gen "
+},
+{
+"id": "js:fig-tree.js:106:1",
+"file": "fig-tree.js",
+"line": 106,
+"lit": " of its coaches were tested",
+"text": " of its coaches were tested"
+},
+{
+"id": "js:fig-tree.js:113:1",
+"file": "fig-tree.js",
+"line": 113,
+"lit": "nothing (the starting code)",
+"text": "nothing (the starting code)"
+},
+{
+"id": "js:fig-tree.js:115:0",
+"file": "fig-tree.js",
+"line": 115,
+"lit": " (but it failed checks)",
+"text": " (but it failed checks)"
+},
+{
+"id": "js:fig-tree.js:115:1",
+"file": "fig-tree.js",
+"line": 115,
+"lit": "nothing saved (the edit failed checks)",
+"text": "nothing saved (the edit failed checks)"
+},
+{
+"id": "js:fig-tree.js:120:0",
+"file": "fig-tree.js",
+"line": 120,
+"lit": "rejected: failed checks (had scored ",
+"text": "rejected: failed checks (had scored "
+},
+{
+"id": "js:fig-tree.js:120:2",
+"file": "fig-tree.js",
+"line": 120,
+"lit": "failed checks, not scored",
+"text": "failed checks, not scored"
+},
+{
+"id": "js:fig-tree.js:155:3",
+"file": "fig-tree.js",
+"line": 155,
+"lit": "Six independent tries of the same self-improvement loop. Each started from the same coach and player, and each evolved differently. All six ran 12 generations; runs 1 to 4 were then extended to 40, as planned in the follow-up design (fixed before any follow-up result).",
+"text": "Six independent tries of the same self-improvement loop. Each started from the same coach and player, and each evolved differently. All six ran 12 generations; runs 1 to 4 were then extended to 40, as planned in the follow-up design (fixed before any follow-up result)."
+},
+{
+"id": "js:fig-tree.js:156:5",
+"file": "fig-tree.js",
+"line": 156,
+"lit": "Self-improvement run",
+"text": "Self-improvement run"
+},
+{
+"id": "js:fig-tree.js:209:1",
+"file": "fig-tree.js",
+"line": 209,
+"lit": "Practice score by generation in run ",
+"text": "Practice score by generation in run "
+},
+{
+"id": "js:fig-tree.js:209:3",
+"file": "fig-tree.js",
+"line": 209,
+"lit": " versions. Tab here, then arrow keys move between versions, up goes to the parent, Enter picks, Escape clears.",
+"text": " versions. Tab here, then arrow keys move between versions, up goes to the parent, Enter picks, Escape clears."
+},
+{
+"id": "js:fig-tree.js:221:6",
+"file": "fig-tree.js",
+"line": 221,
+"lit": " was not extended past gen ",
+"text": " was not extended past gen "
+},
+{
+"id": "js:fig-tree.js:240:7",
+"file": "fig-tree.js",
+"line": 240,
+"lit": "best in this run ",
+"text": "best in this run "
+},
+{
+"id": "js:fig-tree.js:274:0",
+"file": "fig-tree.js",
+"line": 274,
+"lit": ", the coach changed its own code",
+"text": ", the coach changed its own code"
+},
+{
+"id": "js:fig-tree.js:305:0",
+"file": "fig-tree.js",
+"line": 305,
+"lit": "best in this run ",
+"text": "best in this run "
+},
+{
+"id": "js:fig-tree.js:305:1",
+"file": "fig-tree.js",
+"line": 305,
+"lit": ", with this coach",
+"text": ", with this coach"
+},
+{
+"id": "js:fig-tree.js:308:0",
+"file": "fig-tree.js",
+"line": 308,
+"lit": "best with this coach ",
+"text": "best with this coach "
+},
+{
+"id": "js:fig-tree.js:355:1",
+"file": "fig-tree.js",
+"line": 355,
+"lit": "Best practice score",
+"text": "Best practice score"
+},
+{
+"id": "js:fig-tree.js:358:3",
+"file": "fig-tree.js",
+"line": 358,
+"lit": "Pick a dot to see how its coach did.",
+"text": "Pick a dot to see how its coach did."
+},
+{
+"id": "js:fig-tree.js:371:2",
+"file": "fig-tree.js",
+"line": 371,
+"lit": "Its coach is the original coach.",
+"text": "Its coach is the original coach."
+},
+{
+"id": "js:fig-tree.js:371:3",
+"file": "fig-tree.js",
+"line": 371,
+"lit": "Its coach is the original, unchanged coach.",
+"text": "Its coach is the original, unchanged coach."
+},
+{
+"id": "js:fig-tree.js:372:0",
+"file": "fig-tree.js",
+"line": 372,
+"lit": "Its coach is new: the coach changed itself here.",
+"text": "Its coach is new: the coach changed itself here."
+},
+{
+"id": "js:fig-tree.js:373:0",
+"file": "fig-tree.js",
+"line": 373,
+"lit": "Its coach came from version ",
+"text": "Its coach came from version "
+},
+{
+"id": "js:fig-tree.js:375:0",
+"file": "fig-tree.js",
+"line": 375,
+"lit": " Nothing was built on it.",
+"text": " Nothing was built on it."
+},
+{
+"id": "js:fig-tree.js:379:3",
+"file": "fig-tree.js",
+"line": 379,
+"lit": "none passed the checks.",
+"text": "none passed the checks."
+},
+{
+"id": "js:fig-tree.js:379:4",
+"file": "fig-tree.js",
+"line": 379,
+"lit": "it failed the checks.",
+"text": "it failed the checks."
+},
+{
+"id": "js:fig-tree.js:380:0",
+"file": "fig-tree.js",
+"line": 380,
+"lit": "their best score reached ",
+"text": "their best score reached "
+},
+{
+"id": "js:fig-tree.js:381:0",
+"file": "fig-tree.js",
+"line": 381,
+"lit": "their best score climbed from ",
+"text": "their best score climbed from "
+},
+{
+"id": "js:fig-tree.js:382:0",
+"file": "fig-tree.js",
+"line": 382,
+"lit": "none beat its own ",
+"text": "none beat its own "
+},
+{
+"id": "js:fig-tree.js:387:6",
+"file": "fig-tree.js",
+"line": 387,
+"lit": "Hide code change",
+"text": "Hide code change"
+},
+{
+"id": "js:fig-tree.js:387:7",
+"file": "fig-tree.js",
+"line": 387,
+"lit": "Show code change",
+"text": "Show code change"
+},
+{
+"id": "js:fig-tree.js:395:4",
+"file": "fig-tree.js",
+"line": 395,
+"lit": "Read coach transcript",
+"text": "Read coach transcript"
+},
+{
+"id": "js:fig-tree.js:412:3",
+"file": "fig-tree.js",
+"line": 412,
+"lit": "What happened when we froze this coach and gave a fresh player 8 rounds",
+"text": "What happened when we froze this coach and gave a fresh player 8 rounds"
+},
+{
+"id": "js:fig-tree.js:413:3",
+"file": "fig-tree.js",
+"line": 413,
+"lit": "Pick a dot above to see its coach here.",
+"text": "Pick a dot above to see its coach here."
+},
+{
+"id": "js:fig-tree.js:417:4",
+"file": "fig-tree.js",
+"line": 417,
+"lit": "This version\u2019s coach (from version ",
+"text": "This version\u2019s coach (from version "
+},
+{
+"id": "js:fig-tree.js:418:0",
+"file": "fig-tree.js",
+"line": 418,
+"lit": " was never frozen and tested. Only the coaches picked by the rule were tested: the blue diamonds.",
+"text": " was never frozen and tested. Only the coaches picked by the rule were tested: the blue diamonds."
+},
+{
+"id": "js:fig-tree.js:425:0",
+"file": "fig-tree.js",
+"line": 425,
+"lit": "The original coach was tested ",
+"text": "The original coach was tested "
+},
+{
+"id": "js:fig-tree.js:425:1",
+"file": "fig-tree.js",
+"line": 425,
+"lit": " times. Its final players scored ",
+"text": " times. Its final players scored "
+},
+{
+"id": "js:fig-tree.js:426:0",
+"file": "fig-tree.js",
+"line": 426,
+"lit": " on the exam (120 new puzzles). Every self-improved coach is compared with this.",
+"text": " on the exam (120 new puzzles). Every self-improved coach is compared with this."
+},
+{
+"id": "js:fig-tree.js:430:0",
+"file": "fig-tree.js",
+"line": 430,
+"lit": "Made at generation ",
+"text": "Made at generation "
+},
+{
+"id": "js:fig-tree.js:431:0",
+"file": "fig-tree.js",
+"line": 431,
+"lit": "by the rule at gen ",
+"text": "by the rule at gen "
+},
+{
+"id": "js:fig-tree.js:432:0",
+"file": "fig-tree.js",
+"line": 432,
+"lit": "by the fallback rule at gen ",
+"text": "by the fallback rule at gen "
+},
+{
+"id": "js:fig-tree.js:432:1",
+"file": "fig-tree.js",
+"line": 432,
+"lit": " (no coach qualified, so it took the one with the most versions built on it)",
+"text": " (no coach qualified, so it took the one with the most versions built on it)"
+},
+{
+"id": "js:fig-tree.js:434:0",
+"file": "fig-tree.js",
+"line": 434,
+"lit": ". On the exam (120 new puzzles) its final player",
+"text": ". On the exam (120 new puzzles) its final player"
+},
+{
+"id": "js:fig-tree.js:435:0",
+"file": "fig-tree.js",
+"line": 435,
+"lit": "; the original coach\u2019s scored ",
+"text": "; the original coach\u2019s scored "
+},
+{
+"id": "js:fig-tree.js:442:4",
+"file": "fig-tree.js",
+"line": 442,
+"lit": "picked at gen ",
+"text": "picked at gen "
+},
+{
+"id": "js:fig-tree.js:459:3",
+"file": "fig-tree.js",
+"line": 459,
+"lit": "Best practice score so far",
+"text": "Best practice score so far"
+},
+{
+"id": "js:fig-tree.js:502:1",
+"file": "fig-tree.js",
+"line": 502,
+"lit": "Code change in ",
+"text": "Code change in "
+},
+{
+"id": "js:fig-tree.js:504:4",
+"file": "fig-tree.js",
+"line": 504,
+"lit": "Code change in ",
+"text": "Code change in "
+},
+{
+"id": "js:fig-replay.js:3:0",
+"file": "fig-replay.js",
+"line": 3,
+"lit": "s examples, then the test input, the truth and one run",
+"text": "s examples, then the test input, the truth and one run"
+},
+{
+"id": "js:fig-replay.js:50:0",
+"file": "fig-replay.js",
+"line": 50,
+"lit": "Loading the exam answers\u2026",
+"text": "Loading the exam answers\u2026"
+},
+{
+"id": "js:fig-replay.js:88:4",
+"file": "fig-replay.js",
+"line": 88,
+"lit": "Search puzzle id",
+"text": "Search puzzle id"
+},
+{
+"id": "js:fig-replay.js:88:6",
+"file": "fig-replay.js",
+"line": 88,
+"lit": "Search exam puzzles by id",
+"text": "Search exam puzzles by id"
+},
+{
+"id": "js:fig-replay.js:102:3",
+"file": "fig-replay.js",
+"line": 102,
+"lit": ". The bar and number: how many of the ",
+"text": ". The bar and number: how many of the "
+},
+{
+"id": "js:fig-replay.js:102:4",
+"file": "fig-replay.js",
+"line": 102,
+"lit": " runs solved it.",
+"text": " runs solved it."
+},
+{
+"id": "js:fig-replay.js:103:3",
+"file": "fig-replay.js",
+"line": 103,
+"lit": "No puzzle matches.",
+"text": "No puzzle matches."
+},
+{
+"id": "js:fig-replay.js:135:1",
+"file": "fig-replay.js",
+"line": 135,
+"lit": "Run whose answers are shown",
+"text": "Run whose answers are shown"
+},
+{
+"id": "js:fig-replay.js:148:2",
+"file": "fig-replay.js",
+"line": 148,
+"lit": "Solved by no run",
+"text": "Solved by no run"
+},
+{
+"id": "js:fig-replay.js:149:2",
+"file": "fig-replay.js",
+"line": 149,
+"lit": "Solved by some runs",
+"text": "Solved by some runs"
+},
+{
+"id": "js:fig-replay.js:150:2",
+"file": "fig-replay.js",
+"line": 150,
+"lit": "Solved by every run",
+"text": "Solved by every run"
+},
+{
+"id": "js:fig-replay.js:151:0",
+"file": "fig-replay.js",
+"line": 151,
+"lit": "Runs that solved it",
+"text": "Runs that solved it"
+},
+{
+"id": "js:fig-replay.js:154:1",
+"file": "fig-replay.js",
+"line": 154,
+"lit": "Most solved first",
+"text": "Most solved first"
+},
+{
+"id": "js:fig-replay.js:155:1",
+"file": "fig-replay.js",
+"line": 155,
+"lit": "Least solved first",
+"text": "Least solved first"
+},
+{
+"id": "js:fig-replay.js:157:3",
+"file": "fig-replay.js",
+"line": 157,
+"lit": "\u201cSolved\u201d means the run solved every test input of the puzzle.",
+"text": "\u201cSolved\u201d means the run solved every test input of the puzzle."
+},
+{
+"id": "js:fig-replay.js:158:4",
+"file": "fig-replay.js",
+"line": 158,
+"lit": " runs, try 1 and try 2",
+"text": " runs, try 1 and try 2"
+},
+{
+"id": "js:fig-replay.js:272:3",
+"file": "fig-replay.js",
+"line": 272,
+"lit": "Dashed squares: the ",
+"text": "Dashed squares: the "
+},
+{
+"id": "js:fig-replay.js:272:4",
+"file": "fig-replay.js",
+"line": 272,
+"lit": " runs whose answer grids were not kept (right/wrong only).",
+"text": " runs whose answer grids were not kept (right/wrong only)."
+},
+{
+"id": "js:fig-transcripts.js:78:0",
+"file": "fig-transcripts.js",
+"line": 78,
+"lit": "Self-improvement runs",
+"text": "Self-improvement runs"
+},
+{
+"id": "js:fig-transcripts.js:78:2",
+"file": "fig-transcripts.js",
+"line": 78,
+"lit": "Self-improved coach",
+"text": "Self-improved coach"
+},
+{
+"id": "js:fig-transcripts.js:78:5",
+"file": "fig-transcripts.js",
+"line": 78,
+"lit": "Short test runs",
+"text": "Short test runs"
+},
+{
+"id": "js:fig-transcripts.js:83:0",
+"file": "fig-transcripts.js",
+"line": 83,
+"lit": "Trial of the self-improved coach from run ",
+"text": "Trial of the self-improved coach from run "
+},
+{
+"id": "js:fig-transcripts.js:262:1",
+"file": "fig-transcripts.js",
+"line": 262,
+"lit": "Two model calls (refine or verify)",
+"text": "Two model calls (refine or verify)"
+},
+{
+"id": "js:fig-transcripts.js:264:1",
+"file": "fig-transcripts.js",
+"line": 264,
+"lit": "Same puzzle across generations",
+"text": "Same puzzle across generations"
+},
+{
+"id": "js:fig-transcripts.js:266:1",
+"file": "fig-transcripts.js",
+"line": 266,
+"lit": "Solved (answer only)",
+"text": "Solved (answer only)"
+},
+{
+"id": "js:fig-transcripts.js:269:1",
+"file": "fig-transcripts.js",
+"line": 269,
+"lit": "Back to one transcript",
+"text": "Back to one transcript"
+},
+{
+"id": "js:fig-transcripts.js:269:2",
+"file": "fig-transcripts.js",
+"line": 269,
+"lit": "Evolution series view",
+"text": "Evolution series view"
+},
+{
+"id": "js:fig-transcripts.js:273:5",
+"file": "fig-transcripts.js",
+"line": 273,
+"lit": "Show all turns",
+"text": "Show all turns"
+},
+{
+"id": "js:fig-transcripts.js:273:6",
+"file": "fig-transcripts.js",
+"line": 273,
+"lit": "Replay step by step",
+"text": "Replay step by step"
+},
+{
+"id": "js:fig-transcripts.js:299:3",
+"file": "fig-transcripts.js",
+"line": 299,
+"lit": "Saved player transcripts are all failed attempts; solved ones show the answer only.",
+"text": "Saved player transcripts are all failed attempts; solved ones show the answer only."
+},
+{
+"id": "js:fig-transcripts.js:301:3",
+"file": "fig-transcripts.js",
+"line": 301,
+"lit": "No transcripts match these filters.",
+"text": "No transcripts match these filters."
+},
+{
+"id": "js:fig-transcripts.js:336:3",
+"file": "fig-transcripts.js",
+"line": 336,
+"lit": "Pick an item from the list.",
+"text": "Pick an item from the list."
+},
+{
+"id": "js:fig-transcripts.js:340:4",
+"file": "fig-transcripts.js",
+"line": 340,
+"lit": "Solved, so no transcript was saved: only the answer survives (right).",
+"text": "Solved, so no transcript was saved: only the answer survives (right)."
+},
+{
+"id": "js:fig-transcripts.js:345:0",
+"file": "fig-transcripts.js",
+"line": 345,
+"lit": "This practice puzzle failed at several generations of this run.",
+"text": "This practice puzzle failed at several generations of this run."
+},
+{
+"id": "js:fig-transcripts.js:346:0",
+"file": "fig-transcripts.js",
+"line": 346,
+"lit": "This edited player makes a second model call to ",
+"text": "This edited player makes a second model call to "
+},
+{
+"id": "js:fig-transcripts.js:346:3",
+"file": "fig-transcripts.js",
+"line": 346,
+"lit": " its first answer.",
+"text": " its first answer."
+},
+{
+"id": "js:fig-transcripts.js:347:0",
+"file": "fig-transcripts.js",
+"line": 347,
+"lit": "The player crashed before it could answer.",
+"text": "The player crashed before it could answer."
+},
+{
+"id": "js:fig-transcripts.js:348:0",
+"file": "fig-transcripts.js",
+"line": 348,
+"lit": "A failed practice answer sampled from this run.",
+"text": "A failed practice answer sampled from this run."
+},
+{
+"id": "js:fig-transcripts.js:353:3",
+"file": "fig-transcripts.js",
+"line": 353,
+"lit": "Final answers vs the correct answer",
+"text": "Final answers vs the correct answer"
+},
+{
+"id": "js:fig-transcripts.js:379:5",
+"file": "fig-transcripts.js",
+"line": 379,
+"lit": " saved generations of ",
+"text": " saved generations of "
+},
+{
+"id": "js:fig-transcripts.js:379:6",
+"file": "fig-transcripts.js",
+"line": 379,
+"lit": ", left to right.",
+"text": ", left to right."
+},
+{
+"id": "js:fig-transcripts.js:409:3",
+"file": "fig-transcripts.js",
+"line": 409,
+"lit": "The coaching sessions could not be loaded.",
+"text": "The coaching sessions could not be loaded."
+},
+{
+"id": "js:fig-transcripts.js:431:6",
+"file": "fig-transcripts.js",
+"line": 431,
+"lit": ", one per generation",
+"text": ", one per generation"
+},
+{
+"id": "js:fig-transcripts.js:432:1",
+"file": "fig-transcripts.js",
+"line": 432,
+"lit": " changed the code.",
+"text": " changed the code."
+},
+{
+"id": "js:fig-transcripts.js:444:3",
+"file": "fig-transcripts.js",
+"line": 444,
+"lit": "Scroll the list to see all ",
+"text": "Scroll the list to see all "
+},
+{
+"id": "js:fig-transcripts.js:445:3",
+"file": "fig-transcripts.js",
+"line": 445,
+"lit": "\u201crestarted\u201d: an attempt the harness stopped while scoring it; the generation was then run again.",
+"text": "\u201crestarted\u201d: an attempt the harness stopped while scoring it; the generation was then run again."
+},
+{
+"id": "js:fig-transcripts.js:477:1",
+"file": "fig-transcripts.js",
+"line": 477,
+"lit": "Started from the original code (generation 0)",
+"text": "Started from the original code (generation 0)"
+},
+{
+"id": "js:fig-transcripts.js:477:2",
+"file": "fig-transcripts.js",
+"line": 477,
+"lit": "Started from the code of generation ",
+"text": "Started from the code of generation "
+},
+{
+"id": "js:fig-transcripts.js:478:0",
+"file": "fig-transcripts.js",
+"line": 478,
+"lit": "Starting generation not recorded",
+"text": "Starting generation not recorded"
+},
+{
+"id": "js:fig-transcripts.js:482:3",
+"file": "fig-transcripts.js",
+"line": 482,
+"lit": "The coach finished this session, but the harness was stopped while the result was being scored and ran generation ",
+"text": "The coach finished this session, but the harness was stopped while the result was being scored and ran generation "
+},
+{
+"id": "js:fig-transcripts.js:482:4",
+"file": "fig-transcripts.js",
+"line": 482,
+"lit": " again, so this attempt has no score.",
+"text": " again, so this attempt has no score."
+},
+{
+"id": "js:fig-transcripts.js:484:4",
+"file": "fig-transcripts.js",
+"line": 484,
+"lit": "Loading this run\u2019s sessions\u2026",
+"text": "Loading this run\u2019s sessions\u2026"
+},
+{
+"id": "js:fig-transcripts.js:490:3",
+"file": "fig-transcripts.js",
+"line": 490,
+"lit": "This session\u2019s steps are missing.",
+"text": "This session\u2019s steps are missing."
+},
+{
+"id": "js:fig-transcripts.js:495:3",
+"file": "fig-transcripts.js",
+"line": 495,
+"lit": "This run\u2019s sessions could not be loaded (",
+"text": "This run\u2019s sessions could not be loaded ("
+},
+{
+"id": "js:fig-transcripts.js:532:0",
+"file": "fig-transcripts.js",
+"line": 532,
+"lit": "How to read the session",
+"text": "How to read the session"
+},
+{
+"id": "js:fig-transcripts.js:533:5",
+"file": "fig-transcripts.js",
+"line": 533,
+"lit": "Step through the session",
+"text": "Step through the session"
+},
+{
+"id": "js:fig-transcripts.js:543:3",
+"file": "fig-transcripts.js",
+"line": 543,
+"lit": "These are the coach\u2019s visible messages and the commands it ran; the model\u2019s hidden reasoning was not recorded. ",
+"text": "These are the coach\u2019s visible messages and the commands it ran; the model\u2019s hidden reasoning was not recorded. "
+},
+{
+"id": "js:fig-transcripts.js:544:0",
+"file": "fig-transcripts.js",
+"line": 544,
+"lit": "The harness runs one command per message; when a message has none, it sends a short reminder (small grey lines).",
+"text": "The harness runs one command per message; when a message has none, it sends a short reminder (small grey lines)."
+},
+{
+"id": "js:fig-transcripts.js:546:4",
+"file": "fig-transcripts.js",
+"line": 546,
+"lit": "The session, step by step",
+"text": "The session, step by step"
+},
+{
+"id": "js:fig-transcripts.js:606:1",
+"file": "fig-transcripts.js",
+"line": 606,
+"lit": "What the coach was shown",
+"text": "What the coach was shown"
+},
+{
+"id": "js:fig-transcripts.js:608:0",
+"file": "fig-transcripts.js",
+"line": 608,
+"lit": "The instructions, earlier scores and ",
+"text": "The instructions, earlier scores and "
+},
+{
+"id": "js:fig-transcripts.js:608:1",
+"file": "fig-transcripts.js",
+"line": 608,
+"lit": " failed practice puzzle",
+"text": " failed practice puzzle"
+},
+{
+"id": "js:fig-transcripts.js:608:4",
+"file": "fig-transcripts.js",
+"line": 608,
+"lit": " (what the player saw and answered).",
+"text": " (what the player saw and answered)."
+},
+{
+"id": "js:fig-transcripts.js:609:0",
+"file": "fig-transcripts.js",
+"line": 609,
+"lit": "The instructions, with a summary of earlier scores.",
+"text": "The instructions, with a summary of earlier scores."
+},
+{
+"id": "js:fig-transcripts.js:609:1",
+"file": "fig-transcripts.js",
+"line": 609,
+"lit": "The instructions only; the coach had to look up earlier results itself.",
+"text": "The instructions only; the coach had to look up earlier results itself."
+},
+{
+"id": "js:fig-transcripts.js:611:5",
+"file": "fig-transcripts.js",
+"line": 611,
+"lit": "What the coach was shown",
+"text": "What the coach was shown"
+},
+{
+"id": "js:fig-transcripts.js:616:0",
+"file": "fig-transcripts.js",
+"line": 616,
+"lit": "Shown in full.",
+"text": "Shown in full."
+},
+{
+"id": "js:fig-transcripts.js:618:0",
+"file": "fig-transcripts.js",
+"line": 618,
+"lit": "long puzzle grids (answers included) are cut short",
+"text": "long puzzle grids (answers included) are cut short"
+},
+{
+"id": "js:fig-transcripts.js:621:0",
+"file": "fig-transcripts.js",
+"line": 621,
+"lit": "Shortened for display from ",
+"text": "Shortened for display from "
+},
+{
+"id": "js:fig-transcripts.js:631:3",
+"file": "fig-transcripts.js",
+"line": 631,
+"lit": "Written after the command, in the same message (before it ran):",
+"text": "Written after the command, in the same message (before it ran):"
+},
+{
+"id": "js:fig-transcripts.js:635:3",
+"file": "fig-transcripts.js",
+"line": 635,
+"lit": "This message contains a tool call the harness could not read (or one past the first), so it did not run.",
+"text": "This message contains a tool call the harness could not read (or one past the first), so it did not run."
+},
+{
+"id": "js:fig-transcripts.js:638:6",
+"file": "fig-transcripts.js",
+"line": 638,
+"lit": "Show the whole message",
+"text": "Show the whole message"
+},
+{
+"id": "js:fig-transcripts.js:641:2",
+"file": "fig-transcripts.js",
+"line": 641,
+"lit": "Show the whole message",
+"text": "Show the whole message"
+},
+{
+"id": "js:fig-transcripts.js:644:3",
+"file": "fig-transcripts.js",
+"line": 644,
+"lit": "A long run of repeated text in this message was collapsed.",
+"text": "A long run of repeated text in this message was collapsed."
+},
+{
+"id": "js:fig-transcripts.js:665:2",
+"file": "fig-transcripts.js",
+"line": 665,
+"lit": "(command not recorded)",
+"text": "(command not recorded)"
+},
+{
+"id": "js:fig-transcripts.js:710:4",
+"file": "fig-transcripts.js",
+"line": 710,
+"lit": " characters in full.",
+"text": " characters in full."
+},
+{
+"id": "js:fig-transcripts.js:712:3",
+"file": "fig-transcripts.js",
+"line": 712,
+"lit": "The same message asked for ",
+"text": "The same message asked for "
+},
+{
+"id": "js:fig-transcripts.js:712:7",
+"file": "fig-transcripts.js",
+"line": 712,
+"lit": "; the harness runs only the first.",
+"text": "; the harness runs only the first."
+},
+{
+"id": "js:fig-transcripts.js:714:3",
+"file": "fig-transcripts.js",
+"line": 714,
+"lit": "What came back",
+"text": "What came back"
+},
+{
+"id": "js:fig-transcripts.js:716:3",
+"file": "fig-transcripts.js",
+"line": 716,
+"lit": "Shortened to the start and end: ",
+"text": "Shortened to the start and end: "
+},
+{
+"id": "js:fig-transcripts.js:716:4",
+"file": "fig-transcripts.js",
+"line": 716,
+"lit": " characters in full.",
+"text": " characters in full."
+},
+{
+"id": "js:fig-transcripts.js:730:0",
+"file": "fig-transcripts.js",
+"line": 730,
+"lit": "A coach message with no readable text",
+"text": "A coach message with no readable text"
+},
+{
+"id": "js:fig-transcripts.js:730:1",
+"file": "fig-transcripts.js",
+"line": 730,
+"lit": " coach messages with no readable text",
+"text": " coach messages with no readable text"
+},
+{
+"id": "js:fig-transcripts.js:733:0",
+"file": "fig-transcripts.js",
+"line": 733,
+"lit": "Reminder: no command in that message.",
+"text": "Reminder: no command in that message."
+},
+{
+"id": "js:fig-transcripts.js:733:1",
+"file": "fig-transcripts.js",
+"line": 733,
+"lit": " reminders: no command in those messages.",
+"text": " reminders: no command in those messages."
+},
+{
+"id": "js:fig-transcripts.js:734:0",
+"file": "fig-transcripts.js",
+"line": 734,
+"lit": "The model gateway replied",
+"text": "The model gateway replied"
+},
+{
+"id": "js:fig-transcripts.js:734:1",
+"file": "fig-transcripts.js",
+"line": 734,
+"lit": "The model gateway replied ",
+"text": "The model gateway replied "
+},
+{
+"id": "js:fig-transcripts.js:734:3",
+"file": "fig-transcripts.js",
+"line": 734,
+"lit": " in place of the coach: its token budget for this round (600k) was spent.",
+"text": " in place of the coach: its token budget for this round (600k) was spent."
+},
+{
+"id": "js:fig-transcripts.js:736:1",
+"file": "fig-transcripts.js",
+"line": 736,
+"lit": "The coach said DONE.",
+"text": "The coach said DONE."
+},
+{
+"id": "js:fig-transcripts.js:746:3",
+"file": "fig-transcripts.js",
+"line": 746,
+"lit": "Only compiled cache files changed.",
+"text": "Only compiled cache files changed."
+},
+{
+"id": "js:fig-transcripts.js:746:4",
+"file": "fig-transcripts.js",
+"line": 746,
+"lit": "The coach changed no code in this round.",
+"text": "The coach changed no code in this round."
+},
+{
+"id": "js:fig-transcripts.js:750:3",
+"file": "fig-transcripts.js",
+"line": 750,
+"lit": "The coach changed both the player\u2019s code and its own (coach) code.",
+"text": "The coach changed both the player\u2019s code and its own (coach) code."
+},
+{
+"id": "js:fig-transcripts.js:751:0",
+"file": "fig-transcripts.js",
+"line": 751,
+"lit": "The coach changed only its own (coach) code; the player stayed the same.",
+"text": "The coach changed only its own (coach) code; the player stayed the same."
+},
+{
+"id": "js:fig-transcripts.js:751:1",
+"file": "fig-transcripts.js",
+"line": 751,
+"lit": "The coach changed the player\u2019s code.",
+"text": "The coach changed the player\u2019s code."
+},
+{
+"id": "js:fig-transcripts.js:751:2",
+"file": "fig-transcripts.js",
+"line": 751,
+"lit": "The coach changed only other files; the player stayed the same.",
+"text": "The coach changed only other files; the player stayed the same."
+},
+{
+"id": "js:fig-transcripts.js:762:1",
+"file": "fig-transcripts.js",
+"line": 762,
+"lit": "Show code change",
+"text": "Show code change"
+},
+{
+"id": "js:fig-transcripts.js:787:4",
+"file": "fig-transcripts.js",
+"line": 787,
+"lit": "Show in tree",
+"text": "Show in tree"
+},
+{
+"id": "js:fig-transcripts.js:809:3",
+"file": "fig-transcripts.js",
+"line": 809,
+"lit": "A puzzle counts as gained when its practice score went up, for example from one of its two tests to both.",
+"text": "A puzzle counts as gained when its practice score went up, for example from one of its two tests to both."
+},
+{
+"id": "js:fig-transcripts.js:810:0",
+"file": "fig-transcripts.js",
+"line": 810,
+"lit": " With the player unchanged, these differences come from scoring it again.",
+"text": " With the player unchanged, these differences come from scoring it again."
+},
+{
+"id": "js:fig-transcripts.js:819:4",
+"file": "fig-transcripts.js",
+"line": 819,
+"lit": " (no picture saved for this one).",
+"text": " (no picture saved for this one)."
+},
+{
+"id": "js:fig-transcripts.js:821:5",
+"file": "fig-transcripts.js",
+"line": 821,
+"lit": "the first two of its ",
+"text": "the first two of its "
+},
+{
+"id": "js:fig-transcripts.js:830:4",
+"file": "fig-transcripts.js",
+"line": 830,
+"lit": "Read the player\u2019s failed attempt (",
+"text": "Read the player\u2019s failed attempt ("
+},
+{
+"id": "js:fig-transcripts.js:836:3",
+"file": "fig-transcripts.js",
+"line": 836,
+"lit": "No player transcript was saved for this puzzle in this run.",
+"text": "No player transcript was saved for this puzzle in this run."
+},
+{
+"id": "js:fig-transcripts.js:843:1",
+"file": "fig-transcripts.js",
+"line": 843,
+"lit": "No code changed in this attempt, and it was not scored.",
+"text": "No code changed in this attempt, and it was not scored."
+},
+{
+"id": "js:fig-transcripts.js:843:2",
+"file": "fig-transcripts.js",
+"line": 843,
+"lit": "No code changed, so the player stayed as it was.",
+"text": "No code changed, so the player stayed as it was."
+},
+{
+"id": "js:fig-transcripts.js:844:1",
+"file": "fig-transcripts.js",
+"line": 844,
+"lit": "The harness was stopped while scoring this attempt, so the edit has no score.",
+"text": "The harness was stopped while scoring this attempt, so the edit has no score."
+},
+{
+"id": "js:fig-transcripts.js:844:2",
+"file": "fig-transcripts.js",
+"line": 844,
+"lit": "This edit was not scored.",
+"text": "This edit was not scored."
+},
+{
+"id": "js:fig-transcripts.js:845:1",
+"file": "fig-transcripts.js",
+"line": 845,
+"lit": "The edited player broke: it scored 0% on practice puzzles",
+"text": "The edited player broke: it scored 0% on practice puzzles"
+},
+{
+"id": "js:fig-transcripts.js:845:5",
+"file": "fig-transcripts.js",
+"line": 845,
+"lit": "The edited player broke and could not be scored.",
+"text": "The edited player broke and could not be scored."
+},
+{
+"id": "js:fig-transcripts.js:848:1",
+"file": "fig-transcripts.js",
+"line": 848,
+"lit": "The practice score stayed at ",
+"text": "The practice score stayed at "
+},
+{
+"id": "js:fig-transcripts.js:849:0",
+"file": "fig-transcripts.js",
+"line": 849,
+"lit": "The practice score ",
+"text": "The practice score "
+},
+{
+"id": "js:fig-transcripts.js:850:0",
+"file": "fig-transcripts.js",
+"line": 850,
+"lit": " The player itself was not changed, so ",
+"text": " The player itself was not changed, so "
+},
+{
+"id": "js:fig-transcripts.js:850:3",
+"file": "fig-transcripts.js",
+"line": 850,
+"lit": " only reflects scoring the same player again (run-to-run noise).",
+"text": " only reflects scoring the same player again (run-to-run noise)."
+},
+{
+"id": "js:fig-transcripts.js:851:0",
+"file": "fig-transcripts.js",
+"line": 851,
+"lit": " The harness marked this version invalid, so later rounds could not start from it.",
+"text": " The harness marked this version invalid, so later rounds could not start from it."
+},
+{
+"id": "js:fig-transcripts.js:858:5",
+"file": "fig-transcripts.js",
+"line": 858,
+"lit": "Step through turns",
+"text": "Step through turns"
+},
+{
+"id": "js:fig-transcripts.js:888:0",
+"file": "fig-transcripts.js",
+"line": 888,
+"lit": "Answer in this turn",
+"text": "Answer in this turn"
+},
+{
+"id": "js:fig-transcripts.js:898:3",
+"file": "fig-transcripts.js",
+"line": 898,
+"lit": "Model answer (call 1)",
+"text": "Model answer (call 1)"
+},
+{
+"id": "js:fig-transcripts.js:898:5",
+"file": "fig-transcripts.js",
+"line": 898,
+"lit": "Refine prompt (call 2)",
+"text": "Refine prompt (call 2)"
+},
+{
+"id": "js:fig-transcripts.js:898:7",
+"file": "fig-transcripts.js",
+"line": 898,
+"lit": "Model answer (call 2)",
+"text": "Model answer (call 2)"
+},
+{
+"id": "js:fig-transcripts.js:899:1",
+"file": "fig-transcripts.js",
+"line": 899,
+"lit": "Verify prompt (call 2)",
+"text": "Verify prompt (call 2)"
+},
+{
+"id": "js:fig-transcripts.js:899:3",
+"file": "fig-transcripts.js",
+"line": 899,
+"lit": "Model answer (call 2)",
+"text": "Model answer (call 2)"
+},
+{
+"id": "js:fig-transcripts.js:901:1",
+"file": "fig-transcripts.js",
+"line": 901,
+"lit": "Task given to the coach",
+"text": "Task given to the coach"
+},
+{
+"id": "js:fig-audit.js:73:2",
+"file": "fig-audit.js",
+"line": 73,
+"lit": ", the untouched player was kept",
+"text": ", the untouched player was kept"
+},
+{
+"id": "js:fig-audit.js:80:1",
+"file": "fig-audit.js",
+"line": 80,
+"lit": " (same code as the tested pick",
+"text": " (same code as the tested pick"
+},
+{
+"id": "js:fig-audit.js:80:5",
+"file": "fig-audit.js",
+"line": 80,
+"lit": ": code never examined on the exam",
+"text": ": code never examined on the exam"
+},
+{
+"id": "js:fig-audit.js:91:3",
+"file": "fig-audit.js",
+"line": 91,
+"lit": "The tested coaches made ",
+"text": "The tested coaches made "
+},
+{
+"id": "js:fig-audit.js:91:4",
+"file": "fig-audit.js",
+"line": 91,
+"lit": " distinct changes to their own code. ",
+"text": " distinct changes to their own code. "
+},
+{
+"id": "js:fig-audit.js:92:0",
+"file": "fig-audit.js",
+"line": 92,
+"lit": " of them were judged specific to these puzzles (ARC-specific); the rest are general advice.",
+"text": " of them were judged specific to these puzzles (ARC-specific); the rest are general advice."
+},
+{
+"id": "js:fig-audit.js:96:6",
+"file": "fig-audit.js",
+"line": 96,
+"lit": " ARC-specific distinct changes",
+"text": " ARC-specific distinct changes"
+},
+{
+"id": "js:fig-audit.js:103:3",
+"file": "fig-audit.js",
+"line": 103,
+"lit": "Counted once per picked coach, as in the write-up: ",
+"text": "Counted once per picked coach, as in the write-up: "
+},
+{
+"id": "js:fig-audit.js:128:7",
+"file": "fig-audit.js",
+"line": 128,
+"lit": " in the tree",
+"text": " in the tree"
+},
+{
+"id": "js:fig-audit.js:128:8",
+"file": "fig-audit.js",
+"line": 128,
+"lit": "Show in tree",
+"text": "Show in tree"
+},
+{
+"id": "js:fig-audit.js:149:3",
+"file": "fig-audit.js",
+"line": 149,
+"lit": "No change text was saved.",
+"text": "No change text was saved."
+},
+{
+"id": "js:fig-audit.js:152:3",
+"file": "fig-audit.js",
+"line": 152,
+"lit": "No change matches these options.",
+"text": "No change matches these options."
+},
+{
+"id": "js:fig-audit.js:179:3",
+"file": "fig-audit.js",
+"line": 179,
+"lit": "How often the coach edited its own code",
+"text": "How often the coach edited its own code"
+},
+{
+"id": "js:fig-audit.js:180:4",
+"file": "fig-audit.js",
+"line": 180,
+"lit": " generations of each source run: ",
+"text": " generations of each source run: "
+},
+{
+"id": "js:fig-audit.js:181:0",
+"file": "fig-audit.js",
+"line": 181,
+"lit": " generations changed coach code; ",
+"text": " generations changed coach code; "
+},
+{
+"id": "js:fig-audit.js:181:1",
+"file": "fig-audit.js",
+"line": 181,
+"lit": " of those were later built on.",
+"text": " of those were later built on."
+}
+]
+}
