@@ -442,7 +442,7 @@
       var truth = P.test[0].output, notes = [];
       var b0 = (P.before.calls || [])[0], a0 = (P.after.calls || [])[0];
       if(b0 && a0 && isGrid(a0.parsed_grid) && !a0.parsed_correct && EX.gridsEqual(a0.parsed_grid, b0.parsed_grid))
-        notes.push('Try 1 gave the same wrong grid as try 1 before the edit. It is a new call that happened to give the same answer.');
+        notes.push('Try 1 gave the same wrong grid that try 1 gave before the edit. It\'s a new call that happened to land on the same answer.');
       var ob = bestOff(P.before, truth), oa = bestOff(P.after, truth);
       if(!P.after.solved && ob != null && oa != null && oa > ob)
         notes.push('Its closest answer is further off than before the edit: ' + plural(oa, 'cell') + ' off, against ' + ob + ' before.');

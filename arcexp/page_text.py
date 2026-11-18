@@ -77,8 +77,7 @@ def to_html(md, dvmap):
     s = re.sub(r'`([^`]+)`', r'<code>\1</code>', s)
     s = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', s)
     s = re.sub(r'(?<![\w*])\*(?!\s)(.+?)(?<!\s)\*(?![\w*])', r'<i>\1</i>', s)
-    s = re.sub(r'\[([^\]]+)\]\((#[^ )]+) &quot;cite&quot;\)', r'<a class="cite" href="\2">\1</a>', s)
-    s = re.sub(r'\[([^\]]+)\]\((#[^ )]+) "cite"\)', r'<a class="cite" href="\2">\1</a>', s)
+    s = re.sub(r'\[(\[[^\]]+\]|[^\]]+)\]\((#[^ )]+) "cite"\)', r'<a class="cite" href="\2">\1</a>', s)
     s = re.sub(r'\[([^\]]+)\]\(([^)\s]+)\)', r'<a href="\2">\1</a>', s)
     # raw html the writer kept (was escaped above): restore tags only
     s = re.sub(r'&lt;(/?[a-zA-Z][^&]*?)&gt;', lambda m: '<' + html.unescape(m.group(1)) + '>', s)

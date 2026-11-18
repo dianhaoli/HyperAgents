@@ -21,16 +21,16 @@ Rules for the writer:
 Can an AI coach teach itself to coach better?
 
 [[top.p1]]  <!-- p -->
-An AI **coach** rewrites the code of a puzzle-solving AI, the **player**, to make it better. We let the coach rewrite *itself* too, then tested whether the self-improved coach trains better players.
+Picture two AIs. The **player** solves visual logic puzzles. The **coach** studies where the player goes wrong and rewrites the player's code to make it better. The twist: we also let the coach rewrite *its own* code, so it could learn to coach better. Then we tested whether a self-improved coach actually trains better players.
 
 [[top.p2]]  <!-- p -->
-It does not. On an exam of {{int:sets.heldout_tasks}} unseen puzzles, coached players scored about the same as an uncoached one. Letting the model simply think longer beat all coaching.
+Short answer: no. On a final exam of {{int:sets.heldout_tasks}} puzzles none of them had seen before, coached players scored about the same as a player with no coaching at all. What did help was much simpler: letting the model think longer before answering beat every kind of coaching.
 
 [[top.p3]]  <!-- p -->
-Average exam score: share of the {{int:sets.heldout_tasks}} exam puzzles solved.
+Average exam score: the share of the {{int:sets.heldout_tasks}} exam puzzles solved.
 
 [[top.p4]]  <!-- p -->
-Model: gpt-6-luna. Every player gets at most 2 model calls and 2 answers per puzzle. Total cost {{usd:spend.total}}. November 2026.
+Model: gpt-6-luna. Every player gets at most 2 model calls and 2 answers per puzzle. Total cost: {{usd:spend.total}}. November 2026.
 
 [[top.p5]]  <!-- p -->
 Jump to: [The result](#results) · [Watch them answer](#watch) · [Inside one coaching round](#demo) · [Explore the data](#explore)
@@ -39,25 +39,25 @@ Jump to: [The result](#results) · [Watch them answer](#watch) · [Inside one co
 ### 1. The setup
 
 [[1-the-setup.h21]]  <!-- h2 -->
-The setup
+How the experiment works
 
 [[1-the-setup.p1]]  <!-- p -->
-The player is a short program that solves a puzzle with at most two model calls.[^1] The coach looks at how the player did on {{int:sets.source_practice_tasks}} practice puzzles and edits the player's code. One such round is a **generation**. In step 1, the coach may also edit its own code, so it can get better at coaching.
+The player is a short program that solves each puzzle using at most two calls to an AI model.[^1] The coach runs on the same model. It looks at how the player did on {{int:sets.source_practice_tasks}} practice puzzles, then edits the player's code to fix what went wrong. One round of this (play, review, edit) is called a **generation**. In step 1, the coach is also allowed to edit its own code, so in principle it can get better at coaching.
 
 [[1-the-setup.title1]]  <!-- title -->
 A coach edits the player's code. Then we let the coach edit its own.
 
 [[1-the-setup.p2]]  <!-- p -->
-Step 1: the coach improves itself over many generations. Step 2: we freeze it and test it on a fresh player.
+Step 1: the coach improves itself over many generations. Step 2: we freeze it and see how well it trains a brand-new player.
 
 [[1-the-setup.figcaption1]]  <!-- figcaption -->
 **Figure 1**: how the experiment works.
 
 [[1-the-setup.p3]]  <!-- p -->
-We ran step 1 {{int:n_source_seeds}} times for {{int:derived.sourceGens}} generations each. To test a coach, we froze it (either the original coach or the self-improved one from each run[^2]) and gave it a fresh, untouched player and {{int:derived.rounds}} rounds on another {{int:sets.payoff_practice_tasks}} practice puzzles. The finished player then sat the exam once: {{int:sets.heldout_tasks}} puzzles it had never seen.[^3]
+We ran step 1 {{int:n_source_seeds}} separate times, for {{int:derived.sourceGens}} generations each. To test a coach, we froze it so it could no longer change (either the original coach or the self-improved one from each run[^2]). We then handed it a fresh, untouched player and gave it {{int:derived.rounds}} rounds of coaching on a different set of {{int:sets.payoff_practice_tasks}} practice puzzles. The finished player sat the exam exactly once: {{int:sets.heldout_tasks}} puzzles it had never seen.[^3]
 
 [[1-the-setup.p4]]  <!-- p -->
-For comparison, the uncoached player also sat the exam as it was, and once with the model set to **think longer** (reasoning effort one step higher), still with two calls and two answers per puzzle. No coach could change that setting.[^4]
+We also needed something to compare against. The uncoached player sat the same exam as it was, and once more with the model set to **think longer**: one notch higher on its "reasoning effort" setting, which lets the model reason more before it answers. It still got only two calls and two answers per puzzle. That setting was locked, so no coach could change it.[^4]
 
 
 ### 2. Puzzles
@@ -66,13 +66,13 @@ For comparison, the uncoached player also sat the exam as it was, and once with 
 What the puzzles look like
 
 [[2-puzzles.p1]]  <!-- p -->
-Each puzzle shows a few input→output examples. You find the rule and paint the output for a new input, cell for cell. Try one.
+The puzzles come from ARC-AGI-2, a set designed to test whether an AI can pick up a new rule from just a few examples. Each puzzle shows a few input→output pairs of coloured grids. You work out the hidden rule, then paint the output for a new input, cell by cell. Try one yourself.
 
 [[2-puzzles.title1]]  <!-- title -->
 Find the rule from the examples, then paint the answer.
 
 [[2-puzzles.p2]]  <!-- p -->
-Pick a colour, click cells to paint, then press Check. You get two tries, like the player.
+Pick a colour, click cells to paint, then press Check. Like the AI player, you get two tries.
 
 [[2-puzzles.figcaption1]]  <!-- figcaption -->
 **Figure 2**: an exam puzzle from ARC-AGI-2 [[1]](#ref-arc "cite").
@@ -84,13 +84,13 @@ Pick a colour, click cells to paint, then press Check. You get two tries, like t
 The result
 
 [[3-result.p1]]  <!-- p -->
-Players trained by the original coach scored {{pts:G.est}} points above the uncoached player, and players trained by a self-improved coach {{pts:Ig_gain_over_B0.est}} points. Both differences are smaller than the noise between runs.[^5] Thinking longer added about {{pp0:derived.xhighGain}} points.
+Players trained by the original coach scored {{pts:G.est}} points above the uncoached player, and players trained by a self-improved coach {{pts:Ig_gain_over_B0.est}} points. Both gaps are smaller than ordinary run-to-run noise, the amount scores bounce around when you simply run the same setup again. In other words, we can't tell either one apart from no effect.[^5] Thinking longer, by contrast, added about {{pp0:derived.xhighGain}} points.
 
 [[3-result.title1]]  <!-- title -->
 Coached players scored the same as an uncoached one. Thinking longer scored much higher.
 
 [[3-result.p2]]  <!-- p -->
-Each dot is one finished player's exam score; the bar marks the average. Hover or tap a dot.
+Each dot is one finished player's exam score; the bar marks the group's average. Hover over or tap a dot for details.
 
 [[3-result.figcaption1]]  <!-- figcaption -->
 **Figure 3**: exam scores of every finished player. Think longer was run once.
@@ -102,19 +102,19 @@ Each dot is one finished player's exam score; the bar marks the average. Hover o
 Did more generations help?
 
 [[4-generations.p1]]  <!-- p -->
-Coaches rarely changed themselves. Their own code changed in only {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations. In a follow-up that was not pre-registered [[4]](#ref-design2 "cite"), {{int:extension.per_generation.40.n}} runs continued to generation {{int:derived.extMaxGen}}, and we tested coaches picked at generations 20 and 40 too. Later picks were often the very same code: in run 1, the coach picked at generations 12, 20 and 40 was one version, made at generation 1.
+One reason it didn't: coaches rarely changed themselves. A coach's own code changed in only {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations. We then ran a follow-up that wasn't in the original pre-registered plan (its own plan was written down before it ran [[4]](#ref-design2 "cite")). In it, {{int:extension.per_generation.40.n}} runs kept going to generation {{int:derived.extMaxGen}}, and we also tested coaches picked at generations 20 and 40. Often the later pick was literally the same code: in run 1, the coaches picked at generations 12, 20 and 40 were all one version, made back at generation 1.
 
 [[4-generations.p2]]  <!-- p -->
-Its three tests scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}}. That spread is pure noise, and it is larger than any difference between generations.
+That one coach scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}} in its three tests. Same code, different scores: that spread is pure noise, and it's bigger than any difference between generations.
 
 [[4-generations.title1]]  <!-- title -->
 Coaches from later generations were no better.
 
 [[4-generations.p3]]  <!-- p -->
-Each dot is one finished player; the line joins the averages. The button rings one coach that was tested three times.
+Each dot is one finished player; the line connects the averages. The button circles one coach that was tested three times.
 
 [[4-generations.figcaption1]]  <!-- figcaption -->
-**Figure 4**: exam score by the generation the coach was picked at. Generation 40 minus generation 0: {{pts:extension.gen40_minus_gen0.est}} points, 95% interval {{ci:extension.gen40_minus_gen0}}. Generations 20 and 40 are the follow-up [[4]](#ref-design2 "cite").
+**Figure 4**: exam score by the generation the coach was picked at. Generation 40 minus generation 0: {{pts:extension.gen40_minus_gen0.est}} points (95% interval {{ci:extension.gen40_minus_gen0}}). Generations 20 and 40 come from the follow-up [[4]](#ref-design2 "cite").
 
 
 ### 5. Watch
@@ -123,16 +123,16 @@ Each dot is one finished player; the line joins the averages. The button rings o
 Watch them answer
 
 [[5-watch.p1]]  <!-- p -->
-Here are real exam answers, side by side. Some misses are a single cell off; others are far from the answer.
+Here are real exam answers, side by side. Some misses are off by a single cell; others aren't close.
 
 [[5-watch.title1]]  <!-- title -->
 Same puzzle, four kinds of player: some misses are one cell off, others far off.
 
 [[5-watch.p2]]  <!-- p -->
-The correct answer first, then each player's two tries. Press Next for another puzzle.
+First the correct answer, then each player's two tries. Press Next for another puzzle.
 
 [[5-watch.figcaption1]]  <!-- figcaption -->
-**Figure 5**: one run of each kind, answering the puzzle's first test input; "solved by k of n" counts every run of that kind. Shown: puzzles where the four disagree, those only the think-longer player solved first.
+**Figure 5**: one run of each kind of player, answering the puzzle's first test input; "solved by k of n" counts every run of that kind. Only puzzles where the four kinds disagree are shown, starting with the ones only the think-longer player solved.
 
 
 ### 6. Inside one round (demo)
@@ -141,13 +141,13 @@ The correct answer first, then each player's two tries. Press Next for another p
 Inside one coaching round
 
 [[6-inside-one-round-demo.p1]]  <!-- p -->
-The study did not record what the model was thinking. So we re-ran one coaching round with the model's reasoning summaries saved, and you can follow what the player and the coach were thinking, step by step. This is a separate illustrative run, not part of the results. These are not the model's raw thoughts: the API returns a summary of the hidden reasoning, which can run to thousands of words and can be lossy or garbled, and only some calls returned one.[^6]
+The main study didn't record what the model was thinking. So afterwards we re-ran one coaching round with the model's reasoning summaries saved, so you can follow the player and the coach step by step. This is a separate demo to show how coaching works; it isn't part of the results. One caveat: these aren't the model's raw thoughts. The API returns only a summary of its hidden reasoning (which can run to thousands of words), the summary can be lossy or garbled, and only some calls returned one.[^6]
 
 [[6-inside-one-round-demo.title1]]  <!-- title -->
-The coach turned the player's second try into a self-check. In repeat runs, one puzzle was solved more often and the other never.
+The coach turned the player's second try into a self-check. In repeat runs, one puzzle got solved more often; the other was never solved.
 
 [[6-inside-one-round-demo.p2]]  <!-- p -->
-Pick a puzzle, then step through: the player tries, the coach reads and edits, the player tries again.
+Pick a puzzle, then step through it: the player tries, the coach reads and edits, and the player tries again.
 
 [[6-inside-one-round-demo.figcaption1]]  <!-- figcaption -->
 **Figure 6**: a traced re-run of one coaching round on the practice puzzles, made after the study. “Reasoning summary” is the summary of the model's hidden reasoning that the API returned; commands and outputs are as the coach saw them, with long outputs shortened. Not part of the results.
@@ -162,16 +162,16 @@ What to take away
 No coach, original or self-improved, trained a player that beat the uncoached one on this exam.
 
 [[7-takeaways.li2]]  <!-- li -->
-Letting the model think longer was worth about {{pp0:derived.xhighGain}} points; no coaching came close.
+Letting the model think longer was worth about {{pp0:derived.xhighGain}} points. No coaching came close.
 
 [[7-takeaways.li3]]  <!-- li -->
-Coaches seldom rewrote themselves, and testing one unchanged coach three times moved its score by {{pp0:derived.sameCoachSpread}} points, so small differences here are noise.
+Coaches rarely rewrote themselves. And when we tested one unchanged coach three times, its score moved by {{pp0:derived.sameCoachSpread}} points, so small differences in this study are just noise.
 
 [[7-takeaways.li4]]  <!-- li -->
-Up close, a coach's edit can be sensible and still help only some puzzles: in the traced round, the player with a self-check on its second try solved one puzzle more often and another one never. That is one round, so it illustrates how coaching works; it is not evidence about how well it works.
+Up close, a coach's edit can make sense and still help only some puzzles. In the traced round, giving the player a self-check on its second try made one puzzle get solved more often, while another was never solved. That's a single round, so it shows *how* coaching works, not *how well* it works.
 
 [[7-takeaways.p1]]  <!-- p -->
-Below, you can browse every run, every exam answer and every change a coach made to itself ([Code changes](#audit)). The caveats, costs and full method are under [Numbers & method](#numbers).
+Below, you can browse every run, every exam answer and every change a coach made to itself ([Code changes](#audit)). Caveats, costs and the full method are under [Numbers & method](#numbers).
 
 
 ### 7. Explore
@@ -183,40 +183,40 @@ Explore the data
 Everything behind Figures 1 to 5. Pick a tab.
 
 [[7-explore.p2]]  <!-- p -->
-How practice score changed, version by version. Pick a dot to follow its coach and see what changed.
+How the practice score changed, version by version. Pick a dot to follow its coach and see what changed.
 
 [[7-explore.figcaption1]]  <!-- figcaption -->
-Practice score: share of the 25 practice puzzles solved. A tested coach was frozen and used to train a fresh player for 8 rounds; that player then sat the exam.
+Practice score: the share of the 25 practice puzzles solved. A tested coach was frozen and used to train a fresh player for 8 rounds; that player then sat the exam.
 
 [[7-explore.p3]]  <!-- p -->
 All 120 exam puzzles. Pick one to see each run's two answers next to the correct one.
 
 [[7-explore.figcaption2]]  <!-- figcaption -->
-Answer grids were kept for 17 of the 23 exam runs; for the other six (follow-up runs 2 to 4) only right or wrong was kept.
+Answer grids were kept for 17 of the 23 exam runs. For the other six (follow-up runs 2 to 4), only right or wrong was saved.
 
 [[7-explore.p4]]  <!-- p -->
 What the player and the coach actually wrote.
 
 [[7-explore.figcaption3]]  <!-- figcaption -->
-Player transcripts were saved only for failed practice answers. Long prompts are shortened. The model's hidden reasoning was never recorded.
+Player transcripts were saved only for failed practice answers, and long prompts are shortened. The model's hidden reasoning was never recorded.
 
 [[7-explore.p5]]  <!-- p -->
-Every change the tested coaches made to their own code, and whether it was general or specific to these puzzles.
+Every change the tested coaches made to their own code, and whether it was general advice or specific to these puzzles.
 
 [[7-explore.figcaption4]]  <!-- figcaption -->
-Each picked coach compared with the original coach; each change was judged by two judges.
+Each picked coach compared with the original coach; every change was rated by two judges.
 
 [[7-explore.p6]]  <!-- p -->
 The statistics, the cost, the caveats and the method.
 
 [[7-explore.figcaption5]]  <!-- figcaption -->
-Exam score of every finished player, also against the tokens it used, and the pre-registered comparisons as 95% intervals against zero.
+Exam score of every finished player, also plotted against the tokens it used, plus the pre-registered comparisons as 95% intervals against zero.
 
 [[7-explore.h31]]  <!-- h3 -->
 Cost
 
 [[7-explore.p7]]  <!-- p -->
-The study cost {{usd:spend.total}} in model calls: players {{usd:spend.by_role.task}}, coaches {{usd:spend.by_role.meta}}. A coach used about {{tokens:derived.metaTokI0}} tokens per round (original coach) or {{tokens:derived.metaTokIg}} (self-improved coaches).
+The whole study cost {{usd:spend.total}} in model calls: {{usd:spend.by_role.task}} for players and {{usd:spend.by_role.meta}} for coaches. Per round, a coach used about {{tokens:derived.metaTokI0}} tokens (the chunks of text a model reads and writes) if it was the original coach, or {{tokens:derived.metaTokIg}} if it was self-improved.
 
 [[7-explore.th1]]  <!-- th -->
 Phase
@@ -318,28 +318,28 @@ $148.03
 $4.19
 
 [[7-explore.caption1]]  <!-- caption -->
-Spend by phase from the gateway ledger. Phases under one cent are left out of the rows but counted in the totals.
+Spending by phase, from the gateway's ledger. Phases under one cent are left out of the rows but counted in the totals.
 
 [[7-explore.h32]]  <!-- h3 -->
 Caveats
 
 [[7-explore.li1]]  <!-- li -->
-**Noise.** There were only 3 to 6 runs per group. One unchanged coach scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}} in three tests, and several later picks were the same code as earlier ones.
+**Noise.** Each group had only 3 to 6 runs. One unchanged coach scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}} across three tests, and several later picks were the same code as earlier ones.
 
 [[7-explore.li2]]  <!-- li -->
-**The original coach needed adapting.** With the repository's instruction as written, the model only asked clarifying questions. We added one sentence ("work autonomously") and loosened tool-call parsing. Both kinds of coach started from this adapted version.
+**The original coach needed adapting.** With the repository's instruction as written, the model only asked clarifying questions. We added one sentence ("work autonomously") and made tool-call parsing more forgiving. Both kinds of coach started from this adapted version.
 
 [[7-explore.li3]]  <!-- li -->
-**The original coach often made no edit.** It ended 11 of its first 31 rounds without one, mostly from tool-call format problems. This was left as it was, as pre-registered.
+**The original coach often made no edit.** It ended 11 of its first 31 rounds without one, mostly because of tool-call formatting problems. As pre-registered, we left this as it was.
 
 [[7-explore.li4]]  <!-- li -->
-**Some coach edits broke the player.** One edit passed an argument the function did not accept, and that player scored 0. Such results count.
+**Some coach edits broke the player.** One edit passed an argument the function didn't accept, and that player scored 0. Results like this still count.
 
 [[7-explore.li5]]  <!-- li -->
-**Re-runs.** Harness bugs forced restarts of two original-coach test runs (one of them twice) and cost one self-improvement run a generation. An early 30-minute limit cut off 49 exam answers for the no-coach and think-longer players; all were re-run under a 2 to 3 hour limit (think longer: 39.9% before, {{pct:xhigh.score}} after). Six machine restarts lost no result.
+**Re-runs.** Bugs in the test harness forced restarts of two original-coach test runs (one of them twice) and cost one self-improvement run a generation. An early 30-minute time limit cut off 49 exam answers for the no-coach and think-longer players; all were re-run with a 2 to 3 hour limit (think longer: 39.9% before, {{pct:xhigh.score}} after). Six machine restarts lost no results.
 
 [[7-explore.li6]]  <!-- li -->
-**An untouched final player.** In one follow-up test (generation-20 coach, run 4), the untouched starting player beat the best edited finalist on practice ({{num2:derived.untouchedWin.untouched}} vs {{num2:derived.untouchedWin.edited}}), so that exam score is the untouched player's own.
+**An untouched final player.** In one follow-up test (the generation-20 coach, run 4), the untouched starting player beat the best edited finalist on practice ({{num2:derived.untouchedWin.untouched}} vs {{num2:derived.untouchedWin.edited}}). So that exam score is the untouched player's own.
 
 [[7-explore.li7]]  <!-- li -->
 **Transcripts are partial.** They were saved only for failed practice answers (1,513 of them) and contain no hidden reasoning.
@@ -351,16 +351,16 @@ Every deviation, bug and re-run is logged in `DECISIONS.md` [[5]](#ref-decisions
 Method in full
 
 [[7-explore.summary1]]  <!-- summary -->
-Design, fixed before the results
+The design, fixed before any results
 
 [[7-explore.li8]]  <!-- li -->
 **Question.** With equal compute, does a coach that evolved itself train a better player than the original coach?
 
 [[7-explore.li9]]  <!-- li -->
-**Pre-registration.** `DESIGN.md`, `splits.json` and `analysis.py` were committed at `f577cc7` before any test result existed; the follow-up plan, `DESIGN_v2.md`, at `991a237` before any follow-up test.
+**Pre-registration.** `DESIGN.md`, `splits.json` and `analysis.py` were committed at `f577cc7` before any test result existed, so the plan and the analysis couldn't be adjusted to fit the results. The follow-up plan, `DESIGN_v2.md`, was committed at `991a237` before any follow-up test.
 
 [[7-explore.li10]]  <!-- li -->
-**Model.** gpt-6-luna through the OpenAI Responses API, for player and coach. Reasoning effort high for both; the think-longer exam used xhigh.
+**Model.** gpt-6-luna via the OpenAI Responses API, for both player and coach. Reasoning effort was *high* for both; the think-longer exam used *xhigh*.
 
 [[7-explore.li11]]  <!-- li -->
 **Player budget.** At most 2 model calls and 2 answers per test input. A test input counts as solved if either answer matches exactly.
@@ -372,16 +372,16 @@ Design, fixed before the results
 **Spending cap.** $150, raised to $200 before the follow-up. Prices: input $0.10, cached input $0.01, output $0.50 per million tokens.
 
 [[7-explore.li14]]  <!-- li -->
-**Enforcement.** A gateway (`arcexp/gateway.py`) that no agent can edit is the only route to the model. It enforces the caps and keeps a ledger.
+**Enforcement.** A gateway (`arcexp/gateway.py`) that no agent can edit is the only way to reach the model. It enforces the caps and keeps a ledger.
 
 [[7-explore.li15]]  <!-- li -->
-**Sandbox.** Every test input runs as an unprivileged user with no network, in a fresh directory, without access to the answers.
+**Sandbox.** Every test input runs as an unprivileged user, with no network, in a fresh directory, and without access to the answers.
 
 [[7-explore.li16]]  <!-- li -->
 **Puzzle sets.** ARC-AGI-2 commit `f3283f7`, seed 20261117. The exam is all 120 public evaluation tasks (167 test inputs). The two practice sets have 25 training tasks each and do not overlap.
 
 [[7-explore.li17]]  <!-- li -->
-**Score.** Share of test inputs solved within each task, averaged over the 120 tasks (task-averaged pass@2).
+**Score.** For each task, the share of its test inputs solved, averaged over the 120 tasks (task-averaged pass@2: an input counts if either of the two answers is right).
 
 [[7-explore.li18]]  <!-- li -->
 **Final player of a run.** The two best players are re-scored on practice, the untouched starting player included; the better one sits the exam exactly once.
@@ -390,7 +390,7 @@ Design, fixed before the results
 **Picking a self-improved coach.** Among coaches whose code differs from the original and that have at least one scored child, take the one whose children improved most on average; ties go to the earlier generation.
 
 [[7-explore.li20]]  <!-- li -->
-**Statistics.** 95% Welch t-intervals on per-run exam scores. The headline is the first matching row of a pre-written list.
+**Statistics.** 95% Welch t-intervals on per-run exam scores. The headline is the first matching row of a list written in advance.
 
 [[7-explore.summary2]]  <!-- summary -->
 What was run, in order
@@ -444,22 +444,22 @@ B. L. Welch (1947). The generalization of "Student's" problem when several diffe
 ### Footnotes
 
 [[fn-1]]
-"Player" and "coach" are the repository's *task agent* and *meta agent*. Both use the same model.
+In the repository, the "player" is the *task agent* and the "coach" is the *meta agent*. Both run on the same model.
 
 [[fn-2]]
-From each run we took the self-edited coach whose players improved most on practice. The rule was fixed before any exam result existed [[2]](#ref-design "cite").
+From each run we took the self-edited coach whose players improved most on practice. This rule was fixed before any exam result existed [[2]](#ref-design "cite").
 
 [[fn-3]]
-The 120 public ARC-AGI-2 evaluation tasks [[1]](#ref-arc "cite"), with {{int:sets.heldout_test_inputs}} test inputs. A puzzle with several test inputs gives partial credit.
+The 120 public ARC-AGI-2 evaluation tasks [[1]](#ref-arc "cite"), with {{int:sets.heldout_test_inputs}} test inputs. A puzzle with several test inputs earns partial credit.
 
 [[fn-4]]
-A gateway no agent could edit fixed the model, its reasoning effort (*high*; *xhigh* for the think-longer run), the call cap and the budget.
+A gateway that no agent could edit fixed the model, its reasoning effort (*high*; *xhigh* for the think-longer run), the call cap and the budget.
 
 [[fn-5]]
-95% intervals: original coach minus no coach {{ci:G}} points; self-improved minus no coach {{ci:Ig_gain_over_B0}}; self-improved minus original {{pts:Delta.est}} {{ci:Delta}}. All include zero. Welch t-intervals [[3]](#ref-welch "cite"); the headline was pre-registered [[2]](#ref-design "cite").
+95% intervals: original coach minus no coach {{ci:G}} points; self-improved minus no coach {{ci:Ig_gain_over_B0}}; self-improved minus original {{pts:Delta.est}} {{ci:Delta}}. All include zero, which means "no difference" fits the data. Welch t-intervals [[3]](#ref-welch "cite"); the headline was pre-registered [[2]](#ref-design "cite").
 
 [[fn-6]]
-Same model, reasoning effort, call cap and practice puzzles as in the study. One difference: the demo asked for “detailed” reasoning summaries, the study for “auto” (which returned none in a short test). We show the only round, of several tried, that changed the player without breaking it, and two puzzles picked to illustrate: one the edit fixed and one it did not. Runs are not deterministic, so each player was run on each puzzle several times.
+Same model, reasoning effort, call cap and practice puzzles as the study, with one difference: the demo asked for “detailed” reasoning summaries, while the study asked for “auto” (which returned none in a short test). We show the only round, out of several tried, that changed the player without breaking it, plus two puzzles picked to illustrate: one the edit fixed and one it didn't. Runs aren't deterministic, so each player was run on each puzzle several times.
 
 
 ---
@@ -716,7 +716,7 @@ y: exam score. Bars: each arm’s 95% interval for score, drawn at its mean toke
 The pre-registered comparisons
 
 [[js:fig-results.js:670:3]]
-Differences in exam score, in points, with 95% Welch intervals. An interval that crosses 0 cannot be told apart from no effect.
+Differences in exam score, in points, with 95% Welch intervals. An interval that crosses 0 can't be told apart from no effect.
 
 [[js:fig-results.js:672:2]]
 Original coach vs no coach
@@ -1094,7 +1094,7 @@ The edited player gets the same puzzle and the same two tries. This is a separat
 New since the edit: try 2 is a review. Its prompt ends with
 
 [[js:fig-demo.js:445:0]]
-Try 1 gave the same wrong grid as try 1 before the edit. It is a new call that happened to give the same answer.
+Try 1 gave the same wrong grid that try 1 gave before the edit. It's a new call that happened to land on the same answer.
 
 [[js:fig-demo.js:448:0]]
 Its closest answer is further off than before the edit: 

@@ -1,5 +1,5 @@
 {
-"index_sha": "02ea8900e6e76a35848cef2da44a55ddd01e0b2202199391b0ca33c9e03baf54",
+"index_sha": "5c68ddeb6508afaf9542db284ad8b8c9596ecbfcc825ee6eb63a825fafc98950",
 "dv": {
 "{{int:sets.heldout_tasks}}": "<span data-v=\"int:sets.heldout_tasks\">120</span>",
 "{{usd:spend.total}}": "<span data-v=\"usd:spend.total\">$152.23</span>",
@@ -74,43 +74,43 @@
 "section": "Top",
 "tag": "p",
 "start": 1364,
-"end": 1573,
-"orig_inner": "An AI <b>coach</b> rewrites the code of a puzzle-solving AI, the <b>player</b>, to make it better. We let the coach rewrite <i>itself</i> too, then tested whether the self-improved coach trains better players.",
-"md": "An AI **coach** rewrites the code of a puzzle-solving AI, the **player**, to make it better. We let the coach rewrite *itself* too, then tested whether the self-improved coach trains better players."
+"end": 1704,
+"orig_inner": "Picture two AIs. The <b>player</b> solves visual logic puzzles. The <b>coach</b> studies where the player goes wrong and rewrites the player's code to make it better. The twist: we also let the coach rewrite <i>its own</i> code, so it could learn to coach better. Then we tested whether a self-improved coach actually trains better players.",
+"md": "Picture two AIs. The **player** solves visual logic puzzles. The **coach** studies where the player goes wrong and rewrites the player's code to make it better. The twist: we also let the coach rewrite *its own* code, so it could learn to coach better. Then we tested whether a self-improved coach actually trains better players."
 },
 {
 "id": "top.p2",
 "section": "Top",
 "tag": "p",
-"start": 1585,
-"end": 1792,
-"orig_inner": "It does not. On an exam of <span data-v=\"int:sets.heldout_tasks\">120</span> unseen puzzles, coached players scored about the same as an uncoached one. Letting the model simply think longer beat all coaching.",
-"md": "It does not. On an exam of {{int:sets.heldout_tasks}} unseen puzzles, coached players scored about the same as an uncoached one. Letting the model simply think longer beat all coaching."
+"start": 1716,
+"end": 2023,
+"orig_inner": "Short answer: no. On a final exam of <span data-v=\"int:sets.heldout_tasks\">120</span> puzzles none of them had seen before, coached players scored about the same as a player with no coaching at all. What did help was much simpler: letting the model think longer before answering beat every kind of coaching.",
+"md": "Short answer: no. On a final exam of {{int:sets.heldout_tasks}} puzzles none of them had seen before, coached players scored about the same as a player with no coaching at all. What did help was much simpler: letting the model think longer before answering beat every kind of coaching."
 },
 {
 "id": "top.p3",
 "section": "Top",
 "tag": "p",
-"start": 2978,
-"end": 3080,
-"orig_inner": "Average exam score: share of the <span data-v=\"int:sets.heldout_tasks\">120</span> exam puzzles solved.",
-"md": "Average exam score: share of the {{int:sets.heldout_tasks}} exam puzzles solved."
+"start": 3209,
+"end": 3315,
+"orig_inner": "Average exam score: the share of the <span data-v=\"int:sets.heldout_tasks\">120</span> exam puzzles solved.",
+"md": "Average exam score: the share of the {{int:sets.heldout_tasks}} exam puzzles solved."
 },
 {
 "id": "top.p4",
 "section": "Top",
 "tag": "p",
-"start": 3113,
-"end": 3270,
-"orig_inner": "Model: gpt-6-luna. Every player gets at most 2 model calls and 2 answers per puzzle. Total cost <span data-v=\"usd:spend.total\">$152.23</span>. November 2026.",
-"md": "Model: gpt-6-luna. Every player gets at most 2 model calls and 2 answers per puzzle. Total cost {{usd:spend.total}}. November 2026."
+"start": 3348,
+"end": 3506,
+"orig_inner": "Model: gpt-6-luna. Every player gets at most 2 model calls and 2 answers per puzzle. Total cost: <span data-v=\"usd:spend.total\">$152.23</span>. November 2026.",
+"md": "Model: gpt-6-luna. Every player gets at most 2 model calls and 2 answers per puzzle. Total cost: {{usd:spend.total}}. November 2026."
 },
 {
 "id": "top.p5",
 "section": "Top",
 "tag": "p",
-"start": 3293,
-"end": 3481,
+"start": 3529,
+"end": 3717,
 "orig_inner": "Jump to: <a href=\"#results\">The result</a> &#183; <a href=\"#watch\">Watch them answer</a> &#183; <a href=\"#demo\">Inside one coaching round</a> &#183; <a href=\"#explore\">Explore the data</a>",
 "md": "Jump to: [The result](#results) \u00b7 [Watch them answer](#watch) \u00b7 [Inside one coaching round](#demo) \u00b7 [Explore the data](#explore)"
 },
@@ -118,26 +118,26 @@
 "id": "1-the-setup.h21",
 "section": "1. The setup",
 "tag": "h2",
-"start": 3651,
-"end": 3660,
-"orig_inner": "The setup",
-"md": "The setup"
+"start": 3887,
+"end": 3911,
+"orig_inner": "How the experiment works",
+"md": "How the experiment works"
 },
 {
 "id": "1-the-setup.p1",
 "section": "1. The setup",
 "tag": "p",
-"start": 3671,
-"end": 4248,
-"orig_inner": "The player is a short program that solves a puzzle with at most two model calls.<sup class=\"fn\" id=\"fnref-1\"><a href=\"#fn-1\">1</a></sup><span class=\"sidenote\" id=\"fn-1\"><span class=\"sn-num\">1</span>\"Player\" and \"coach\" are the repository's <i>task agent</i> and <i>meta agent</i>. Both use the same model.</span> The coach looks at how the player did on <span data-v=\"int:sets.source_practice_tasks\">25</span> practice puzzles and edits the player's code. One such round is a <b>generation</b>. In step 1, the coach may also edit its own code, so it can get better at coaching.",
-"md": "The player is a short program that solves a puzzle with at most two model calls.[^1] The coach looks at how the player did on {{int:sets.source_practice_tasks}} practice puzzles and edits the player's code. One such round is a **generation**. In step 1, the coach may also edit its own code, so it can get better at coaching."
+"start": 3922,
+"end": 4637,
+"orig_inner": "The player is a short program that solves each puzzle using at most two calls to an AI model.<sup class=\"fn\" id=\"fnref-1\"><a href=\"#fn-1\">1</a></sup><span class=\"sidenote\" id=\"fn-1\"><span class=\"sn-num\">1</span>In the repository, the \"player\" is the <i>task agent</i> and the \"coach\" is the <i>meta agent</i>. Both run on the same model.</span> The coach runs on the same model. It looks at how the player did on <span data-v=\"int:sets.source_practice_tasks\">25</span> practice puzzles, then edits the player's code to fix what went wrong. One round of this (play, review, edit) is called a <b>generation</b>. In step 1, the coach is also allowed to edit its own code, so in principle it can get better at coaching.",
+"md": "The player is a short program that solves each puzzle using at most two calls to an AI model.[^1] The coach runs on the same model. It looks at how the player did on {{int:sets.source_practice_tasks}} practice puzzles, then edits the player's code to fix what went wrong. One round of this (play, review, edit) is called a **generation**. In step 1, the coach is also allowed to edit its own code, so in principle it can get better at coaching."
 },
 {
 "id": "1-the-setup.title1",
 "section": "1. The setup",
 "tag": "title",
-"start": 4390,
-"end": 4458,
+"start": 4779,
+"end": 4847,
 "orig_inner": "A coach edits the player's code. Then we let the coach edit its own.",
 "md": "A coach edits the player's code. Then we let the coach edit its own."
 },
@@ -145,17 +145,17 @@
 "id": "1-the-setup.p2",
 "section": "1. The setup",
 "tag": "p",
-"start": 4491,
-"end": 4599,
-"orig_inner": "Step 1: the coach improves itself over many generations. Step 2: we freeze it and test it on a fresh player.",
-"md": "Step 1: the coach improves itself over many generations. Step 2: we freeze it and test it on a fresh player."
+"start": 4880,
+"end": 5004,
+"orig_inner": "Step 1: the coach improves itself over many generations. Step 2: we freeze it and see how well it trains a brand-new player.",
+"md": "Step 1: the coach improves itself over many generations. Step 2: we freeze it and see how well it trains a brand-new player."
 },
 {
 "id": "1-the-setup.figcaption1",
 "section": "1. The setup",
 "tag": "figcaption",
-"start": 4738,
-"end": 4780,
+"start": 5143,
+"end": 5185,
 "orig_inner": "<b>Figure 1</b>: how the experiment works.",
 "md": "**Figure 1**: how the experiment works."
 },
@@ -163,26 +163,26 @@
 "id": "1-the-setup.p3",
 "section": "1. The setup",
 "tag": "p",
-"start": 4835,
-"end": 5999,
-"orig_inner": "We ran step 1 <span data-v=\"int:n_source_seeds\">6</span> times for <span data-v=\"int:derived.sourceGens\">12</span> generations each. To test a coach, we froze it (either the original coach or the self-improved one from each run<sup class=\"fn\" id=\"fnref-2\"><a href=\"#fn-2\">2</a></sup><span class=\"sidenote\" id=\"fn-2\"><span class=\"sn-num\">2</span>From each run we took the self-edited coach whose players improved most on practice. The rule was fixed before any exam result existed <a class=\"cite\" href=\"#ref-design\">[2]</a>.</span>) and gave it a fresh, untouched player and <span data-v=\"int:derived.rounds\">8</span> rounds on another <span data-v=\"int:sets.payoff_practice_tasks\">25</span> practice puzzles. The finished player then sat the exam once: <span data-v=\"int:sets.heldout_tasks\">120</span> puzzles it had never seen.<sup class=\"fn\" id=\"fnref-3\"><a href=\"#fn-3\">3</a></sup><span class=\"sidenote\" id=\"fn-3\"><span class=\"sn-num\">3</span>The 120 public ARC-AGI-2 evaluation tasks <a class=\"cite\" href=\"#ref-arc\">[1]</a>, with <span data-v=\"int:sets.heldout_test_inputs\">167</span> test inputs. A puzzle with several test inputs gives partial credit.</span>",
-"md": "We ran step 1 {{int:n_source_seeds}} times for {{int:derived.sourceGens}} generations each. To test a coach, we froze it (either the original coach or the self-improved one from each run[^2]) and gave it a fresh, untouched player and {{int:derived.rounds}} rounds on another {{int:sets.payoff_practice_tasks}} practice puzzles. The finished player then sat the exam once: {{int:sets.heldout_tasks}} puzzles it had never seen.[^3]"
+"start": 5240,
+"end": 6485,
+"orig_inner": "We ran step 1 <span data-v=\"int:n_source_seeds\">6</span> separate times, for <span data-v=\"int:derived.sourceGens\">12</span> generations each. To test a coach, we froze it so it could no longer change (either the original coach or the self-improved one from each run<sup class=\"fn\" id=\"fnref-2\"><a href=\"#fn-2\">2</a></sup><span class=\"sidenote\" id=\"fn-2\"><span class=\"sn-num\">2</span>From each run we took the self-edited coach whose players improved most on practice. This rule was fixed before any exam result existed <a class=\"cite\" href=\"#ref-design\">[2]</a>.</span>). We then handed it a fresh, untouched player and gave it <span data-v=\"int:derived.rounds\">8</span> rounds of coaching on a different set of <span data-v=\"int:sets.payoff_practice_tasks\">25</span> practice puzzles. The finished player sat the exam exactly once: <span data-v=\"int:sets.heldout_tasks\">120</span> puzzles it had never seen.<sup class=\"fn\" id=\"fnref-3\"><a href=\"#fn-3\">3</a></sup><span class=\"sidenote\" id=\"fn-3\"><span class=\"sn-num\">3</span>The 120 public ARC-AGI-2 evaluation tasks <a class=\"cite\" href=\"#ref-arc\">[1]</a>, with <span data-v=\"int:sets.heldout_test_inputs\">167</span> test inputs. A puzzle with several test inputs earns partial credit.</span>",
+"md": "We ran step 1 {{int:n_source_seeds}} separate times, for {{int:derived.sourceGens}} generations each. To test a coach, we froze it so it could no longer change (either the original coach or the self-improved one from each run[^2]). We then handed it a fresh, untouched player and gave it {{int:derived.rounds}} rounds of coaching on a different set of {{int:sets.payoff_practice_tasks}} practice puzzles. The finished player sat the exam exactly once: {{int:sets.heldout_tasks}} puzzles it had never seen.[^3]"
 },
 {
 "id": "1-the-setup.p4",
 "section": "1. The setup",
 "tag": "p",
-"start": 6009,
-"end": 6521,
-"orig_inner": "For comparison, the uncoached player also sat the exam as it was, and once with the model set to <b>think longer</b> (reasoning effort one step higher), still with two calls and two answers per puzzle. No coach could change that setting.<sup class=\"fn\" id=\"fnref-4\"><a href=\"#fn-4\">4</a></sup><span class=\"sidenote\" id=\"fn-4\"><span class=\"sn-num\">4</span>A gateway no agent could edit fixed the model, its reasoning effort (<i>high</i>; <i>xhigh</i> for the think-longer run), the call cap and the budget.</span>",
-"md": "For comparison, the uncoached player also sat the exam as it was, and once with the model set to **think longer** (reasoning effort one step higher), still with two calls and two answers per puzzle. No coach could change that setting.[^4]"
+"start": 6495,
+"end": 7140,
+"orig_inner": "We also needed something to compare against. The uncoached player sat the same exam as it was, and once more with the model set to <b>think longer</b>: one notch higher on its \"reasoning effort\" setting, which lets the model reason more before it answers. It still got only two calls and two answers per puzzle. That setting was locked, so no coach could change it.<sup class=\"fn\" id=\"fnref-4\"><a href=\"#fn-4\">4</a></sup><span class=\"sidenote\" id=\"fn-4\"><span class=\"sn-num\">4</span>A gateway that no agent could edit fixed the model, its reasoning effort (<i>high</i>; <i>xhigh</i> for the think-longer run), the call cap and the budget.</span>",
+"md": "We also needed something to compare against. The uncoached player sat the same exam as it was, and once more with the model set to **think longer**: one notch higher on its \"reasoning effort\" setting, which lets the model reason more before it answers. It still got only two calls and two answers per puzzle. That setting was locked, so no coach could change it.[^4]"
 },
 {
 "id": "2-puzzles.h21",
 "section": "2. Puzzles",
 "tag": "h2",
-"start": 6684,
-"end": 6710,
+"start": 7303,
+"end": 7329,
 "orig_inner": "What the puzzles look like",
 "md": "What the puzzles look like"
 },
@@ -190,17 +190,17 @@
 "id": "2-puzzles.p1",
 "section": "2. Puzzles",
 "tag": "p",
-"start": 6721,
-"end": 6853,
-"orig_inner": "Each puzzle shows a few input&#8594;output examples. You find the rule and paint the output for a new input, cell for cell. Try one.",
-"md": "Each puzzle shows a few input\u2192output examples. You find the rule and paint the output for a new input, cell for cell. Try one."
+"start": 7340,
+"end": 7627,
+"orig_inner": "The puzzles come from ARC-AGI-2, a set designed to test whether an AI can pick up a new rule from just a few examples. Each puzzle shows a few input&#8594;output pairs of coloured grids. You work out the hidden rule, then paint the output for a new input, cell by cell. Try one yourself.",
+"md": "The puzzles come from ARC-AGI-2, a set designed to test whether an AI can pick up a new rule from just a few examples. Each puzzle shows a few input\u2192output pairs of coloured grids. You work out the hidden rule, then paint the output for a new input, cell by cell. Try one yourself."
 },
 {
 "id": "2-puzzles.title1",
 "section": "2. Puzzles",
 "tag": "title",
-"start": 6995,
-"end": 7050,
+"start": 7769,
+"end": 7824,
 "orig_inner": "Find the rule from the examples, then paint the answer.",
 "md": "Find the rule from the examples, then paint the answer."
 },
@@ -208,17 +208,17 @@
 "id": "2-puzzles.p2",
 "section": "2. Puzzles",
 "tag": "p",
-"start": 7083,
-"end": 7173,
-"orig_inner": "Pick a colour, click cells to paint, then press Check. You get two tries, like the player.",
-"md": "Pick a colour, click cells to paint, then press Check. You get two tries, like the player."
+"start": 7857,
+"end": 7950,
+"orig_inner": "Pick a colour, click cells to paint, then press Check. Like the AI player, you get two tries.",
+"md": "Pick a colour, click cells to paint, then press Check. Like the AI player, you get two tries."
 },
 {
 "id": "2-puzzles.figcaption1",
 "section": "2. Puzzles",
 "tag": "figcaption",
-"start": 7313,
-"end": 7400,
+"start": 8090,
+"end": 8177,
 "orig_inner": "<b>Figure 2</b>: an exam puzzle from ARC-AGI-2 <a class=\"cite\" href=\"#ref-arc\">[1]</a>.",
 "md": "**Figure 2**: an exam puzzle from ARC-AGI-2 [[1]](#ref-arc \"cite\")."
 },
@@ -226,8 +226,8 @@
 "id": "3-result.h21",
 "section": "3. Result",
 "tag": "h2",
-"start": 7572,
-"end": 7582,
+"start": 8349,
+"end": 8359,
 "orig_inner": "The result",
 "md": "The result"
 },
@@ -235,17 +235,17 @@
 "id": "3-result.p1",
 "section": "3. Result",
 "tag": "p",
-"start": 7593,
-"end": 8555,
-"orig_inner": "Players trained by the original coach scored <span data-v=\"pts:G.est\">+0.4</span> points above the uncoached player, and players trained by a self-improved coach <span data-v=\"pts:Ig_gain_over_B0.est\">&#8722;1.4</span> points. Both differences are smaller than the noise between runs.<sup class=\"fn\" id=\"fnref-5\"><a href=\"#fn-5\">5</a></sup><span class=\"sidenote\" id=\"fn-5\"><span class=\"sn-num\">5</span>95% intervals: original coach minus no coach <span data-v=\"ci:G\">[&#8722;1.9, +2.8]</span> points; self-improved minus no coach <span data-v=\"ci:Ig_gain_over_B0\">[&#8722;4.0, +1.3]</span>; self-improved minus original <span data-v=\"pts:Delta.est\">&#8722;1.8</span> <span data-v=\"ci:Delta\">[&#8722;4.2, +0.6]</span>. All include zero. Welch t-intervals <a class=\"cite\" href=\"#ref-welch\">[3]</a>; the headline was pre-registered <a class=\"cite\" href=\"#ref-design\">[2]</a>.</span> Thinking longer added about <span data-v=\"pp0:derived.xhighGain\">12</span> points.",
-"md": "Players trained by the original coach scored {{pts:G.est}} points above the uncoached player, and players trained by a self-improved coach {{pts:Ig_gain_over_B0.est}} points. Both differences are smaller than the noise between runs.[^5] Thinking longer added about {{pp0:derived.xhighGain}} points."
+"start": 8370,
+"end": 9522,
+"orig_inner": "Players trained by the original coach scored <span data-v=\"pts:G.est\">+0.4</span> points above the uncoached player, and players trained by a self-improved coach <span data-v=\"pts:Ig_gain_over_B0.est\">&#8722;1.4</span> points. Both gaps are smaller than ordinary run-to-run noise, the amount scores bounce around when you simply run the same setup again. In other words, we can't tell either one apart from no effect.<sup class=\"fn\" id=\"fnref-5\"><a href=\"#fn-5\">5</a></sup><span class=\"sidenote\" id=\"fn-5\"><span class=\"sn-num\">5</span>95% intervals: original coach minus no coach <span data-v=\"ci:G\">[&#8722;1.9, +2.8]</span> points; self-improved minus no coach <span data-v=\"ci:Ig_gain_over_B0\">[&#8722;4.0, +1.3]</span>; self-improved minus original <span data-v=\"pts:Delta.est\">&#8722;1.8</span> <span data-v=\"ci:Delta\">[&#8722;4.2, +0.6]</span>. All include zero, which means \"no difference\" fits the data. Welch t-intervals <a class=\"cite\" href=\"#ref-welch\">[3]</a>; the headline was pre-registered <a class=\"cite\" href=\"#ref-design\">[2]</a>.</span> Thinking longer, by contrast, added about <span data-v=\"pp0:derived.xhighGain\">12</span> points.",
+"md": "Players trained by the original coach scored {{pts:G.est}} points above the uncoached player, and players trained by a self-improved coach {{pts:Ig_gain_over_B0.est}} points. Both gaps are smaller than ordinary run-to-run noise, the amount scores bounce around when you simply run the same setup again. In other words, we can't tell either one apart from no effect.[^5] Thinking longer, by contrast, added about {{pp0:derived.xhighGain}} points."
 },
 {
 "id": "3-result.title1",
 "section": "3. Result",
 "tag": "title",
-"start": 8699,
-"end": 8787,
+"start": 9666,
+"end": 9754,
 "orig_inner": "Coached players scored the same as an uncoached one. Thinking longer scored much higher.",
 "md": "Coached players scored the same as an uncoached one. Thinking longer scored much higher."
 },
@@ -253,17 +253,17 @@
 "id": "3-result.p2",
 "section": "3. Result",
 "tag": "p",
-"start": 8820,
-"end": 8912,
-"orig_inner": "Each dot is one finished player's exam score; the bar marks the average. Hover or tap a dot.",
-"md": "Each dot is one finished player's exam score; the bar marks the average. Hover or tap a dot."
+"start": 9787,
+"end": 9904,
+"orig_inner": "Each dot is one finished player's exam score; the bar marks the group's average. Hover over or tap a dot for details.",
+"md": "Each dot is one finished player's exam score; the bar marks the group's average. Hover over or tap a dot for details."
 },
 {
 "id": "3-result.figcaption1",
 "section": "3. Result",
 "tag": "figcaption",
-"start": 9053,
-"end": 9134,
+"start": 10045,
+"end": 10126,
 "orig_inner": "<b>Figure 3</b>: exam scores of every finished player. Think longer was run once.",
 "md": "**Figure 3**: exam scores of every finished player. Think longer was run once."
 },
@@ -271,8 +271,8 @@
 "id": "4-generations.h21",
 "section": "4. Generations",
 "tag": "h2",
-"start": 9319,
-"end": 9345,
+"start": 10311,
+"end": 10337,
 "orig_inner": "Did more generations help?",
 "md": "Did more generations help?"
 },
@@ -280,26 +280,26 @@
 "id": "4-generations.p1",
 "section": "4. Generations",
 "tag": "p",
-"start": 9356,
-"end": 9954,
-"orig_inner": "Coaches rarely changed themselves. Their own code changed in only <span data-v=\"int:derived.selfEditGens\">21</span> of <span data-v=\"int:derived.totalGens\">72</span> generations. In a follow-up that was not pre-registered <a class=\"cite\" href=\"#ref-design2\">[4]</a>, <span data-v=\"int:extension.per_generation.40.n\">4</span> runs continued to generation <span data-v=\"int:derived.extMaxGen\">40</span>, and we tested coaches picked at generations 20 and 40 too. Later picks were often the very same code: in run 1, the coach picked at generations 12, 20 and 40 was one version, made at generation 1.",
-"md": "Coaches rarely changed themselves. Their own code changed in only {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations. In a follow-up that was not pre-registered [[4]](#ref-design2 \"cite\"), {{int:extension.per_generation.40.n}} runs continued to generation {{int:derived.extMaxGen}}, and we tested coaches picked at generations 20 and 40 too. Later picks were often the very same code: in run 1, the coach picked at generations 12, 20 and 40 was one version, made at generation 1."
+"start": 10348,
+"end": 11075,
+"orig_inner": "One reason it didn't: coaches rarely changed themselves. A coach's own code changed in only <span data-v=\"int:derived.selfEditGens\">21</span> of <span data-v=\"int:derived.totalGens\">72</span> generations. We then ran a follow-up that wasn't in the original pre-registered plan (its own plan was written down before it ran <a class=\"cite\" href=\"#ref-design2\">[4]</a>). In it, <span data-v=\"int:extension.per_generation.40.n\">4</span> runs kept going to generation <span data-v=\"int:derived.extMaxGen\">40</span>, and we also tested coaches picked at generations 20 and 40. Often the later pick was literally the same code: in run 1, the coaches picked at generations 12, 20 and 40 were all one version, made back at generation 1.",
+"md": "One reason it didn't: coaches rarely changed themselves. A coach's own code changed in only {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations. We then ran a follow-up that wasn't in the original pre-registered plan (its own plan was written down before it ran [[4]](#ref-design2 \"cite\")). In it, {{int:extension.per_generation.40.n}} runs kept going to generation {{int:derived.extMaxGen}}, and we also tested coaches picked at generations 20 and 40. Often the later pick was literally the same code: in run 1, the coaches picked at generations 12, 20 and 40 were all one version, made back at generation 1."
 },
 {
 "id": "4-generations.p2",
 "section": "4. Generations",
 "tag": "p",
-"start": 9964,
-"end": 10239,
-"orig_inner": "Its three tests scored <span data-v=\"pct:derived.sameCoach.g12\">26.0%</span>, <span data-v=\"pct:derived.sameCoach.g20\">27.8%</span> and <span data-v=\"pct:derived.sameCoach.g40\">36.0%</span>. That spread is pure noise, and it is larger than any difference between generations.",
-"md": "Its three tests scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}}. That spread is pure noise, and it is larger than any difference between generations."
+"start": 11085,
+"end": 11406,
+"orig_inner": "That one coach scored <span data-v=\"pct:derived.sameCoach.g12\">26.0%</span>, <span data-v=\"pct:derived.sameCoach.g20\">27.8%</span> and <span data-v=\"pct:derived.sameCoach.g40\">36.0%</span> in its three tests. Same code, different scores: that spread is pure noise, and it's bigger than any difference between generations.",
+"md": "That one coach scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}} in its three tests. Same code, different scores: that spread is pure noise, and it's bigger than any difference between generations."
 },
 {
 "id": "4-generations.title1",
 "section": "4. Generations",
 "tag": "title",
-"start": 10387,
-"end": 10433,
+"start": 11554,
+"end": 11600,
 "orig_inner": "Coaches from later generations were no better.",
 "md": "Coaches from later generations were no better."
 },
@@ -307,26 +307,26 @@
 "id": "4-generations.p3",
 "section": "4. Generations",
 "tag": "p",
-"start": 10466,
-"end": 10583,
-"orig_inner": "Each dot is one finished player; the line joins the averages. The button rings one coach that was tested three times.",
-"md": "Each dot is one finished player; the line joins the averages. The button rings one coach that was tested three times."
+"start": 11633,
+"end": 11755,
+"orig_inner": "Each dot is one finished player; the line connects the averages. The button circles one coach that was tested three times.",
+"md": "Each dot is one finished player; the line connects the averages. The button circles one coach that was tested three times."
 },
 {
 "id": "4-generations.figcaption1",
 "section": "4. Generations",
 "tag": "figcaption",
-"start": 10728,
-"end": 11072,
-"orig_inner": "<b>Figure 4</b>: exam score by the generation the coach was picked at. Generation 40 minus generation 0: <span data-v=\"pts:extension.gen40_minus_gen0.est\">+0.6</span> points, 95% interval <span data-v=\"ci:extension.gen40_minus_gen0\">[&#8722;6.5, +7.8]</span>. Generations 20 and 40 are the follow-up <a class=\"cite\" href=\"#ref-design2\">[4]</a>.",
-"md": "**Figure 4**: exam score by the generation the coach was picked at. Generation 40 minus generation 0: {{pts:extension.gen40_minus_gen0.est}} points, 95% interval {{ci:extension.gen40_minus_gen0}}. Generations 20 and 40 are the follow-up [[4]](#ref-design2 \"cite\")."
+"start": 11900,
+"end": 12251,
+"orig_inner": "<b>Figure 4</b>: exam score by the generation the coach was picked at. Generation 40 minus generation 0: <span data-v=\"pts:extension.gen40_minus_gen0.est\">+0.6</span> points (95% interval <span data-v=\"ci:extension.gen40_minus_gen0\">[&#8722;6.5, +7.8]</span>). Generations 20 and 40 come from the follow-up <a class=\"cite\" href=\"#ref-design2\">[4]</a>.",
+"md": "**Figure 4**: exam score by the generation the coach was picked at. Generation 40 minus generation 0: {{pts:extension.gen40_minus_gen0.est}} points (95% interval {{ci:extension.gen40_minus_gen0}}). Generations 20 and 40 come from the follow-up [[4]](#ref-design2 \"cite\")."
 },
 {
 "id": "5-watch.h21",
 "section": "5. Watch",
 "tag": "h2",
-"start": 11239,
-"end": 11256,
+"start": 12418,
+"end": 12435,
 "orig_inner": "Watch them answer",
 "md": "Watch them answer"
 },
@@ -334,17 +334,17 @@
 "id": "5-watch.p1",
 "section": "5. Watch",
 "tag": "p",
-"start": 11267,
-"end": 11375,
-"orig_inner": "Here are real exam answers, side by side. Some misses are a single cell off; others are far from the answer.",
-"md": "Here are real exam answers, side by side. Some misses are a single cell off; others are far from the answer."
+"start": 12446,
+"end": 12546,
+"orig_inner": "Here are real exam answers, side by side. Some misses are off by a single cell; others aren't close.",
+"md": "Here are real exam answers, side by side. Some misses are off by a single cell; others aren't close."
 },
 {
 "id": "5-watch.title1",
 "section": "5. Watch",
 "tag": "title",
-"start": 11517,
-"end": 11597,
+"start": 12688,
+"end": 12768,
 "orig_inner": "Same puzzle, four kinds of player: some misses are one cell off, others far off.",
 "md": "Same puzzle, four kinds of player: some misses are one cell off, others far off."
 },
@@ -352,26 +352,26 @@
 "id": "5-watch.p2",
 "section": "5. Watch",
 "tag": "p",
-"start": 11630,
-"end": 11716,
-"orig_inner": "The correct answer first, then each player's two tries. Press Next for another puzzle.",
-"md": "The correct answer first, then each player's two tries. Press Next for another puzzle."
+"start": 12801,
+"end": 12887,
+"orig_inner": "First the correct answer, then each player's two tries. Press Next for another puzzle.",
+"md": "First the correct answer, then each player's two tries. Press Next for another puzzle."
 },
 {
 "id": "5-watch.figcaption1",
 "section": "5. Watch",
 "tag": "figcaption",
-"start": 11855,
-"end": 12073,
-"orig_inner": "<b>Figure 5</b>: one run of each kind, answering the puzzle's first test input; \"solved by k of n\" counts every run of that kind. Shown: puzzles where the four disagree, those only the think-longer player solved first.",
-"md": "**Figure 5**: one run of each kind, answering the puzzle's first test input; \"solved by k of n\" counts every run of that kind. Shown: puzzles where the four disagree, those only the think-longer player solved first."
+"start": 13026,
+"end": 13279,
+"orig_inner": "<b>Figure 5</b>: one run of each kind of player, answering the puzzle's first test input; \"solved by k of n\" counts every run of that kind. Only puzzles where the four kinds disagree are shown, starting with the ones only the think-longer player solved.",
+"md": "**Figure 5**: one run of each kind of player, answering the puzzle's first test input; \"solved by k of n\" counts every run of that kind. Only puzzles where the four kinds disagree are shown, starting with the ones only the think-longer player solved."
 },
 {
 "id": "6-inside-one-round-demo.h21",
 "section": "6. Inside one round (demo)",
 "tag": "h2",
-"start": 12256,
-"end": 12281,
+"start": 13462,
+"end": 13487,
 "orig_inner": "Inside one coaching round",
 "md": "Inside one coaching round"
 },
@@ -379,35 +379,35 @@
 "id": "6-inside-one-round-demo.p1",
 "section": "6. Inside one round (demo)",
 "tag": "p",
-"start": 12292,
-"end": 13348,
-"orig_inner": "The study did not record what the model was thinking. So we re-ran one coaching round with the model's reasoning summaries saved, and you can follow what the player and the coach were thinking, step by step. This is a separate illustrative run, not part of the results. These are not the model's raw thoughts: the API returns a summary of the hidden reasoning, which can run to thousands of words and can be lossy or garbled, and only some calls returned one.<sup class=\"fn\" id=\"fnref-6\"><a href=\"#fn-6\">6</a></sup><span class=\"sidenote\" id=\"fn-6\"><span class=\"sn-num\">6</span>Same model, reasoning effort, call cap and practice puzzles as in the study. One difference: the demo asked for &#8220;detailed&#8221; reasoning summaries, the study for &#8220;auto&#8221; (which returned none in a short test). We show the only round, of several tried, that changed the player without breaking it, and two puzzles picked to illustrate: one the edit fixed and one it did not. Runs are not deterministic, so each player was run on each puzzle several times.</span>",
-"md": "The study did not record what the model was thinking. So we re-ran one coaching round with the model's reasoning summaries saved, and you can follow what the player and the coach were thinking, step by step. This is a separate illustrative run, not part of the results. These are not the model's raw thoughts: the API returns a summary of the hidden reasoning, which can run to thousands of words and can be lossy or garbled, and only some calls returned one.[^6]"
+"start": 13498,
+"end": 14611,
+"orig_inner": "The main study didn't record what the model was thinking. So afterwards we re-ran one coaching round with the model's reasoning summaries saved, so you can follow the player and the coach step by step. This is a separate demo to show how coaching works; it isn't part of the results. One caveat: these aren't the model's raw thoughts. The API returns only a summary of its hidden reasoning (which can run to thousands of words), the summary can be lossy or garbled, and only some calls returned one.<sup class=\"fn\" id=\"fnref-6\"><a href=\"#fn-6\">6</a></sup><span class=\"sidenote\" id=\"fn-6\"><span class=\"sn-num\">6</span>Same model, reasoning effort, call cap and practice puzzles as the study, with one difference: the demo asked for &#8220;detailed&#8221; reasoning summaries, while the study asked for &#8220;auto&#8221; (which returned none in a short test). We show the only round, out of several tried, that changed the player without breaking it, plus two puzzles picked to illustrate: one the edit fixed and one it didn't. Runs aren't deterministic, so each player was run on each puzzle several times.</span>",
+"md": "The main study didn't record what the model was thinking. So afterwards we re-ran one coaching round with the model's reasoning summaries saved, so you can follow the player and the coach step by step. This is a separate demo to show how coaching works; it isn't part of the results. One caveat: these aren't the model's raw thoughts. The API returns only a summary of its hidden reasoning (which can run to thousands of words), the summary can be lossy or garbled, and only some calls returned one.[^6]"
 },
 {
 "id": "6-inside-one-round-demo.title1",
 "section": "6. Inside one round (demo)",
 "tag": "title",
-"start": 13489,
-"end": 13618,
-"orig_inner": "The coach turned the player's second try into a self-check. In repeat runs, one puzzle was solved more often and the other never.",
-"md": "The coach turned the player's second try into a self-check. In repeat runs, one puzzle was solved more often and the other never."
+"start": 14752,
+"end": 14889,
+"orig_inner": "The coach turned the player's second try into a self-check. In repeat runs, one puzzle got solved more often; the other was never solved.",
+"md": "The coach turned the player's second try into a self-check. In repeat runs, one puzzle got solved more often; the other was never solved."
 },
 {
 "id": "6-inside-one-round-demo.p2",
 "section": "6. Inside one round (demo)",
 "tag": "p",
-"start": 13651,
-"end": 13753,
-"orig_inner": "Pick a puzzle, then step through: the player tries, the coach reads and edits, the player tries again.",
-"md": "Pick a puzzle, then step through: the player tries, the coach reads and edits, the player tries again."
+"start": 14922,
+"end": 15031,
+"orig_inner": "Pick a puzzle, then step through it: the player tries, the coach reads and edits, and the player tries again.",
+"md": "Pick a puzzle, then step through it: the player tries, the coach reads and edits, and the player tries again."
 },
 {
 "id": "6-inside-one-round-demo.figcaption1",
 "section": "6. Inside one round (demo)",
 "tag": "figcaption",
-"start": 13891,
-"end": 14196,
+"start": 15169,
+"end": 15474,
 "orig_inner": "<b>Figure 6</b>: a traced re-run of one coaching round on the practice puzzles, made after the study. &#8220;Reasoning summary&#8221; is the summary of the model's hidden reasoning that the API returned; commands and outputs are as the coach saw them, with long outputs shortened. Not part of the results.",
 "md": "**Figure 6**: a traced re-run of one coaching round on the practice puzzles, made after the study. \u201cReasoning summary\u201d is the summary of the model's hidden reasoning that the API returned; commands and outputs are as the coach saw them, with long outputs shortened. Not part of the results."
 },
@@ -415,8 +415,8 @@
 "id": "7-takeaways.h21",
 "section": "7. Takeaways",
 "tag": "h2",
-"start": 14385,
-"end": 14402,
+"start": 15663,
+"end": 15680,
 "orig_inner": "What to take away",
 "md": "What to take away"
 },
@@ -424,8 +424,8 @@
 "id": "7-takeaways.li1",
 "section": "7. Takeaways",
 "tag": "li",
-"start": 14423,
-"end": 14518,
+"start": 15701,
+"end": 15796,
 "orig_inner": "No coach, original or self-improved, trained a player that beat the uncoached one on this exam.",
 "md": "No coach, original or self-improved, trained a player that beat the uncoached one on this exam."
 },
@@ -433,44 +433,44 @@
 "id": "7-takeaways.li2",
 "section": "7. Takeaways",
 "tag": "li",
-"start": 14532,
-"end": 14657,
-"orig_inner": "Letting the model think longer was worth about <span data-v=\"pp0:derived.xhighGain\">12</span> points; no coaching came close.",
-"md": "Letting the model think longer was worth about {{pp0:derived.xhighGain}} points; no coaching came close."
+"start": 15810,
+"end": 15935,
+"orig_inner": "Letting the model think longer was worth about <span data-v=\"pp0:derived.xhighGain\">12</span> points. No coaching came close.",
+"md": "Letting the model think longer was worth about {{pp0:derived.xhighGain}} points. No coaching came close."
 },
 {
 "id": "7-takeaways.li3",
 "section": "7. Takeaways",
 "tag": "li",
-"start": 14671,
-"end": 14866,
-"orig_inner": "Coaches seldom rewrote themselves, and testing one unchanged coach three times moved its score by <span data-v=\"pp0:derived.sameCoachSpread\">10</span> points, so small differences here are noise.",
-"md": "Coaches seldom rewrote themselves, and testing one unchanged coach three times moved its score by {{pp0:derived.sameCoachSpread}} points, so small differences here are noise."
+"start": 15949,
+"end": 16166,
+"orig_inner": "Coaches rarely rewrote themselves. And when we tested one unchanged coach three times, its score moved by <span data-v=\"pp0:derived.sameCoachSpread\">10</span> points, so small differences in this study are just noise.",
+"md": "Coaches rarely rewrote themselves. And when we tested one unchanged coach three times, its score moved by {{pp0:derived.sameCoachSpread}} points, so small differences in this study are just noise."
 },
 {
 "id": "7-takeaways.li4",
 "section": "7. Takeaways",
 "tag": "li",
-"start": 14880,
-"end": 15175,
-"orig_inner": "Up close, a coach's edit can be sensible and still help only some puzzles: in the traced round, the player with a self-check on its second try solved one puzzle more often and another one never. That is one round, so it illustrates how coaching works; it is not evidence about how well it works.",
-"md": "Up close, a coach's edit can be sensible and still help only some puzzles: in the traced round, the player with a self-check on its second try solved one puzzle more often and another one never. That is one round, so it illustrates how coaching works; it is not evidence about how well it works."
+"start": 16180,
+"end": 16486,
+"orig_inner": "Up close, a coach's edit can make sense and still help only some puzzles. In the traced round, giving the player a self-check on its second try made one puzzle get solved more often, while another was never solved. That's a single round, so it shows <i>how</i> coaching works, not <i>how well</i> it works.",
+"md": "Up close, a coach's edit can make sense and still help only some puzzles. In the traced round, giving the player a self-check on its second try made one puzzle get solved more often, while another was never solved. That's a single round, so it shows *how* coaching works, not *how well* it works."
 },
 {
 "id": "7-takeaways.p1",
 "section": "7. Takeaways",
 "tag": "p",
-"start": 15194,
-"end": 15411,
-"orig_inner": "Below, you can browse every run, every exam answer and every change a coach made to itself (<a href=\"#audit\">Code changes</a>). The caveats, costs and full method are under <a href=\"#numbers\">Numbers &amp; method</a>.",
-"md": "Below, you can browse every run, every exam answer and every change a coach made to itself ([Code changes](#audit)). The caveats, costs and full method are under [Numbers & method](#numbers)."
+"start": 16505,
+"end": 16722,
+"orig_inner": "Below, you can browse every run, every exam answer and every change a coach made to itself (<a href=\"#audit\">Code changes</a>). Caveats, costs and the full method are under <a href=\"#numbers\">Numbers &amp; method</a>.",
+"md": "Below, you can browse every run, every exam answer and every change a coach made to itself ([Code changes](#audit)). Caveats, costs and the full method are under [Numbers & method](#numbers)."
 },
 {
 "id": "7-explore.h21",
 "section": "7. Explore",
 "tag": "h2",
-"start": 15610,
-"end": 15626,
+"start": 16921,
+"end": 16937,
 "orig_inner": "Explore the data",
 "md": "Explore the data"
 },
@@ -478,8 +478,8 @@
 "id": "7-explore.p1",
 "section": "7. Explore",
 "tag": "p",
-"start": 15658,
-"end": 15703,
+"start": 16969,
+"end": 17014,
 "orig_inner": "Everything behind Figures 1 to 5. Pick a tab.",
 "md": "Everything behind Figures 1 to 5. Pick a tab."
 },
@@ -487,26 +487,26 @@
 "id": "7-explore.p2",
 "section": "7. Explore",
 "tag": "p",
-"start": 16717,
-"end": 16817,
-"orig_inner": "How practice score changed, version by version. Pick a dot to follow its coach and see what changed.",
-"md": "How practice score changed, version by version. Pick a dot to follow its coach and see what changed."
+"start": 18028,
+"end": 18132,
+"orig_inner": "How the practice score changed, version by version. Pick a dot to follow its coach and see what changed.",
+"md": "How the practice score changed, version by version. Pick a dot to follow its coach and see what changed."
 },
 {
 "id": "7-explore.figcaption1",
 "section": "7. Explore",
 "tag": "figcaption",
-"start": 17014,
-"end": 17174,
-"orig_inner": "Practice score: share of the 25 practice puzzles solved. A tested coach was frozen and used to train a fresh player for 8 rounds; that player then sat the exam.",
-"md": "Practice score: share of the 25 practice puzzles solved. A tested coach was frozen and used to train a fresh player for 8 rounds; that player then sat the exam."
+"start": 18329,
+"end": 18493,
+"orig_inner": "Practice score: the share of the 25 practice puzzles solved. A tested coach was frozen and used to train a fresh player for 8 rounds; that player then sat the exam.",
+"md": "Practice score: the share of the 25 practice puzzles solved. A tested coach was frozen and used to train a fresh player for 8 rounds; that player then sat the exam."
 },
 {
 "id": "7-explore.p3",
 "section": "7. Explore",
 "tag": "p",
-"start": 17348,
-"end": 17433,
+"start": 18667,
+"end": 18752,
 "orig_inner": "All 120 exam puzzles. Pick one to see each run's two answers next to the correct one.",
 "md": "All 120 exam puzzles. Pick one to see each run's two answers next to the correct one."
 },
@@ -514,17 +514,17 @@
 "id": "7-explore.figcaption2",
 "section": "7. Explore",
 "tag": "figcaption",
-"start": 17634,
-"end": 17756,
-"orig_inner": "Answer grids were kept for 17 of the 23 exam runs; for the other six (follow-up runs 2 to 4) only right or wrong was kept.",
-"md": "Answer grids were kept for 17 of the 23 exam runs; for the other six (follow-up runs 2 to 4) only right or wrong was kept."
+"start": 18953,
+"end": 19077,
+"orig_inner": "Answer grids were kept for 17 of the 23 exam runs. For the other six (follow-up runs 2 to 4), only right or wrong was saved.",
+"md": "Answer grids were kept for 17 of the 23 exam runs. For the other six (follow-up runs 2 to 4), only right or wrong was saved."
 },
 {
 "id": "7-explore.p4",
 "section": "7. Explore",
 "tag": "p",
-"start": 17940,
-"end": 17985,
+"start": 19261,
+"end": 19306,
 "orig_inner": "What the player and the coach actually wrote.",
 "md": "What the player and the coach actually wrote."
 },
@@ -532,35 +532,35 @@
 "id": "7-explore.figcaption3",
 "section": "7. Explore",
 "tag": "figcaption",
-"start": 18196,
-"end": 18336,
-"orig_inner": "Player transcripts were saved only for failed practice answers. Long prompts are shortened. The model's hidden reasoning was never recorded.",
-"md": "Player transcripts were saved only for failed practice answers. Long prompts are shortened. The model's hidden reasoning was never recorded."
+"start": 19517,
+"end": 19661,
+"orig_inner": "Player transcripts were saved only for failed practice answers, and long prompts are shortened. The model's hidden reasoning was never recorded.",
+"md": "Player transcripts were saved only for failed practice answers, and long prompts are shortened. The model's hidden reasoning was never recorded."
 },
 {
 "id": "7-explore.p5",
 "section": "7. Explore",
 "tag": "p",
-"start": 18508,
-"end": 18620,
-"orig_inner": "Every change the tested coaches made to their own code, and whether it was general or specific to these puzzles.",
-"md": "Every change the tested coaches made to their own code, and whether it was general or specific to these puzzles."
+"start": 19833,
+"end": 19952,
+"orig_inner": "Every change the tested coaches made to their own code, and whether it was general advice or specific to these puzzles.",
+"md": "Every change the tested coaches made to their own code, and whether it was general advice or specific to these puzzles."
 },
 {
 "id": "7-explore.figcaption4",
 "section": "7. Explore",
 "tag": "figcaption",
-"start": 18819,
-"end": 18908,
-"orig_inner": "Each picked coach compared with the original coach; each change was judged by two judges.",
-"md": "Each picked coach compared with the original coach; each change was judged by two judges."
+"start": 20151,
+"end": 20240,
+"orig_inner": "Each picked coach compared with the original coach; every change was rated by two judges.",
+"md": "Each picked coach compared with the original coach; every change was rated by two judges."
 },
 {
 "id": "7-explore.p6",
 "section": "7. Explore",
 "tag": "p",
-"start": 19084,
-"end": 19137,
+"start": 20416,
+"end": 20469,
 "orig_inner": "The statistics, the cost, the caveats and the method.",
 "md": "The statistics, the cost, the caveats and the method."
 },
@@ -568,17 +568,17 @@
 "id": "7-explore.figcaption5",
 "section": "7. Explore",
 "tag": "figcaption",
-"start": 19355,
-"end": 19490,
-"orig_inner": "Exam score of every finished player, also against the tokens it used, and the pre-registered comparisons as 95% intervals against zero.",
-"md": "Exam score of every finished player, also against the tokens it used, and the pre-registered comparisons as 95% intervals against zero."
+"start": 20687,
+"end": 20831,
+"orig_inner": "Exam score of every finished player, also plotted against the tokens it used, plus the pre-registered comparisons as 95% intervals against zero.",
+"md": "Exam score of every finished player, also plotted against the tokens it used, plus the pre-registered comparisons as 95% intervals against zero."
 },
 {
 "id": "7-explore.h31",
 "section": "7. Explore",
 "tag": "h3",
-"start": 19570,
-"end": 19574,
+"start": 20911,
+"end": 20915,
 "orig_inner": "Cost",
 "md": "Cost"
 },
@@ -586,17 +586,17 @@
 "id": "7-explore.p7",
 "section": "7. Explore",
 "tag": "p",
-"start": 19589,
-"end": 19972,
-"orig_inner": "The study cost <span data-v=\"usd:spend.total\">$152.23</span> in model calls: players <span data-v=\"usd:spend.by_role.task\">$148.03</span>, coaches <span data-v=\"usd:spend.by_role.meta\">$4.19</span>. A coach used about <span data-v=\"tokens:derived.metaTokI0\">350k</span> tokens per round (original coach) or <span data-v=\"tokens:derived.metaTokIg\">188k</span> (self-improved coaches).",
-"md": "The study cost {{usd:spend.total}} in model calls: players {{usd:spend.by_role.task}}, coaches {{usd:spend.by_role.meta}}. A coach used about {{tokens:derived.metaTokI0}} tokens per round (original coach) or {{tokens:derived.metaTokIg}} (self-improved coaches)."
+"start": 20930,
+"end": 21390,
+"orig_inner": "The whole study cost <span data-v=\"usd:spend.total\">$152.23</span> in model calls: <span data-v=\"usd:spend.by_role.task\">$148.03</span> for players and <span data-v=\"usd:spend.by_role.meta\">$4.19</span> for coaches. Per round, a coach used about <span data-v=\"tokens:derived.metaTokI0\">350k</span> tokens (the chunks of text a model reads and writes) if it was the original coach, or <span data-v=\"tokens:derived.metaTokIg\">188k</span> if it was self-improved.",
+"md": "The whole study cost {{usd:spend.total}} in model calls: {{usd:spend.by_role.task}} for players and {{usd:spend.by_role.meta}} for coaches. Per round, a coach used about {{tokens:derived.metaTokI0}} tokens (the chunks of text a model reads and writes) if it was the original coach, or {{tokens:derived.metaTokIg}} if it was self-improved."
 },
 {
 "id": "7-explore.th1",
 "section": "7. Explore",
 "tag": "th",
-"start": 20071,
-"end": 20076,
+"start": 21489,
+"end": 21494,
 "orig_inner": "Phase",
 "md": "Phase"
 },
@@ -604,8 +604,8 @@
 "id": "7-explore.th2",
 "section": "7. Explore",
 "tag": "th",
-"start": 20107,
-"end": 20113,
+"start": 21525,
+"end": 21531,
 "orig_inner": "Player",
 "md": "Player"
 },
@@ -613,8 +613,8 @@
 "id": "7-explore.th3",
 "section": "7. Explore",
 "tag": "th",
-"start": 20144,
-"end": 20149,
+"start": 21562,
+"end": 21567,
 "orig_inner": "Coach",
 "md": "Coach"
 },
@@ -622,8 +622,8 @@
 "id": "7-explore.td1",
 "section": "7. Explore",
 "tag": "td",
-"start": 20206,
-"end": 20232,
+"start": 21624,
+"end": 21650,
 "orig_inner": "Exams, all coached players",
 "md": "Exams, all coached players"
 },
@@ -631,8 +631,8 @@
 "id": "7-explore.td2",
 "section": "7. Explore",
 "tag": "td",
-"start": 20293,
-"end": 20299,
+"start": 21711,
+"end": 21717,
 "orig_inner": "$80.86",
 "md": "$80.86"
 },
@@ -640,8 +640,8 @@
 "id": "7-explore.td3",
 "section": "7. Explore",
 "tag": "td",
-"start": 20351,
-"end": 20380,
+"start": 21769,
+"end": 21798,
 "orig_inner": "Step 1: self-improvement runs",
 "md": "Step 1: self-improvement runs"
 },
@@ -649,8 +649,8 @@
 "id": "7-explore.td4",
 "section": "7. Explore",
 "tag": "td",
-"start": 20441,
-"end": 20447,
+"start": 21859,
+"end": 21865,
 "orig_inner": "$23.03",
 "md": "$23.03"
 },
@@ -658,8 +658,8 @@
 "id": "7-explore.td5",
 "section": "7. Explore",
 "tag": "td",
-"start": 20508,
-"end": 20513,
+"start": 21926,
+"end": 21931,
 "orig_inner": "$2.25",
 "md": "$2.25"
 },
@@ -667,8 +667,8 @@
 "id": "7-explore.td6",
 "section": "7. Explore",
 "tag": "td",
-"start": 20544,
-"end": 20577,
+"start": 21962,
+"end": 21995,
 "orig_inner": "Step 2: test runs (8 rounds each)",
 "md": "Step 2: test runs (8 rounds each)"
 },
@@ -676,8 +676,8 @@
 "id": "7-explore.td7",
 "section": "7. Explore",
 "tag": "td",
-"start": 20638,
-"end": 20644,
+"start": 22056,
+"end": 22062,
 "orig_inner": "$12.02",
 "md": "$12.02"
 },
@@ -685,8 +685,8 @@
 "id": "7-explore.td8",
 "section": "7. Explore",
 "tag": "td",
-"start": 20705,
-"end": 20710,
+"start": 22123,
+"end": 22128,
 "orig_inner": "$1.17",
 "md": "$1.17"
 },
@@ -694,8 +694,8 @@
 "id": "7-explore.td9",
 "section": "7. Explore",
 "tag": "td",
-"start": 20741,
-"end": 20758,
+"start": 22159,
+"end": 22176,
 "orig_inner": "No coach, 3 exams",
 "md": "No coach, 3 exams"
 },
@@ -703,8 +703,8 @@
 "id": "7-explore.td10",
 "section": "7. Explore",
 "tag": "td",
-"start": 20819,
-"end": 20824,
+"start": 22237,
+"end": 22242,
 "orig_inner": "$8.76",
 "md": "$8.76"
 },
@@ -712,8 +712,8 @@
 "id": "7-explore.td11",
 "section": "7. Explore",
 "tag": "td",
-"start": 20876,
-"end": 20896,
+"start": 22294,
+"end": 22314,
 "orig_inner": "Re-scoring finalists",
 "md": "Re-scoring finalists"
 },
@@ -721,8 +721,8 @@
 "id": "7-explore.td12",
 "section": "7. Explore",
 "tag": "td",
-"start": 20957,
-"end": 20962,
+"start": 22375,
+"end": 22380,
 "orig_inner": "$7.72",
 "md": "$7.72"
 },
@@ -730,8 +730,8 @@
 "id": "7-explore.td13",
 "section": "7. Explore",
 "tag": "td",
-"start": 21014,
-"end": 21033,
+"start": 22432,
+"end": 22451,
 "orig_inner": "Follow-up test runs",
 "md": "Follow-up test runs"
 },
@@ -739,8 +739,8 @@
 "id": "7-explore.td14",
 "section": "7. Explore",
 "tag": "td",
-"start": 21094,
-"end": 21099,
+"start": 22512,
+"end": 22517,
 "orig_inner": "$6.95",
 "md": "$6.95"
 },
@@ -748,8 +748,8 @@
 "id": "7-explore.td15",
 "section": "7. Explore",
 "tag": "td",
-"start": 21161,
-"end": 21166,
+"start": 22579,
+"end": 22584,
 "orig_inner": "$0.69",
 "md": "$0.69"
 },
@@ -757,8 +757,8 @@
 "id": "7-explore.td16",
 "section": "7. Explore",
 "tag": "td",
-"start": 21197,
-"end": 21217,
+"start": 22615,
+"end": 22635,
 "orig_inner": "Think longer, 1 exam",
 "md": "Think longer, 1 exam"
 },
@@ -766,8 +766,8 @@
 "id": "7-explore.td17",
 "section": "7. Explore",
 "tag": "td",
-"start": 21278,
-"end": 21283,
+"start": 22696,
+"end": 22701,
 "orig_inner": "$5.75",
 "md": "$5.75"
 },
@@ -775,8 +775,8 @@
 "id": "7-explore.td18",
 "section": "7. Explore",
 "tag": "td",
-"start": 21335,
-"end": 21362,
+"start": 22753,
+"end": 22780,
 "orig_inner": "Scoring the starting player",
 "md": "Scoring the starting player"
 },
@@ -784,8 +784,8 @@
 "id": "7-explore.td19",
 "section": "7. Explore",
 "tag": "td",
-"start": 21423,
-"end": 21428,
+"start": 22841,
+"end": 22846,
 "orig_inner": "$1.32",
 "md": "$1.32"
 },
@@ -793,8 +793,8 @@
 "id": "7-explore.td20",
 "section": "7. Explore",
 "tag": "td",
-"start": 21480,
-"end": 21497,
+"start": 22898,
+"end": 22915,
 "orig_inner": "Transplant checks",
 "md": "Transplant checks"
 },
@@ -802,8 +802,8 @@
 "id": "7-explore.td21",
 "section": "7. Explore",
 "tag": "td",
-"start": 21559,
-"end": 21564,
+"start": 22977,
+"end": 22982,
 "orig_inner": "$0.81",
 "md": "$0.81"
 },
@@ -811,8 +811,8 @@
 "id": "7-explore.td22",
 "section": "7. Explore",
 "tag": "td",
-"start": 21626,
-"end": 21631,
+"start": 23044,
+"end": 23049,
 "orig_inner": "$0.04",
 "md": "$0.04"
 },
@@ -820,8 +820,8 @@
 "id": "7-explore.td23",
 "section": "7. Explore",
 "tag": "td",
-"start": 21662,
-"end": 21679,
+"start": 23080,
+"end": 23097,
 "orig_inner": "Screening puzzles",
 "md": "Screening puzzles"
 },
@@ -829,8 +829,8 @@
 "id": "7-explore.td24",
 "section": "7. Explore",
 "tag": "td",
-"start": 21741,
-"end": 21746,
+"start": 23159,
+"end": 23164,
 "orig_inner": "$0.71",
 "md": "$0.71"
 },
@@ -838,8 +838,8 @@
 "id": "7-explore.td25",
 "section": "7. Explore",
 "tag": "td",
-"start": 21798,
-"end": 21808,
+"start": 23216,
+"end": 23226,
 "orig_inner": "Smoke test",
 "md": "Smoke test"
 },
@@ -847,8 +847,8 @@
 "id": "7-explore.td26",
 "section": "7. Explore",
 "tag": "td",
-"start": 21870,
-"end": 21875,
+"start": 23288,
+"end": 23293,
 "orig_inner": "$0.08",
 "md": "$0.08"
 },
@@ -856,8 +856,8 @@
 "id": "7-explore.td27",
 "section": "7. Explore",
 "tag": "td",
-"start": 21937,
-"end": 21942,
+"start": 23355,
+"end": 23360,
 "orig_inner": "$0.03",
 "md": "$0.03"
 },
@@ -865,8 +865,8 @@
 "id": "7-explore.td28",
 "section": "7. Explore",
 "tag": "td",
-"start": 21987,
-"end": 21992,
+"start": 23405,
+"end": 23410,
 "orig_inner": "Total",
 "md": "Total"
 },
@@ -874,8 +874,8 @@
 "id": "7-explore.td29",
 "section": "7. Explore",
 "tag": "td",
-"start": 22045,
-"end": 22052,
+"start": 23463,
+"end": 23470,
 "orig_inner": "$148.03",
 "md": "$148.03"
 },
@@ -883,8 +883,8 @@
 "id": "7-explore.td30",
 "section": "7. Explore",
 "tag": "td",
-"start": 22105,
-"end": 22110,
+"start": 23523,
+"end": 23528,
 "orig_inner": "$4.19",
 "md": "$4.19"
 },
@@ -892,17 +892,17 @@
 "id": "7-explore.caption1",
 "section": "7. Explore",
 "tag": "caption",
-"start": 22159,
-"end": 22272,
-"orig_inner": "Spend by phase from the gateway ledger. Phases under one cent are left out of the rows but counted in the totals.",
-"md": "Spend by phase from the gateway ledger. Phases under one cent are left out of the rows but counted in the totals."
+"start": 23577,
+"end": 23696,
+"orig_inner": "Spending by phase, from the gateway's ledger. Phases under one cent are left out of the rows but counted in the totals.",
+"md": "Spending by phase, from the gateway's ledger. Phases under one cent are left out of the rows but counted in the totals."
 },
 {
 "id": "7-explore.h32",
 "section": "7. Explore",
 "tag": "h3",
-"start": 22337,
-"end": 22344,
+"start": 23761,
+"end": 23768,
 "orig_inner": "Caveats",
 "md": "Caveats"
 },
@@ -910,62 +910,62 @@
 "id": "7-explore.li1",
 "section": "7. Explore",
 "tag": "li",
-"start": 22389,
-"end": 22711,
-"orig_inner": "<b>Noise.</b> There were only 3 to 6 runs per group. One unchanged coach scored <span data-v=\"pct:derived.sameCoach.g12\">26.0%</span>, <span data-v=\"pct:derived.sameCoach.g20\">27.8%</span> and <span data-v=\"pct:derived.sameCoach.g40\">36.0%</span> in three tests, and several later picks were the same code as earlier ones.",
-"md": "**Noise.** There were only 3 to 6 runs per group. One unchanged coach scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}} in three tests, and several later picks were the same code as earlier ones."
+"start": 23813,
+"end": 24133,
+"orig_inner": "<b>Noise.</b> Each group had only 3 to 6 runs. One unchanged coach scored <span data-v=\"pct:derived.sameCoach.g12\">26.0%</span>, <span data-v=\"pct:derived.sameCoach.g20\">27.8%</span> and <span data-v=\"pct:derived.sameCoach.g40\">36.0%</span> across three tests, and several later picks were the same code as earlier ones.",
+"md": "**Noise.** Each group had only 3 to 6 runs. One unchanged coach scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}} across three tests, and several later picks were the same code as earlier ones."
 },
 {
 "id": "7-explore.li2",
 "section": "7. Explore",
 "tag": "li",
-"start": 22729,
-"end": 22991,
-"orig_inner": "<b>The original coach needed adapting.</b> With the repository's instruction as written, the model only asked clarifying questions. We added one sentence (\"work autonomously\") and loosened tool-call parsing. Both kinds of coach started from this adapted version.",
-"md": "**The original coach needed adapting.** With the repository's instruction as written, the model only asked clarifying questions. We added one sentence (\"work autonomously\") and loosened tool-call parsing. Both kinds of coach started from this adapted version."
+"start": 24151,
+"end": 24424,
+"orig_inner": "<b>The original coach needed adapting.</b> With the repository's instruction as written, the model only asked clarifying questions. We added one sentence (\"work autonomously\") and made tool-call parsing more forgiving. Both kinds of coach started from this adapted version.",
+"md": "**The original coach needed adapting.** With the repository's instruction as written, the model only asked clarifying questions. We added one sentence (\"work autonomously\") and made tool-call parsing more forgiving. Both kinds of coach started from this adapted version."
 },
 {
 "id": "7-explore.li3",
 "section": "7. Explore",
 "tag": "li",
-"start": 23009,
-"end": 23185,
-"orig_inner": "<b>The original coach often made no edit.</b> It ended 11 of its first 31 rounds without one, mostly from tool-call format problems. This was left as it was, as pre-registered.",
-"md": "**The original coach often made no edit.** It ended 11 of its first 31 rounds without one, mostly from tool-call format problems. This was left as it was, as pre-registered."
+"start": 24442,
+"end": 24627,
+"orig_inner": "<b>The original coach often made no edit.</b> It ended 11 of its first 31 rounds without one, mostly because of tool-call formatting problems. As pre-registered, we left this as it was.",
+"md": "**The original coach often made no edit.** It ended 11 of its first 31 rounds without one, mostly because of tool-call formatting problems. As pre-registered, we left this as it was."
 },
 {
 "id": "7-explore.li4",
 "section": "7. Explore",
 "tag": "li",
-"start": 23203,
-"end": 23347,
-"orig_inner": "<b>Some coach edits broke the player.</b> One edit passed an argument the function did not accept, and that player scored 0. Such results count.",
-"md": "**Some coach edits broke the player.** One edit passed an argument the function did not accept, and that player scored 0. Such results count."
+"start": 24645,
+"end": 24799,
+"orig_inner": "<b>Some coach edits broke the player.</b> One edit passed an argument the function didn't accept, and that player scored 0. Results like this still count.",
+"md": "**Some coach edits broke the player.** One edit passed an argument the function didn't accept, and that player scored 0. Results like this still count."
 },
 {
 "id": "7-explore.li5",
 "section": "7. Explore",
 "tag": "li",
-"start": 23365,
-"end": 23761,
-"orig_inner": "<b>Re-runs.</b> Harness bugs forced restarts of two original-coach test runs (one of them twice) and cost one self-improvement run a generation. An early 30-minute limit cut off 49 exam answers for the no-coach and think-longer players; all were re-run under a 2 to 3 hour limit (think longer: 39.9% before, <span data-v=\"pct:xhigh.score\">41.1%</span> after). Six machine restarts lost no result.",
-"md": "**Re-runs.** Harness bugs forced restarts of two original-coach test runs (one of them twice) and cost one self-improvement run a generation. An early 30-minute limit cut off 49 exam answers for the no-coach and think-longer players; all were re-run under a 2 to 3 hour limit (think longer: 39.9% before, {{pct:xhigh.score}} after). Six machine restarts lost no result."
+"start": 24817,
+"end": 25230,
+"orig_inner": "<b>Re-runs.</b> Bugs in the test harness forced restarts of two original-coach test runs (one of them twice) and cost one self-improvement run a generation. An early 30-minute time limit cut off 49 exam answers for the no-coach and think-longer players; all were re-run with a 2 to 3 hour limit (think longer: 39.9% before, <span data-v=\"pct:xhigh.score\">41.1%</span> after). Six machine restarts lost no results.",
+"md": "**Re-runs.** Bugs in the test harness forced restarts of two original-coach test runs (one of them twice) and cost one self-improvement run a generation. An early 30-minute time limit cut off 49 exam answers for the no-coach and think-longer players; all were re-run with a 2 to 3 hour limit (think longer: 39.9% before, {{pct:xhigh.score}} after). Six machine restarts lost no results."
 },
 {
 "id": "7-explore.li6",
 "section": "7. Explore",
 "tag": "li",
-"start": 23779,
-"end": 24115,
-"orig_inner": "<b>An untouched final player.</b> In one follow-up test (generation-20 coach, run 4), the untouched starting player beat the best edited finalist on practice (<span data-v=\"num2:derived.untouchedWin.untouched\">0.70</span> vs <span data-v=\"num2:derived.untouchedWin.edited\">0.66</span>), so that exam score is the untouched player's own.",
-"md": "**An untouched final player.** In one follow-up test (generation-20 coach, run 4), the untouched starting player beat the best edited finalist on practice ({{num2:derived.untouchedWin.untouched}} vs {{num2:derived.untouchedWin.edited}}), so that exam score is the untouched player's own."
+"start": 25248,
+"end": 25588,
+"orig_inner": "<b>An untouched final player.</b> In one follow-up test (the generation-20 coach, run 4), the untouched starting player beat the best edited finalist on practice (<span data-v=\"num2:derived.untouchedWin.untouched\">0.70</span> vs <span data-v=\"num2:derived.untouchedWin.edited\">0.66</span>). So that exam score is the untouched player's own.",
+"md": "**An untouched final player.** In one follow-up test (the generation-20 coach, run 4), the untouched starting player beat the best edited finalist on practice ({{num2:derived.untouchedWin.untouched}} vs {{num2:derived.untouchedWin.edited}}). So that exam score is the untouched player's own."
 },
 {
 "id": "7-explore.li7",
 "section": "7. Explore",
 "tag": "li",
-"start": 24133,
-"end": 24262,
+"start": 25606,
+"end": 25735,
 "orig_inner": "<b>Transcripts are partial.</b> They were saved only for failed practice answers (1,513 of them) and contain no hidden reasoning.",
 "md": "**Transcripts are partial.** They were saved only for failed practice answers (1,513 of them) and contain no hidden reasoning."
 },
@@ -973,8 +973,8 @@
 "id": "7-explore.p8",
 "section": "7. Explore",
 "tag": "p",
-"start": 24308,
-"end": 24425,
+"start": 25781,
+"end": 25898,
 "orig_inner": "Every deviation, bug and re-run is logged in <code>DECISIONS.md</code> <a class=\"cite\" href=\"#ref-decisions\">[5]</a>.",
 "md": "Every deviation, bug and re-run is logged in `DECISIONS.md` [[5]](#ref-decisions \"cite\")."
 },
@@ -982,8 +982,8 @@
 "id": "7-explore.h33",
 "section": "7. Explore",
 "tag": "h3",
-"start": 24455,
-"end": 24469,
+"start": 25928,
+"end": 25942,
 "orig_inner": "Method in full",
 "md": "Method in full"
 },
@@ -991,17 +991,17 @@
 "id": "7-explore.summary1",
 "section": "7. Explore",
 "tag": "summary",
-"start": 24537,
-"end": 24569,
-"orig_inner": "Design, fixed before the results",
-"md": "Design, fixed before the results"
+"start": 26010,
+"end": 26046,
+"orig_inner": "The design, fixed before any results",
+"md": "The design, fixed before any results"
 },
 {
 "id": "7-explore.li8",
 "section": "7. Explore",
 "tag": "li",
-"start": 24625,
-"end": 24741,
+"start": 26102,
+"end": 26218,
 "orig_inner": "<b>Question.</b> With equal compute, does a coach that evolved itself train a better player than the original coach?",
 "md": "**Question.** With equal compute, does a coach that evolved itself train a better player than the original coach?"
 },
@@ -1009,26 +1009,26 @@
 "id": "7-explore.li9",
 "section": "7. Explore",
 "tag": "li",
-"start": 24761,
-"end": 25032,
-"orig_inner": "<b>Pre-registration.</b> <code>DESIGN.md</code>, <code>splits.json</code> and <code>analysis.py</code> were committed at <code>f577cc7</code> before any test result existed; the follow-up plan, <code>DESIGN_v2.md</code>, at <code>991a237</code> before any follow-up test.",
-"md": "**Pre-registration.** `DESIGN.md`, `splits.json` and `analysis.py` were committed at `f577cc7` before any test result existed; the follow-up plan, `DESIGN_v2.md`, at `991a237` before any follow-up test."
+"start": 26238,
+"end": 26593,
+"orig_inner": "<b>Pre-registration.</b> <code>DESIGN.md</code>, <code>splits.json</code> and <code>analysis.py</code> were committed at <code>f577cc7</code> before any test result existed, so the plan and the analysis couldn't be adjusted to fit the results. The follow-up plan, <code>DESIGN_v2.md</code>, was committed at <code>991a237</code> before any follow-up test.",
+"md": "**Pre-registration.** `DESIGN.md`, `splits.json` and `analysis.py` were committed at `f577cc7` before any test result existed, so the plan and the analysis couldn't be adjusted to fit the results. The follow-up plan, `DESIGN_v2.md`, was committed at `991a237` before any follow-up test."
 },
 {
 "id": "7-explore.li10",
 "section": "7. Explore",
 "tag": "li",
-"start": 25052,
-"end": 25198,
-"orig_inner": "<b>Model.</b> gpt-6-luna through the OpenAI Responses API, for player and coach. Reasoning effort high for both; the think-longer exam used xhigh.",
-"md": "**Model.** gpt-6-luna through the OpenAI Responses API, for player and coach. Reasoning effort high for both; the think-longer exam used xhigh."
+"start": 26613,
+"end": 26778,
+"orig_inner": "<b>Model.</b> gpt-6-luna via the OpenAI Responses API, for both player and coach. Reasoning effort was <i>high</i> for both; the think-longer exam used <i>xhigh</i>.",
+"md": "**Model.** gpt-6-luna via the OpenAI Responses API, for both player and coach. Reasoning effort was *high* for both; the think-longer exam used *xhigh*."
 },
 {
 "id": "7-explore.li11",
 "section": "7. Explore",
 "tag": "li",
-"start": 25218,
-"end": 25355,
+"start": 26798,
+"end": 26935,
 "orig_inner": "<b>Player budget.</b> At most 2 model calls and 2 answers per test input. A test input counts as solved if either answer matches exactly.",
 "md": "**Player budget.** At most 2 model calls and 2 answers per test input. A test input counts as solved if either answer matches exactly."
 },
@@ -1036,8 +1036,8 @@
 "id": "7-explore.li12",
 "section": "7. Explore",
 "tag": "li",
-"start": 25375,
-"end": 25427,
+"start": 26955,
+"end": 27007,
 "orig_inner": "<b>Coach budget.</b> 600k tokens per coaching round.",
 "md": "**Coach budget.** 600k tokens per coaching round."
 },
@@ -1045,8 +1045,8 @@
 "id": "7-explore.li13",
 "section": "7. Explore",
 "tag": "li",
-"start": 25447,
-"end": 25584,
+"start": 27027,
+"end": 27164,
 "orig_inner": "<b>Spending cap.</b> $150, raised to $200 before the follow-up. Prices: input $0.10, cached input $0.01, output $0.50 per million tokens.",
 "md": "**Spending cap.** $150, raised to $200 before the follow-up. Prices: input $0.10, cached input $0.01, output $0.50 per million tokens."
 },
@@ -1054,26 +1054,26 @@
 "id": "7-explore.li14",
 "section": "7. Explore",
 "tag": "li",
-"start": 25604,
-"end": 25762,
-"orig_inner": "<b>Enforcement.</b> A gateway (<code>arcexp/gateway.py</code>) that no agent can edit is the only route to the model. It enforces the caps and keeps a ledger.",
-"md": "**Enforcement.** A gateway (`arcexp/gateway.py`) that no agent can edit is the only route to the model. It enforces the caps and keeps a ledger."
+"start": 27184,
+"end": 27346,
+"orig_inner": "<b>Enforcement.</b> A gateway (<code>arcexp/gateway.py</code>) that no agent can edit is the only way to reach the model. It enforces the caps and keeps a ledger.",
+"md": "**Enforcement.** A gateway (`arcexp/gateway.py`) that no agent can edit is the only way to reach the model. It enforces the caps and keeps a ledger."
 },
 {
 "id": "7-explore.li15",
 "section": "7. Explore",
 "tag": "li",
-"start": 25782,
-"end": 25913,
-"orig_inner": "<b>Sandbox.</b> Every test input runs as an unprivileged user with no network, in a fresh directory, without access to the answers.",
-"md": "**Sandbox.** Every test input runs as an unprivileged user with no network, in a fresh directory, without access to the answers."
+"start": 27366,
+"end": 27502,
+"orig_inner": "<b>Sandbox.</b> Every test input runs as an unprivileged user, with no network, in a fresh directory, and without access to the answers.",
+"md": "**Sandbox.** Every test input runs as an unprivileged user, with no network, in a fresh directory, and without access to the answers."
 },
 {
 "id": "7-explore.li16",
 "section": "7. Explore",
 "tag": "li",
-"start": 25933,
-"end": 26139,
+"start": 27522,
+"end": 27728,
 "orig_inner": "<b>Puzzle sets.</b> ARC-AGI-2 commit <code>f3283f7</code>, seed 20261117. The exam is all 120 public evaluation tasks (167 test inputs). The two practice sets have 25 training tasks each and do not overlap.",
 "md": "**Puzzle sets.** ARC-AGI-2 commit `f3283f7`, seed 20261117. The exam is all 120 public evaluation tasks (167 test inputs). The two practice sets have 25 training tasks each and do not overlap."
 },
@@ -1081,17 +1081,17 @@
 "id": "7-explore.li17",
 "section": "7. Explore",
 "tag": "li",
-"start": 26159,
-"end": 26270,
-"orig_inner": "<b>Score.</b> Share of test inputs solved within each task, averaged over the 120 tasks (task-averaged pass@2).",
-"md": "**Score.** Share of test inputs solved within each task, averaged over the 120 tasks (task-averaged pass@2)."
+"start": 27748,
+"end": 27920,
+"orig_inner": "<b>Score.</b> For each task, the share of its test inputs solved, averaged over the 120 tasks (task-averaged pass@2: an input counts if either of the two answers is right).",
+"md": "**Score.** For each task, the share of its test inputs solved, averaged over the 120 tasks (task-averaged pass@2: an input counts if either of the two answers is right)."
 },
 {
 "id": "7-explore.li18",
 "section": "7. Explore",
 "tag": "li",
-"start": 26290,
-"end": 26450,
+"start": 27940,
+"end": 28100,
 "orig_inner": "<b>Final player of a run.</b> The two best players are re-scored on practice, the untouched starting player included; the better one sits the exam exactly once.",
 "md": "**Final player of a run.** The two best players are re-scored on practice, the untouched starting player included; the better one sits the exam exactly once."
 },
@@ -1099,8 +1099,8 @@
 "id": "7-explore.li19",
 "section": "7. Explore",
 "tag": "li",
-"start": 26470,
-"end": 26688,
+"start": 28120,
+"end": 28338,
 "orig_inner": "<b>Picking a self-improved coach.</b> Among coaches whose code differs from the original and that have at least one scored child, take the one whose children improved most on average; ties go to the earlier generation.",
 "md": "**Picking a self-improved coach.** Among coaches whose code differs from the original and that have at least one scored child, take the one whose children improved most on average; ties go to the earlier generation."
 },
@@ -1108,17 +1108,17 @@
 "id": "7-explore.li20",
 "section": "7. Explore",
 "tag": "li",
-"start": 26708,
-"end": 26834,
-"orig_inner": "<b>Statistics.</b> 95% Welch t-intervals on per-run exam scores. The headline is the first matching row of a pre-written list.",
-"md": "**Statistics.** 95% Welch t-intervals on per-run exam scores. The headline is the first matching row of a pre-written list."
+"start": 28358,
+"end": 28491,
+"orig_inner": "<b>Statistics.</b> 95% Welch t-intervals on per-run exam scores. The headline is the first matching row of a list written in advance.",
+"md": "**Statistics.** 95% Welch t-intervals on per-run exam scores. The headline is the first matching row of a list written in advance."
 },
 {
 "id": "7-explore.summary2",
 "section": "7. Explore",
 "tag": "summary",
-"start": 26910,
-"end": 26932,
+"start": 28567,
+"end": 28589,
 "orig_inner": "What was run, in order",
 "md": "What was run, in order"
 },
@@ -1126,8 +1126,8 @@
 "id": "7-explore.li21",
 "section": "7. Explore",
 "tag": "li",
-"start": 26988,
-"end": 27225,
+"start": 28645,
+"end": 28882,
 "orig_inner": "<b>No coach.</b> The starting player sat the exam 3 times: <span data-v=\"pct:B0.reps.0\">30.1%</span>, <span data-v=\"pct:B0.reps.1\">27.9%</span>, <span data-v=\"pct:B0.reps.2\">29.7%</span> (average <span data-v=\"pct:B0.mean\">29.3%</span>).",
 "md": "**No coach.** The starting player sat the exam 3 times: {{pct:B0.reps.0}}, {{pct:B0.reps.1}}, {{pct:B0.reps.2}} (average {{pct:B0.mean}})."
 },
@@ -1135,8 +1135,8 @@
 "id": "7-explore.li22",
 "section": "7. Explore",
 "tag": "li",
-"start": 27245,
-"end": 27357,
+"start": 28902,
+"end": 29014,
 "orig_inner": "<b>Think longer.</b> The starting player at xhigh effort, one exam: <span data-v=\"pct:xhigh.score\">41.1%</span>.",
 "md": "**Think longer.** The starting player at xhigh effort, one exam: {{pct:xhigh.score}}."
 },
@@ -1144,8 +1144,8 @@
 "id": "7-explore.li23",
 "section": "7. Explore",
 "tag": "li",
-"start": 27377,
-"end": 27687,
+"start": 29034,
+"end": 29344,
 "orig_inner": "<b>Step 1.</b> 6 self-improvement runs of 12 generations. The coach's own code changed in <span data-v=\"int:derived.selfEditGens\">21</span> of <span data-v=\"int:derived.totalGens\">72</span> generations (runs 1 to 6: 1, 4, 5, 1, 7, 3). Run 4 produced no qualifying coach, so 5 self-improved coaches were tested.",
 "md": "**Step 1.** 6 self-improvement runs of 12 generations. The coach's own code changed in {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations (runs 1 to 6: 1, 4, 5, 1, 7, 3). Run 4 produced no qualifying coach, so 5 self-improved coaches were tested."
 },
@@ -1153,8 +1153,8 @@
 "id": "7-explore.li24",
 "section": "7. Explore",
 "tag": "li",
-"start": 27707,
-"end": 28520,
+"start": 29364,
+"end": 30177,
 "orig_inner": "<b>Step 2.</b> Original coach, 6 test runs: <span data-v=\"pct:I0_runs.payoff_I0_1\">26.9%</span>, <span data-v=\"pct:I0_runs.payoff_I0_2\">29.4%</span>, <span data-v=\"pct:I0_runs.payoff_I0_3\">30.4%</span>, <span data-v=\"pct:I0_runs.payoff_I0_4\">30.4%</span>, <span data-v=\"pct:I0_runs.payoff_I0_5\">31.4%</span>, <span data-v=\"pct:I0_runs.payoff_I0_6\">29.4%</span> (average <span data-v=\"pct:I0_mean\">29.7%</span>). Self-improved coaches from runs 1, 2, 3, 5, 6: <span data-v=\"pct:Ig_runs.payoff_Ig_source_s1\">26.0%</span>, <span data-v=\"pct:Ig_runs.payoff_Ig_source_s2\">27.4%</span>, <span data-v=\"pct:Ig_runs.payoff_Ig_source_s3\">31.0%</span>, <span data-v=\"pct:Ig_runs.payoff_Ig_source_s5\">27.2%</span>, <span data-v=\"pct:Ig_runs.payoff_Ig_source_s6\">27.9%</span> (average <span data-v=\"pct:Ig_mean\">27.9%</span>).",
 "md": "**Step 2.** Original coach, 6 test runs: {{pct:I0_runs.payoff_I0_1}}, {{pct:I0_runs.payoff_I0_2}}, {{pct:I0_runs.payoff_I0_3}}, {{pct:I0_runs.payoff_I0_4}}, {{pct:I0_runs.payoff_I0_5}}, {{pct:I0_runs.payoff_I0_6}} (average {{pct:I0_mean}}). Self-improved coaches from runs 1, 2, 3, 5, 6: {{pct:Ig_runs.payoff_Ig_source_s1}}, {{pct:Ig_runs.payoff_Ig_source_s2}}, {{pct:Ig_runs.payoff_Ig_source_s3}}, {{pct:Ig_runs.payoff_Ig_source_s5}}, {{pct:Ig_runs.payoff_Ig_source_s6}} (average {{pct:Ig_mean}})."
 },
@@ -1162,8 +1162,8 @@
 "id": "7-explore.li25",
 "section": "7. Explore",
 "tag": "li",
-"start": 28540,
-"end": 28908,
+"start": 30197,
+"end": 30565,
 "orig_inner": "<b>Pre-registered analysis.</b> Original minus no coach <span data-v=\"pts:G.est\">+0.4</span> <span data-v=\"ci:G\">[&#8722;1.9, +2.8]</span>; self-improved minus original <span data-v=\"pts:Delta.est\">&#8722;1.8</span> <span data-v=\"ci:Delta\">[&#8722;4.2, +0.6]</span>. Headline: \"<span data-v=\"raw:headline\">Neither improver beat two plain attempts on ARC-AGI-2</span>.\"",
 "md": "**Pre-registered analysis.** Original minus no coach {{pts:G.est}} {{ci:G}}; self-improved minus original {{pts:Delta.est}} {{ci:Delta}}. Headline: \"{{raw:headline}}.\""
 },
@@ -1171,8 +1171,8 @@
 "id": "7-explore.li26",
 "section": "7. Explore",
 "tag": "li",
-"start": 28928,
-"end": 29362,
+"start": 30585,
+"end": 31019,
 "orig_inner": "<b>Follow-up.</b> Runs 1 to 4 continued to 40 generations; coaches picked at generations 20 and 40 were tested under the same rules. Averages at generations 0, 12, 20, 40: <span data-v=\"pct:extension.per_generation.0.mean\">29.7%</span>, <span data-v=\"pct:extension.per_generation.12.mean\">27.9%</span>, <span data-v=\"pct:extension.per_generation.20.mean\">29.8%</span>, <span data-v=\"pct:extension.per_generation.40.mean\">30.3%</span>.",
 "md": "**Follow-up.** Runs 1 to 4 continued to 40 generations; coaches picked at generations 20 and 40 were tested under the same rules. Averages at generations 0, 12, 20, 40: {{pct:extension.per_generation.0.mean}}, {{pct:extension.per_generation.12.mean}}, {{pct:extension.per_generation.20.mean}}, {{pct:extension.per_generation.40.mean}}."
 },
@@ -1180,8 +1180,8 @@
 "id": "7-explore.li27",
 "section": "7. Explore",
 "tag": "li",
-"start": 29382,
-"end": 29644,
+"start": 31039,
+"end": 31301,
 "orig_inner": "<b>Code audit.</b> <span data-v=\"int:diff_audit_summary.hunks\">32</span> changed blocks in the picked coaches: <span data-v=\"int:diff_audit_summary.arc_specific\">3</span> specific to these puzzles, <span data-v=\"int:diff_audit_summary.general\">29</span> general.",
 "md": "**Code audit.** {{int:diff_audit_summary.hunks}} changed blocks in the picked coaches: {{int:diff_audit_summary.arc_specific}} specific to these puzzles, {{int:diff_audit_summary.general}} general."
 },
@@ -1189,8 +1189,8 @@
 "id": "7-explore.p9",
 "section": "7. Explore",
 "tag": "p",
-"start": 29733,
-"end": 29935,
+"start": 31390,
+"end": 31592,
 "orig_inner": "Every number on this page is read from <code>explorer/data/*.json</code>, built from the experiment's records by <code>arcexp/build_explorer_data.py</code>. The full write-up is <code>WRITEUP.md</code>.",
 "md": "Every number on this page is read from `explorer/data/*.json`, built from the experiment's records by `arcexp/build_explorer_data.py`. The full write-up is `WRITEUP.md`."
 },
@@ -1198,8 +1198,8 @@
 "id": "references.h21",
 "section": "References",
 "tag": "h2",
-"start": 30131,
-"end": 30141,
+"start": 31788,
+"end": 31798,
 "orig_inner": "References",
 "md": "References"
 },
@@ -1207,8 +1207,8 @@
 "id": "references.li1",
 "section": "References",
 "tag": "li",
-"start": 30175,
-"end": 30348,
+"start": 31832,
+"end": 32005,
 "orig_inner": "ARC Prize Foundation. <i>ARC-AGI-2</i>, public evaluation set, commit <code>f3283f7</code>. <a href=\"https://github.com/arcprize/ARC-AGI-2\">github.com/arcprize/ARC-AGI-2</a>",
 "md": "ARC Prize Foundation. *ARC-AGI-2*, public evaluation set, commit `f3283f7`. [github.com/arcprize/ARC-AGI-2](https://github.com/arcprize/ARC-AGI-2)"
 },
@@ -1216,8 +1216,8 @@
 "id": "references.li2",
 "section": "References",
 "tag": "li",
-"start": 30378,
-"end": 30486,
+"start": 32035,
+"end": 32143,
 "orig_inner": "<code>DESIGN.md</code>, the pre-registered design, committed at <code>f577cc7</code> before any test result.",
 "md": "`DESIGN.md`, the pre-registered design, committed at `f577cc7` before any test result."
 },
@@ -1225,8 +1225,8 @@
 "id": "references.li3",
 "section": "References",
 "tag": "li",
-"start": 30515,
-"end": 30680,
+"start": 32172,
+"end": 32337,
 "orig_inner": "B. L. Welch (1947). The generalization of \"Student's\" problem when several different population variances are involved. <i>Biometrika</i> 34(1&#8211;2), 28&#8211;35.",
 "md": "B. L. Welch (1947). The generalization of \"Student's\" problem when several different population variances are involved. *Biometrika* 34(1\u20132), 28\u201335."
 },
@@ -1234,8 +1234,8 @@
 "id": "references.li4",
 "section": "References",
 "tag": "li",
-"start": 30711,
-"end": 30818,
+"start": 32368,
+"end": 32475,
 "orig_inner": "<code>DESIGN_v2.md</code>, the follow-up plan, committed at <code>991a237</code> before any follow-up test.",
 "md": "`DESIGN_v2.md`, the follow-up plan, committed at `991a237` before any follow-up test."
 },
@@ -1243,36 +1243,36 @@
 "id": "references.li5",
 "section": "References",
 "tag": "li",
-"start": 30851,
-"end": 30910,
+"start": 32508,
+"end": 32567,
 "orig_inner": "<code>DECISIONS.md</code>: every deviation, bug and re-run.",
 "md": "`DECISIONS.md`: every deviation, bug and re-run."
 }
 ],
 "fns": {
 "1": {
-"html": "\"Player\" and \"coach\" are the repository's <i>task agent</i> and <i>meta agent</i>. Both use the same model.",
-"md": "\"Player\" and \"coach\" are the repository's *task agent* and *meta agent*. Both use the same model."
+"html": "In the repository, the \"player\" is the <i>task agent</i> and the \"coach\" is the <i>meta agent</i>. Both run on the same model.",
+"md": "In the repository, the \"player\" is the *task agent* and the \"coach\" is the *meta agent*. Both run on the same model."
 },
 "3": {
-"html": "The 120 public ARC-AGI-2 evaluation tasks <a class=\"cite\" href=\"#ref-arc\">[1]</a>, with <span data-v=\"int:sets.heldout_test_inputs\">167</span> test inputs. A puzzle with several test inputs gives partial credit.",
-"md": "The 120 public ARC-AGI-2 evaluation tasks [[1]](#ref-arc \"cite\"), with {{int:sets.heldout_test_inputs}} test inputs. A puzzle with several test inputs gives partial credit."
+"html": "The 120 public ARC-AGI-2 evaluation tasks <a class=\"cite\" href=\"#ref-arc\">[1]</a>, with <span data-v=\"int:sets.heldout_test_inputs\">167</span> test inputs. A puzzle with several test inputs earns partial credit.",
+"md": "The 120 public ARC-AGI-2 evaluation tasks [[1]](#ref-arc \"cite\"), with {{int:sets.heldout_test_inputs}} test inputs. A puzzle with several test inputs earns partial credit."
 },
 "2": {
-"html": "From each run we took the self-edited coach whose players improved most on practice. The rule was fixed before any exam result existed <a class=\"cite\" href=\"#ref-design\">[2]</a>.",
-"md": "From each run we took the self-edited coach whose players improved most on practice. The rule was fixed before any exam result existed [[2]](#ref-design \"cite\")."
+"html": "From each run we took the self-edited coach whose players improved most on practice. This rule was fixed before any exam result existed <a class=\"cite\" href=\"#ref-design\">[2]</a>.",
+"md": "From each run we took the self-edited coach whose players improved most on practice. This rule was fixed before any exam result existed [[2]](#ref-design \"cite\")."
 },
 "4": {
-"html": "A gateway no agent could edit fixed the model, its reasoning effort (<i>high</i>; <i>xhigh</i> for the think-longer run), the call cap and the budget.",
-"md": "A gateway no agent could edit fixed the model, its reasoning effort (*high*; *xhigh* for the think-longer run), the call cap and the budget."
+"html": "A gateway that no agent could edit fixed the model, its reasoning effort (<i>high</i>; <i>xhigh</i> for the think-longer run), the call cap and the budget.",
+"md": "A gateway that no agent could edit fixed the model, its reasoning effort (*high*; *xhigh* for the think-longer run), the call cap and the budget."
 },
 "5": {
-"html": "95% intervals: original coach minus no coach <span data-v=\"ci:G\">[&#8722;1.9, +2.8]</span> points; self-improved minus no coach <span data-v=\"ci:Ig_gain_over_B0\">[&#8722;4.0, +1.3]</span>; self-improved minus original <span data-v=\"pts:Delta.est\">&#8722;1.8</span> <span data-v=\"ci:Delta\">[&#8722;4.2, +0.6]</span>. All include zero. Welch t-intervals <a class=\"cite\" href=\"#ref-welch\">[3]</a>; the headline was pre-registered <a class=\"cite\" href=\"#ref-design\">[2]</a>.",
-"md": "95% intervals: original coach minus no coach {{ci:G}} points; self-improved minus no coach {{ci:Ig_gain_over_B0}}; self-improved minus original {{pts:Delta.est}} {{ci:Delta}}. All include zero. Welch t-intervals [[3]](#ref-welch \"cite\"); the headline was pre-registered [[2]](#ref-design \"cite\")."
+"html": "95% intervals: original coach minus no coach <span data-v=\"ci:G\">[&#8722;1.9, +2.8]</span> points; self-improved minus no coach <span data-v=\"ci:Ig_gain_over_B0\">[&#8722;4.0, +1.3]</span>; self-improved minus original <span data-v=\"pts:Delta.est\">&#8722;1.8</span> <span data-v=\"ci:Delta\">[&#8722;4.2, +0.6]</span>. All include zero, which means \"no difference\" fits the data. Welch t-intervals <a class=\"cite\" href=\"#ref-welch\">[3]</a>; the headline was pre-registered <a class=\"cite\" href=\"#ref-design\">[2]</a>.",
+"md": "95% intervals: original coach minus no coach {{ci:G}} points; self-improved minus no coach {{ci:Ig_gain_over_B0}}; self-improved minus original {{pts:Delta.est}} {{ci:Delta}}. All include zero, which means \"no difference\" fits the data. Welch t-intervals [[3]](#ref-welch \"cite\"); the headline was pre-registered [[2]](#ref-design \"cite\")."
 },
 "6": {
-"html": "Same model, reasoning effort, call cap and practice puzzles as in the study. One difference: the demo asked for &#8220;detailed&#8221; reasoning summaries, the study for &#8220;auto&#8221; (which returned none in a short test). We show the only round, of several tried, that changed the player without breaking it, and two puzzles picked to illustrate: one the edit fixed and one it did not. Runs are not deterministic, so each player was run on each puzzle several times.",
-"md": "Same model, reasoning effort, call cap and practice puzzles as in the study. One difference: the demo asked for \u201cdetailed\u201d reasoning summaries, the study for \u201cauto\u201d (which returned none in a short test). We show the only round, of several tried, that changed the player without breaking it, and two puzzles picked to illustrate: one the edit fixed and one it did not. Runs are not deterministic, so each player was run on each puzzle several times."
+"html": "Same model, reasoning effort, call cap and practice puzzles as the study, with one difference: the demo asked for &#8220;detailed&#8221; reasoning summaries, while the study asked for &#8220;auto&#8221; (which returned none in a short test). We show the only round, out of several tried, that changed the player without breaking it, plus two puzzles picked to illustrate: one the edit fixed and one it didn't. Runs aren't deterministic, so each player was run on each puzzle several times.",
+"md": "Same model, reasoning effort, call cap and practice puzzles as the study, with one difference: the demo asked for \u201cdetailed\u201d reasoning summaries, while the study asked for \u201cauto\u201d (which returned none in a short test). We show the only round, out of several tried, that changed the player without breaking it, plus two puzzles picked to illustrate: one the edit fixed and one it didn't. Runs aren't deterministic, so each player was run on each puzzle several times."
 }
 },
 "js": [
@@ -1833,8 +1833,8 @@
 "id": "js:fig-results.js:670:3",
 "file": "fig-results.js",
 "line": 670,
-"lit": "Differences in exam score, in points, with 95% Welch intervals. An interval that crosses 0 cannot be told apart from no effect.",
-"text": "Differences in exam score, in points, with 95% Welch intervals. An interval that crosses 0 cannot be told apart from no effect."
+"lit": "Differences in exam score, in points, with 95% Welch intervals. An interval that crosses 0 can\\'t be told apart from no effect.",
+"text": "Differences in exam score, in points, with 95% Welch intervals. An interval that crosses 0 can't be told apart from no effect."
 },
 {
 "id": "js:fig-results.js:672:2",
@@ -2694,8 +2694,8 @@
 "id": "js:fig-demo.js:445:0",
 "file": "fig-demo.js",
 "line": 445,
-"lit": "Try 1 gave the same wrong grid as try 1 before the edit. It is a new call that happened to give the same answer.",
-"text": "Try 1 gave the same wrong grid as try 1 before the edit. It is a new call that happened to give the same answer."
+"lit": "Try 1 gave the same wrong grid that try 1 gave before the edit. It\\'s a new call that happened to land on the same answer.",
+"text": "Try 1 gave the same wrong grid that try 1 gave before the edit. It's a new call that happened to land on the same answer."
 },
 {
 "id": "js:fig-demo.js:448:0",

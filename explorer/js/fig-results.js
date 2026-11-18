@@ -667,7 +667,7 @@
     /* ---------------- G / Δ side panel ---------------- */
     function buildSide(host){
       EX.h('div', { 'class': 'fx-r-sidetitle' }, host, 'The pre-registered comparisons');
-      EX.h('p', { 'class': 'fx-r-sidetext' }, host, 'Differences in exam score, in points, with 95% Welch intervals. An interval that crosses 0 cannot be told apart from no effect.');
+      EX.h('p', { 'class': 'fx-r-sidetext' }, host, 'Differences in exam score, in points, with 95% Welch intervals. An interval that crosses 0 can\'t be told apart from no effect.');
       var items = [
         { key: 'G', sym: 'G', name: 'Original coach vs no coach', words: ['no coach better', 'coach better'] },
         { key: 'Delta', sym: 'Δ', name: 'Self-improved vs original coach', words: ['original better', 'self-improved better'] },
