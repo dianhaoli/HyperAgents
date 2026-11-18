@@ -1,0 +1,88 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index 4517c61..d07a636 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -15,6 +15,7 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+         return "No evaluation reports were found (evaluation directory is unavailable)."
+ 
+     reports = []
++    prediction_diagnostics = []
+     task_statuses = {}
+     task_observations = {}
+     task_failures = {}
+@@ -78,6 +79,37 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+         total = data.get("total")
+         reports.append((generation, label, kind, score, total, failed))
+ 
++        # Reports identify which tasks regressed, while predictions distinguish a
++        # wrong model answer from an execution/formatting failure. Keep only brief
++        # metadata here; candidate grids can be large and are better inspected directly.
++        if failed:
++            prediction_path = os.path.join(root, "predictions.json")
++            try:
++                with open(prediction_path, encoding="utf-8") as stream:
++                    predictions = json.load(stream)
++            except (OSError, ValueError, TypeError):
++                predictions = []
++            if isinstance(predictions, list):
++                failed_ids = set(failed)
++                for prediction in predictions:
++                    if not isinstance(prediction, dict):
++                        continue
++                    task_id = str(prediction.get("task_id", ""))
++                    if task_id not in failed_ids:
++                        continue
++                    count = prediction.get("n_answers_returned")
++                    count_text = f"{count} candidate(s)" if isinstance(count, int) and not isinstance(count, bool) else "answer count unavailable"
++                    status = "solved" if prediction.get("solved") is True else "not solved"
++                    detail = f"gen_{label} [{kind}] {task_id}: {status}, {count_text}"
++                    wrong = prediction.get("wrong_answers")
++                    if isinstance(wrong, list) and wrong:
++                        detail += f", {len(wrong)} wrong answer set(s)"
++                    error = prediction.get("agent_error")
++                    if error:
++                        error_text = " ".join(str(error).split())[:120]
++                        detail += f", agent_error={error_text}"
++                    prediction_diagnostics.append((generation, detail))
++
+     if not reports:
+         return "No usable evaluation reports were found in the supplied history."
+ 
+@@ -110,6 +142,11 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+         failures = f"; partial/failed task IDs: {', '.join(failed[:12])}" if failed else "; no partial/failed tasks reported"
+         lines.append(f"- gen_{generation_label} [{kind}]: {score:.3f}{count}{failures}")
+ 
++    if prediction_diagnostics:
++        lines.append("Prediction diagnostics for partial/failed tasks (answer grids omitted):")
++        for _, detail in sorted(prediction_diagnostics)[-16:]:
++            lines.append(f"- {detail}")
++
+     by_kind = {}
+     for report in reports:
+         by_kind.setdefault(report[2], []).append(report)
+diff --git a/tests/test_meta_agent.py b/tests/test_meta_agent.py
+index a8e0556..721060a 100644
+--- a/tests/test_meta_agent.py
++++ b/tests/test_meta_agent.py
+@@ -56,6 +56,21 @@ class EvaluationHistorySummaryTests(unittest.TestCase):
+             self.assertIn("gen_3 [arc_eval]: 0.600", summary)
+             self.assertNotIn("gen_2 [arc_eval]", summary)
+ 
++    def test_summary_includes_compact_failed_prediction_diagnostics(self):
++        with tempfile.TemporaryDirectory() as root:
++            eval_dir = os.path.join(root, "gen_4", "arc_eval")
++            os.makedirs(eval_dir)
++            with open(os.path.join(eval_dir, "report.json"), "w", encoding="utf-8") as stream:
++                json.dump({"overall_accuracy": 0.0, "total": 1, "per_task_score": {"task": 0.0}}, stream)
++            with open(os.path.join(eval_dir, "predictions.json"), "w", encoding="utf-8") as stream:
++                json.dump([{"task_id": "task", "solved": False, "n_answers_returned": 2,
++                            "agent_error": None, "wrong_answers": [[[1]], [[2]]]}], stream)
++
++            summary = summarize_evaluation_history(root)
++            self.assertIn("Prediction diagnostics", summary)
++            self.assertIn("gen_4 [arc_eval] task: not solved, 2 candidate(s), 2 wrong answer set(s)", summary)
++            self.assertNotIn("[[[1]]", summary)
++
+     def test_unavailable_or_invalid_history_is_safe(self):
+         self.assertIn("unavailable", summarize_evaluation_history("/path/that/does/not/exist"))
+         with tempfile.TemporaryDirectory() as root:

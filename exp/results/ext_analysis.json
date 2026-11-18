@@ -1,9 +1,69 @@
 {
  "label": "EXTENSION (DESIGN_v2.md) - not part of the pre-registered analysis",
- "points": [],
- "per_generation": {},
+ "points": [
+  {
+   "generation": 0,
+   "seed_index": null,
+   "heldout": 0.2694444444444445,
+   "run": "payoff_I0_1"
+  },
+  {
+   "generation": 0,
+   "seed_index": null,
+   "heldout": 0.29444444444444445,
+   "run": "payoff_I0_2"
+  },
+  {
+   "generation": 0,
+   "seed_index": null,
+   "heldout": 0.3138888888888889,
+   "run": "payoff_I0_5"
+  },
+  {
+   "generation": 12,
+   "seed_index": 1,
+   "heldout": 0.27361111111111114,
+   "run": "payoff_Ig_source_s2"
+  },
+  {
+   "generation": 0,
+   "seed_index": null,
+   "heldout": 0.30416666666666664,
+   "run": "payoff_I0_3"
+  },
+  {
+   "generation": 12,
+   "seed_index": 2,
+   "heldout": 0.3097222222222222,
+   "run": "payoff_Ig_source_s3"
+  }
+ ],
+ "per_generation": {
+  "0": {
+   "n": 4,
+   "mean": 0.2954861111111111,
+   "lo": 0.2651098910883626,
+   "hi": 0.32586233113385965,
+   "scores": [
+    0.2694444444444445,
+    0.29444444444444445,
+    0.3138888888888889,
+    0.30416666666666664
+   ]
+  },
+  "12": {
+   "n": 2,
+   "mean": 0.29166666666666663,
+   "lo": 0.0622490811524018,
+   "hi": 0.5210842521809315,
+   "scores": [
+    0.27361111111111114,
+    0.3097222222222222
+   ]
+  }
+ },
  "B0": 0.29259259259259257,
- "xhigh": 0.3986,
+ "xhigh": 0.4111,
  "paired_changes": {
   "12->20": {
    "per_seed": {},
@@ -16,7 +76,22 @@
  },
  "picks_changed_code": {
   "gen12 (part A rule)": "5 of 6 seeds",
-  "extension picks": {},
-  "extension picks with changed coach code": "0 of 0"
+  "extension picks": {
+   "source_s1:g6": 1,
+   "source_s2:g6": 5,
+   "source_s3:g6": 3,
+   "source_s4:g6": 6,
+   "source_s4:g20": 12,
+   "source_s2:g20": 9,
+   "source_s3:g20": 9,
+   "source_s1:g20": 1,
+   "source_s4:g30": 15
+  },
+  "extension picks with changed coach code": "9 of 9"
+ },
+ "diff_audit_summary": {
+  "hunks": 7,
+  "arc_specific": 1,
+  "general": 6
  }
 }

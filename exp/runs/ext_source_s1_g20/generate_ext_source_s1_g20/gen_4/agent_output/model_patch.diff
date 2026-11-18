@@ -1,0 +1,59 @@
+diff --git a/task_agent.py b/task_agent.py
+index 9c3ff46..7b28f01 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,7 +50,7 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs, candidate=None):
++def build_prompt(inputs, candidate=None, independent_check=False):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+@@ -81,6 +81,15 @@ def build_prompt(inputs, candidate=None):
+             "the corrected grid. Pay particular attention to row/column ordering and exact cell placement.",
+             "",
+         ])
++    if independent_check:
++        parts.extend([
++            "INDEPENDENT SECOND SOLUTION: Solve this task afresh without assuming any prior candidate. "
++            "Describe the transformation internally as concrete operations (including any cropping, "
++            "row/column permutation, or cell changes), and verify those operations on every example. "
++            "Then derive the test grid from the test input. Before returning it, count its rows and "
++            "columns and inspect each row for exact cell placement; do not use a visually approximate grid.",
++            "",
++        ])
+     parts.append(
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+@@ -147,9 +156,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs, candidate=None):
++    def solve_once(self, inputs, candidate=None, independent_check=False):
+         """One model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs, candidate=candidate)
++        prompt = build_prompt(inputs, candidate=candidate, independent_check=independent_check)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -163,13 +172,12 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        # Spend the existing two-call budget on a solve followed by a deliberate audit,
+-        # rather than sending the identical prompt twice. If the first call fails to yield
+-        # a grid, the second call still gets the ordinary full task prompt.
++        # Spend the existing two-call budget on two independent solutions. A candidate-based
++        # audit can anchor the second response to the first answer's small cell-placement errors;
++        # instead, the second call re-derives the rule and explicitly checks examples and dimensions.
+         for attempt in range(2):
+-            candidate = answers[0] if attempt == 1 and answers else None
+             try:
+-                g = self.solve_once(inputs, candidate=candidate)
++                g = self.solve_once(inputs, independent_check=(attempt == 1))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

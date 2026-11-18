@@ -77,6 +77,59 @@ def main():
     for p in sorted(glob.glob(os.path.join(EXP, "runs", "*", "infra_aborts.jsonl"))):
         for r in read_jsonl(p):
             L.append(f"- infra abort (resumed) in {p.split('/')[-2]} at gen {r.get('gen')}: {r.get('error', '')[:160]}")
+    # timeouts per arm (same 3 h limit for every arm; earlier limits were re-run, see DECISIONS 26)
+    L += ["", "## Timeouts per arm (rollouts that hit the per-test-input wall-clock limit)", "",
+          "| arm / phase | rollouts | timeouts |", "|---|---|---|"]
+    import collections
+    cnt = collections.OrderedDict()
+    for f in sorted(glob.glob(os.path.join(EXP, "results", "*.jsonl"))):
+        ph = os.path.basename(f)[:-6]
+        if ph.endswith(".invalidated") or ph in ("b0_summary", "final_runs", "devtest"):
+            continue
+        for r in read_jsonl(f):
+            if r.get("attempt") != 1 or r.get("infra_error"):
+                continue
+            k = f"{ph} / {r.get('arm')}"
+            c = cnt.setdefault(k, [0, 0]); c[0] += 1; c[1] += 1 if r.get("timeout") else 0
+    for k, (n, t) in cnt.items():
+        L.append(f"| {k} | {n} | {t} |")
+    inv = sum(1 for f in glob.glob(os.path.join(EXP, "results", "*.invalidated.jsonl")) for r in read_jsonl(f) if r.get("attempt") == 1)
+    L.append(f"\n{inv} rollouts that hit an earlier (30-min) limit were invalidated and re-run under the 3 h limit.")
+    # effort and model actually used
+    led = read_jsonl(os.path.join(EXP, "ledger", "calls.jsonl"))
+    eff = collections.Counter((r.get("role"), r.get("effort_echo")) for r in led if not r.get("error"))
+    models = collections.Counter(r.get("model") for r in led if not r.get("error"))
+    L += ["", "## Model and reasoning effort actually used", "",
+          f"- Model string returned by the API: {', '.join(f'`{m}` ({n} calls)' for m, n in models.items())}; calls from 2026-11-17 to {__import__('time').strftime('%Y-%m-%d')}.",
+          f"- Effort echoed by the API, by role: {', '.join(f'{r}={e}: {n}' for (r, e), n in sorted(eff.items(), key=lambda x: str(x)))}."]
+    # extension
+    ext = subprocess.run(["python3", os.path.join(REPO, "analysis_ext.py")], capture_output=True, text=True, cwd=REPO)
+    ea = json.load(open(os.path.join(EXP, "results", "ext_analysis.json"))) if os.path.exists(os.path.join(EXP, "results", "ext_analysis.json")) else {}
+    L += ["", "# EXTENSION (DESIGN_v2.md, not pre-registered in f577cc7)", "",
+          "Does the coach get better at coaching over generations? Exam score of the player each coach builds, by coach generation.", "",
+          "![extension plot](exp/results/extension_plot.png)", "",
+          "| generation | runs | mean | 95% t-interval | scores |", "|---|---|---|---|---|"]
+    for g, v in sorted(ea.get("per_generation", {}).items(), key=lambda x: int(x[0])):
+        L.append(f"| {g} | {v['n']} | {pct(v['mean'])} | [{pct(v['lo']) if v['lo'] == v['lo'] else 'n/a'}, {pct(v['hi']) if v['hi'] == v['hi'] else 'n/a'}] | {', '.join(pct(x) for x in v['scores'])} |")
+    if "gen40_minus_gen0" in ea:
+        v = ea["gen40_minus_gen0"]
+        L.append(f"\n**Generation 40 minus original coach: {pts(v['est'])} points, 95% Welch CI [{pts(v['lo'])}, {pts(v['hi'])}] -> {v['verdict']}.**")
+    for k, v in ea.get("paired_changes", {}).items():
+        L.append(f"- Paired change {k} (seeds 0-3): " + (", ".join(f"seed {s}: {pts(d)}" for s, d in v["per_seed"].items()) or "n/a")
+                 + (f"; mean {pts(v['mean'])}" if v.get("mean") is not None else ""))
+    pc = ea.get("picks_changed_code", {})
+    L.append(f"- Picks with changed coach code: generation 12 (part A rule) {pc.get('gen12 (part A rule)')}; extension {pc.get('extension picks with changed coach code')} ({pc.get('extension picks')}).")
+    au_p = os.path.join(EXP, "results", "diff_audit.json")
+    if os.path.exists(au_p):
+        au = json.load(open(au_p))
+        L += ["", "## Diff audit of every picked coach (each changed hunk vs I_0; 2 independent judges + tiebreak)", "",
+              "| pick | file | hunk | tag | agreement |", "|---|---|---|---|---|"]
+        for k, v in sorted(au.items()):
+            for h in sorted(v["hunks"], key=lambda h: h["idx"]):
+                L.append(f"| {k} | {h['file']} | {h['idx']} | {h['tag']} | {h['agreement']} |")
+        tags = [h["tag"] for v in au.values() for h in v["hunks"]]
+        L.append(f"\n{tags.count('ARC-specific')} of {len(tags)} hunks ARC-specific, {tags.count('general')} general. Reasons in exp/results/diff_audit.json.")
+    L += ["", "## Deviations from f577cc7 and DESIGN_v2.md", "", "Every deviation and harness fix is numbered in DECISIONS.md (items marked DEVIATION; harness bugs and reruns at 23, 24, 26, 28, 33, 35)."]
     L += ["", "## analysis.py output", "", "```", out.strip(), "```", ""]
     open(os.path.join(REPO, "RESULTS.md"), "w").write("\n".join(L))
     print("\n".join(L[:30]))

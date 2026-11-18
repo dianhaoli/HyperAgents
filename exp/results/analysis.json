@@ -1,24 +1,259 @@
 {
- "B0_reps": [],
- "B0": null,
- "I0_runs": {},
- "Ig_runs": {},
- "n_source_seeds": 0,
- "n_qualifying_Ig": 0,
+ "B0_reps": [
+  0.3013888888888889,
+  0.2791666666666667,
+  0.2972222222222222
+ ],
+ "B0": 0.29259259259259257,
+ "I0_runs": {
+  "payoff_I0_1": 0.2694444444444445,
+  "payoff_I0_2": 0.29444444444444445,
+  "payoff_I0_5": 0.3138888888888889,
+  "payoff_I0_3": 0.30416666666666664
+ },
+ "Ig_runs": {
+  "payoff_Ig_source_s2": 0.27361111111111114,
+  "payoff_Ig_source_s3": 0.3097222222222222
+ },
+ "n_source_seeds": 6,
+ "n_qualifying_Ig": 5,
+ "G": {
+  "est": 0.0028935185185185452,
+  "lo": -0.027407946974019298,
+  "hi": 0.03319498401105639,
+  "df": 4.921112354017267
+ },
+ "Delta": {
+  "est": -0.0038194444444444864,
+  "lo": -0.11691024903226002,
+  "hi": 0.10927136014337105,
+  "df": 1.595488830299318
+ },
+ "Ig_gain_over_B0": {
+  "est": -0.0009259259259259411,
+  "lo": -0.147110253733634,
+  "hi": 0.14525840188178213,
+  "df": 1.2925386143816477
+ },
+ "I0_gain_over_B0": {
+  "est": 0.0028935185185185452,
+  "lo": -0.027407946974019298,
+  "hi": 0.03319498401105639,
+  "df": 4.921112354017267
+ },
  "sd": {
-  "B0": null,
-  "I0": null,
-  "Ig": null
+  "B0": 0.011812361872382465,
+  "I0": 0.01908985548149922,
+  "Ig": 0.0255344115428475
  },
- "headline": "Incomplete: not enough runs to evaluate the headline",
- "self_edit": {},
- "self_edit_rate": null,
+ "headline": "Neither improver beat two plain attempts on ARC-AGI-2",
+ "self_edit": {
+  "source_s1": {
+   "gens": 12,
+   "self_edit_gens": 1,
+   "self_edit_parents": 1
+  },
+  "source_s2": {
+   "gens": 12,
+   "self_edit_gens": 4,
+   "self_edit_parents": 3
+  },
+  "source_s3": {
+   "gens": 12,
+   "self_edit_gens": 5,
+   "self_edit_parents": 3
+  },
+  "source_s4": {
+   "gens": 12,
+   "self_edit_gens": 1,
+   "self_edit_parents": 0
+  },
+  "source_s5": {
+   "gens": 12,
+   "self_edit_gens": 7,
+   "self_edit_parents": 5
+  },
+  "source_s6": {
+   "gens": 12,
+   "self_edit_gens": 3,
+   "self_edit_parents": 3
+  }
+ },
+ "self_edit_rate": 0.2916666666666667,
  "spend_by_role": {
-  "probe": 9.3e-06,
-  "task": 2.930950629999999,
-  "meta": 0.04166185000000001
+  "probe": 1.98e-05,
+  "task": 102.15456167000013,
+  "meta": 3.1400145199999923
  },
- "spend_total": 2.972621779999999,
- "tokens_by_arm": {},
- "final_runs": []
+ "spend_total": 105.29459599000013,
+ "tokens_by_arm": {
+  "I0": {
+   "task_tokens_per_task_eval": 27048.02303030303,
+   "meta_tokens_per_iteration": 349804.3333333333,
+   "n_task_evals": 825,
+   "n_meta_iterations": 48
+  },
+  "Ig": {
+   "task_tokens_per_task_eval": 23510.296363636364,
+   "meta_tokens_per_iteration": 187913.875,
+   "n_task_evals": 550,
+   "n_meta_iterations": 40
+  }
+ },
+ "final_runs": [
+  {
+   "run": "payoff_I0_1",
+   "arm": "I0",
+   "seed": "r1",
+   "source_seed": null,
+   "node_scores": {
+    "initial": 0.62,
+    "1": 0.54,
+    "2": 0.62,
+    "4": 0.76,
+    "5": 0.68,
+    "6": 0.54,
+    "8": 0.66
+   },
+   "candidates": [
+    "4",
+    "5"
+   ],
+   "combined": {
+    "4": 0.76,
+    "5": 0.65
+   },
+   "final_node": "4",
+   "heldout": 0.2694444444444445,
+   "heldout_missing": 0,
+   "n_accepted": 6
+  },
+  {
+   "run": "payoff_I0_2",
+   "arm": "I0",
+   "seed": "r2",
+   "source_seed": null,
+   "node_scores": {
+    "initial": 0.62,
+    "1": 0.58,
+    "2": 0.56,
+    "3": 0.76,
+    "4": 0.74,
+    "5": 0.62,
+    "6": 0.6,
+    "7": 0.62
+   },
+   "candidates": [
+    "3",
+    "4"
+   ],
+   "combined": {
+    "3": 0.6699999999999999,
+    "4": 0.71
+   },
+   "final_node": "4",
+   "heldout": 0.29444444444444445,
+   "heldout_missing": 0,
+   "n_accepted": 7
+  },
+  {
+   "run": "payoff_I0_5",
+   "arm": "I0",
+   "seed": "r5",
+   "source_seed": null,
+   "node_scores": {
+    "initial": 0.62,
+    "1": 0.0,
+    "2": 0.62,
+    "3": 0.62
+   },
+   "candidates": [
+    "2",
+    "3"
+   ],
+   "combined": {
+    "2": 0.5900000000000001,
+    "3": 0.64
+   },
+   "final_node": "3",
+   "heldout": 0.3138888888888889,
+   "heldout_missing": 0,
+   "n_accepted": 3
+  },
+  {
+   "run": "payoff_Ig_source_s2",
+   "arm": "Ig",
+   "seed": 2,
+   "source_seed": 2,
+   "node_scores": {
+    "initial": 0.62,
+    "3": 0.66,
+    "4": 0.56,
+    "5": 0.68,
+    "7": 0.64,
+    "8": 0.54
+   },
+   "candidates": [
+    "5",
+    "3"
+   ],
+   "combined": {
+    "5": 0.6200000000000001,
+    "3": 0.66
+   },
+   "final_node": "3",
+   "heldout": 0.27361111111111114,
+   "heldout_missing": 0,
+   "n_accepted": 5
+  },
+  {
+   "run": "payoff_I0_3",
+   "arm": "I0",
+   "seed": "r3",
+   "source_seed": null,
+   "node_scores": {
+    "initial": 0.62,
+    "2": 0.0,
+    "3": 0.7,
+    "4": 0.62,
+    "5": 0.64,
+    "8": 0.62
+   },
+   "candidates": [
+    "3",
+    "5"
+   ],
+   "combined": {
+    "3": 0.6599999999999999,
+    "5": 0.62
+   },
+   "final_node": "3",
+   "heldout": 0.30416666666666664,
+   "heldout_missing": 0,
+   "n_accepted": 5
+  },
+  {
+   "run": "payoff_Ig_source_s3",
+   "arm": "Ig",
+   "seed": 3,
+   "source_seed": 3,
+   "node_scores": {
+    "initial": 0.62,
+    "1": 0.76,
+    "5": 0.58
+   },
+   "candidates": [
+    "1",
+    "initial"
+   ],
+   "combined": {
+    "1": 0.65,
+    "initial": 0.64
+   },
+   "final_node": "1",
+   "heldout": 0.3097222222222222,
+   "heldout_missing": 0,
+   "n_accepted": 2
+  }
+ ]
 }
