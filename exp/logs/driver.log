@@ -66,3 +66,7 @@ launched extension test ext_source_s4_g40: launched run_ext_source_s4_g40
 pick source_s3:g30: source_s3 g30 -> (9, 5, 0.08000000000000007) | max mean child improvement among changed coaches with >=3 descendants
    transplant check: True __ARC_SANDBOX_STARTED__
 IMPORT_OK 
+launched final exam for ext_source_s4_g40
+pick source_s1:g30: source_s1 g30 -> (1, 23, 0.12) | max mean child improvement among changed coaches with >=3 descendants
+   transplant check: True __ARC_SANDBOX_STARTED__
+IMPORT_OK 

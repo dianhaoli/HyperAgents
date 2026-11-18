@@ -1,0 +1,44 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index 20cc8d4..460691f 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -91,6 +91,39 @@ def _evaluation_summary(eval_path):
+             lines.append(
+                 f"  gen_{record['generation']}={record['score']:.4f} (parent {parent}){comparison}"
+             )
++            # A scalar delta hides which examples were lost or gained. Only compare
++            # per-task outcomes when both reports contain the same task IDs (which
++            # is already guaranteed by this cohort), and only against the parent.
++            if parent_record is not None:
++                parent_tasks = parent_record["report"].get("per_task_score")
++                child_report = record["report"]
++                child_tasks = child_report.get("per_task_score")
++                if isinstance(parent_tasks, dict) and isinstance(child_tasks, dict) and set(parent_tasks) == set(child_tasks):
++                    regressions = [
++                        task_id for task_id in child_tasks
++                        if isinstance(parent_tasks[task_id], (int, float))
++                        and not isinstance(parent_tasks[task_id], bool)
++                        and parent_tasks[task_id] >= 1
++                        and isinstance(child_tasks[task_id], (int, float))
++                        and not isinstance(child_tasks[task_id], bool)
++                        and child_tasks[task_id] < 1
++                    ]
++                    recoveries = [
++                        task_id for task_id in child_tasks
++                        if isinstance(parent_tasks[task_id], (int, float))
++                        and not isinstance(parent_tasks[task_id], bool)
++                        and parent_tasks[task_id] < 1
++                        and isinstance(child_tasks[task_id], (int, float))
++                        and not isinstance(child_tasks[task_id], bool)
++                        and child_tasks[task_id] >= 1
++                    ]
++                    if regressions or recoveries:
++                        changes = []
++                        if regressions:
++                            changes.append("new failures: " + ", ".join(map(str, regressions[:8])))
++                        if recoveries:
++                            changes.append("newly solved: " + ", ".join(map(str, recoveries[:8])))
++                        lines.append("    Parent task-level changes: " + "; ".join(changes) + ".")
+         best = records[0]
+         report = best["report"]
+         failures = report.get("question_ids_failed", [])

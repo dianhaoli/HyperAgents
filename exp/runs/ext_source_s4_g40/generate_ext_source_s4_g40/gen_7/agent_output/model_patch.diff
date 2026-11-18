@@ -1,0 +1,56 @@
+diff --git a/task_agent.py b/task_agent.py
+index c9ffde9..7f740a2 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,6 +50,39 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
++def _change_summary(input_grid, output_grid, detail_limit=80):
++    """Compactly expose coordinate-level changes in a demonstration pair."""
++    if len(input_grid) != len(output_grid) or any(
++        len(in_row) != len(out_row) for in_row, out_row in zip(input_grid, output_grid)
++    ):
++        return "Cell-by-cell comparison is unavailable because the grid dimensions differ."
++
++    changes = [
++        (r, c, before, after)
++        for r, (in_row, out_row) in enumerate(zip(input_grid, output_grid))
++        for c, (before, after) in enumerate(zip(in_row, out_row))
++        if before != after
++    ]
++    if not changes:
++        return "Changed cells: none."
++    if len(changes) <= detail_limit:
++        details = "; ".join(
++            f"({r},{c}) {before}->{after}" for r, c, before, after in changes
++        )
++        return f"Changed cells (zero-based row,column): {details}."
++
++    counts = []
++    for r, (in_row, out_row) in enumerate(zip(input_grid, output_grid)):
++        count = sum(before != after for before, after in zip(in_row, out_row))
++        if count:
++            counts.append(f"row {r}: {count}")
++    return (
++        f"{len(changes)} cells change; changed-cell counts by zero-based row: "
++        + ", ".join(counts)
++        + "."
++    )
++
++
+ def build_prompt(inputs):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+@@ -72,6 +105,7 @@ def build_prompt(inputs):
+         h, w = len(pair["output"]), len(pair["output"][0])
+         parts.append(f"Output ({h}x{w}):")
+         parts.append(grid_to_text(pair["output"]))
++        parts.append("Input/output cell comparison: " + _change_summary(pair["input"], pair["output"]))
+         parts.append("")
+     t = inputs["test_input"]
+     parts.append("## Test")
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..3aa516e
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

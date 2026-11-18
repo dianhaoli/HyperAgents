@@ -1,0 +1,75 @@
+diff --git a/task_agent.py b/task_agent.py
+index cd2ca6e..382dae7 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -84,6 +84,19 @@ def build_prompt(inputs):
+     return "\n".join(parts)
+ 
+ 
++def build_review_prompt(inputs, candidate):
++    """Build a second-pass prompt that checks a candidate against the demonstrations."""
++    prompt = build_prompt(inputs)
++    review = (
++        "A first attempt proposed this test output grid:\n"
++        + json.dumps(candidate)
++        + "\nTreat it as a hypothesis, not as an answer. Independently infer the rule from every "
++        "training pair, check this grid against that rule, and correct it if needed. If it is "
++        "already correct, return it unchanged. Give the final output grid for the test input."
++    )
++    return prompt.replace("Give the output grid for the test input.", review, 1)
++
++
+ def _valid(g):
+     return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
+             and len({len(r) for r in g}) == 1
+@@ -142,9 +155,13 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def solve_once(self, inputs, candidate=None):
++        """Make one model call and return its parsed grid (or None)."""
++        prompt = (
++            build_prompt(inputs)
++            if candidate is None
++            else build_review_prompt(inputs, candidate)
++        )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -155,15 +172,23 @@ class TaskAgent:
+         Args:
+             inputs (dict): {"domain": "arc", "train": [{"input": grid, "output": grid}, ...], "test_input": grid}
+         Returns:
+-            tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
++            tuple: (prediction, msg_history) with up to two candidate grids.
+         """
+-        answers = []
+-        for _ in range(2):
+-            try:
+-                g = self.solve_once(inputs)
+-            except Exception as e:
+-                self.log(f"Error: {e}")
+-                g = None
+-            if g is not None:
+-                answers.append(g)
++        try:
++            first = self.solve_once(inputs)
++        except Exception as e:
++            self.log(f"Error on first attempt: {e}")
++            first = None
++
++        answers = [first] if first is not None else []
++        try:
++            # Use the second and final permitted model call to audit a usable first answer.
++            # If the first call failed or produced unparseable output, spend it on a fresh solve.
++            second = self.solve_once(inputs, candidate=first) if first is not None else self.solve_once(inputs)
++        except Exception as e:
++            self.log(f"Error on second attempt: {e}")
++            second = None
++
++        if second is not None and second not in answers:
++            answers.append(second)
+         return answers, []

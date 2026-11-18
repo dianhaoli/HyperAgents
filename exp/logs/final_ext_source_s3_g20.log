@@ -3,3 +3,4 @@ ext_source_s3_g20 cand gen_2: loop score 0.820 rescore 0.680 combined 0.750
 [eval] {'phase': 'rescore', 'arm': 'g20', 'seed': 2, 'iteration': 5} round 0: 26 test inputs to run (0 cached)
 ext_source_s3_g20 cand gen_5: loop score 0.740 rescore 0.620 combined 0.680
 [eval] {'phase': 'heldout', 'arm': 'g20', 'seed': 2, 'iteration': 2} round 0: 167 test inputs to run (0 cached)
+[eval] {'phase': 'heldout', 'arm': 'g20', 'seed': 2, 'iteration': 2} round 1: 12 test inputs to run (155 cached)

@@ -1,0 +1,22 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..f3252cb 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -57,6 +57,13 @@ def build_prompt(inputs):
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
+         "",
+     ]
++    parts.extend([
++        "Use every demonstration pair to infer and check the rule before applying it to the test. "
++        "Compare candidate objects or regions by their roles across examples instead of selecting "
++        "only the most visually prominent one. Reject an interpretation that does not explain all "
++        "demonstrations; check dimensions, colors, positions, and whether unchanged cells are supported.",
++        "",
++    ])
+     for i, pair in enumerate(inputs["train"], 1):
+         parts.append(f"## Example {i}")
+         h, w = len(pair["input"]), len(pair["input"][0])
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..ac5a4c7
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ

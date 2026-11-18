@@ -1,0 +1,63 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index a5f3e2b..8fc1b90 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -23,6 +23,7 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+     task_observations = {}
+     task_failures = {}
+     task_statuses = {}
++    prediction_diagnostics = []
+     for root, dirs, files in os.walk(eval_path):
+         dirs.sort()
+         if "report.json" not in files:
+@@ -76,6 +77,50 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+                     failed.append(task)
+                     task_failures.setdefault(key, set()).add(generation)
+         task_statuses[(kind, generation)] = outcomes
++
++        # Predictions can distinguish wrong answers from execution failures. Keep
++        # only compact metadata; answer grids can be large and are inspected directly.
++        if failed:
++            try:
++                with open(os.path.join(root, "predictions.json"), encoding="utf-8") as stream:
++                    predictions = json.load(stream)
++            except (OSError, ValueError, TypeError):
++                predictions = []
++            if isinstance(predictions, dict):
++                normalized = []
++                for task_id, prediction in predictions.items():
++                    if isinstance(prediction, dict):
++                        prediction = dict(prediction)
++                        prediction.setdefault("task_id", task_id)
++                        normalized.append(prediction)
++                predictions = normalized
++            if isinstance(predictions, list):
++                failed_ids = set(failed)
++                for prediction in predictions:
++                    if not isinstance(prediction, dict):
++                        continue
++                    task_id = str(prediction.get("task_id", ""))
++                    if task_id not in failed_ids:
++                        continue
++                    solved = prediction.get("solved")
++                    status = ("test input solved" if solved is True else
++                              "test input not solved" if solved is False else
++                              "test input status unavailable")
++                    detail = f"gen_{label} [{kind}] {task_id}: {status}"
++                    test_input = prediction.get("test_input")
++                    if isinstance(test_input, (int, str)) and not isinstance(test_input, bool):
++                        detail += f" (test input {test_input})"
++                    count = prediction.get("n_answers_returned")
++                    if isinstance(count, int) and not isinstance(count, bool):
++                        detail += f", {count} candidate(s)"
++                    wrong = prediction.get("wrong_answers")
++                    if isinstance(wrong, list) and wrong:
++                        detail += f", {len(wrong)} wrong answer set(s)"
++                    error = prediction.get("agent_error")
++                    if error:
++                        error_text = " ".join(str(error).split())[:120]
++                        detail += f", agent_error={error_text}"
++                    prediction_diagnostics.append((generation, detail))
+         reports.append((generation, label, kind, score, data.get("total"), sorted(failed)))
+ 
+     if not reports:
