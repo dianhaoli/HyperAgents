@@ -490,3 +490,12 @@ figure.fig.explore-fig{margin:0 0 40px}
 .plasticity-box p{margin:0}
 .plasticity-box ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px}
 @media (max-width:520px){.plasticity-box{padding:16px}}
+.plasticity-box details.formal{border-top:1px solid var(--rule);padding-top:10px}
+.plasticity-box details.formal summary{cursor:pointer;font-weight:600;color:var(--accent)}
+.plasticity-box details.formal summary:focus-visible{box-shadow:var(--focus-ring);border-radius:3px}
+.formal-body{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.formal-body p{margin:0}
+.formal-h{font-weight:600;margin-top:8px!important}
+.formal-body .eq{overflow-x:auto;overflow-y:hidden;padding:2px 0;min-width:0}
+.formal-body mjx-container[display="true"]{margin:.4em 0!important}
+.formal-body mjx-container{color:var(--ink)}

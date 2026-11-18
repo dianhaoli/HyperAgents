@@ -113,6 +113,48 @@ How well does a coach improve, and does it get better at improving?
 [[3b-plasticity.p2]]  <!-- p -->
 Here both are indistinguishable from zero: coaching did not measurably improve the player, and rewriting itself did not make the coach a better coach. “Second-order plasticity” is our own name; the Hyperagents paper calls a coach rewriting itself *metacognitive self-modification*. That paper's positive result comes from moving evolved coaches to a new kind of task. Ours is a same-task test on ARC-AGI-2, so it does not directly test that claim.
 
+[[3b-plasticity.summary1]]  <!-- summary -->
+The definitions, precisely
+
+[[3b-plasticity.p3]]  <!-- p -->
+Notation, following the Hyperagents paper [[4]](#ref-hyper "cite"): a *task agent* \(A\) (our player) solves tasks; a *meta agent* \(M\) (our coach) modifies agents and generates new ones; \(\mathcal{G}\) is the agent-generation loop; \(\mathrm{Eval}(A, T)\) is the score of \(A\) on a task set \(T\).
+
+[[3b-plasticity.p4]]  <!-- p -->
+Agent plasticity [[3]](#ref-plasticity "cite")
+
+[[3b-plasticity.p5]]  <!-- p -->
+Held-out score gain per unit of learning cost, from checkpoint \(0\) to checkpoint \(t\):
+
+[[3b-plasticity.p6]]  <!-- p -->
+Improvement@k [[4]](#ref-hyper "cite")
+
+[[3b-plasticity.p7]]  <!-- p -->
+Hold \(M\) fixed and let it generate up to \(k\) task agents \(\mathcal{A}^{(k)} = \{A_1, \dots, A_k\}\), starting from \(A\):
+
+[[3b-plasticity.p8]]  <!-- p -->
+First-order plasticity of a coach (this study)
+
+[[3b-plasticity.p9]]  <!-- p -->
+Freeze coach \(M\) and run \(k = 8\) rounds from the fresh player \(A_0\) on the practice set. \(\hat{A}_{M}\) is the finished player, chosen on practice puzzles only (the untouched \(A_0\) is a candidate too), and \(T_{\text{exam}}\) is the 120-puzzle exam. Runs are random, so we take the expectation over runs:
+
+[[3b-plasticity.p10]]  <!-- p -->
+\(\Delta_1\) is imp@8 measured on the exam, with the finished player chosen without looking at the exam; \(C(M)\) is the cost of the coaching run.
+
+[[3b-plasticity.p11]]  <!-- p -->
+Second-order plasticity (this study)
+
+[[3b-plasticity.p12]]  <!-- p -->
+Let the coach rewrite itself for \(g\) generations, giving \(M_0 \to M_1 \to \dots \to M_g\), and freeze the coach picked at generation \(g\). Second-order plasticity is the change in first-order plasticity:
+
+[[3b-plasticity.p13]]  <!-- p -->
+\(C_{\text{evolve}}(g)\) is the cost of evolving the coach to generation \(g\). \(\Delta_2 > 0\) would mean the coach got better at improving players.
+
+[[3b-plasticity.p14]]  <!-- p -->
+Our estimates
+
+[[3b-plasticity.p15]]  <!-- p -->
+\(\hat{\Delta}_1(M_0)\) = {{pts:G.est}} points {{ci:G}}; \(\hat{\Delta}_2(12)\) = {{pts:Delta.est}} {{ci:Delta}}; \(\hat{\Delta}_2(40)\) = {{pts:extension.gen40_minus_gen0.est}} {{ci:extension.gen40_minus_gen0}}. Each is a difference of run means with a 95% Welch interval [[2]](#ref-welch "cite"). All three intervals include zero, so we do not report the per-cost ratios \(P_1\) and \(P_2\): dividing a gain that cannot be told apart from zero by a cost only adds noise.
+
 
 ### 4. Generations
 
