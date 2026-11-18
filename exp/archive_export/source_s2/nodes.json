@@ -1,0 +1,552 @@
+{
+ "initial": {
+  "generation": "initial",
+  "parent": null,
+  "children": [
+   1,
+   3
+  ],
+  "loop_score_on_set": 0.72,
+  "valid_parent": true,
+  "patch_file": null,
+  "snapshot": null,
+  "code_dir": "archive_export/source_s2/code/gen_initial",
+  "coach_files_changed_vs_I0": []
+ },
+ "1": {
+  "generation": 1,
+  "parent": "initial",
+  "children": [
+   2,
+   14,
+   19
+  ],
+  "loop_score_on_set": 0.78,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_1/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_1.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_1",
+  "coach_files_changed_vs_I0": []
+ },
+ "2": {
+  "generation": 2,
+  "parent": 1,
+  "children": [
+   4,
+   6,
+   12
+  ],
+  "loop_score_on_set": 0.8,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_2/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_2.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_2",
+  "coach_files_changed_vs_I0": []
+ },
+ "3": {
+  "generation": 3,
+  "parent": "initial",
+  "children": [
+   7,
+   22,
+   26,
+   30
+  ],
+  "loop_score_on_set": 0.8,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_3/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_3.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_3",
+  "coach_files_changed_vs_I0": []
+ },
+ "4": {
+  "generation": 4,
+  "parent": 2,
+  "children": [
+   5
+  ],
+  "loop_score_on_set": 0.88,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_4/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_4.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_4",
+  "coach_files_changed_vs_I0": []
+ },
+ "5": {
+  "generation": 5,
+  "parent": 4,
+  "children": [
+   8,
+   9,
+   13,
+   15,
+   31
+  ],
+  "loop_score_on_set": 0.96,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_5/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_5.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_5",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "6": {
+  "generation": 6,
+  "parent": 2,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_6/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "7": {
+  "generation": 7,
+  "parent": 3,
+  "children": [
+   10
+  ],
+  "loop_score_on_set": 0.84,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_7/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_7.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_7",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "8": {
+  "generation": 8,
+  "parent": 5,
+  "children": [
+   18,
+   40
+  ],
+  "loop_score_on_set": 0.84,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_8/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_8.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_8",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "9": {
+  "generation": 9,
+  "parent": 5,
+  "children": [
+   11,
+   17,
+   20,
+   21,
+   23,
+   24
+  ],
+  "loop_score_on_set": 1.0,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_9/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_9.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_9",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "10": {
+  "generation": 10,
+  "parent": 7,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_10/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "11": {
+  "generation": 11,
+  "parent": 9,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_11/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "12": {
+  "generation": 12,
+  "parent": 2,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_12/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "13": {
+  "generation": 13,
+  "parent": 5,
+  "children": [
+   27
+  ],
+  "loop_score_on_set": 0.84,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_13/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_13.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_13",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "14": {
+  "generation": 14,
+  "parent": 1,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_14/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "15": {
+  "generation": 15,
+  "parent": 5,
+  "children": [
+   16
+  ],
+  "loop_score_on_set": 0.88,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_15/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_15.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_15",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "16": {
+  "generation": 16,
+  "parent": 15,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": null,
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "17": {
+  "generation": 17,
+  "parent": 9,
+  "children": [
+   25,
+   28
+  ],
+  "loop_score_on_set": 1.0,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_17/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_17.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_17",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "18": {
+  "generation": 18,
+  "parent": 8,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_18/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "19": {
+  "generation": 19,
+  "parent": 1,
+  "children": [],
+  "loop_score_on_set": 0.84,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_19/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_19.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_19",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "20": {
+  "generation": 20,
+  "parent": 9,
+  "children": [
+   32,
+   33,
+   35
+  ],
+  "loop_score_on_set": 0.92,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_20/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_20.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_20",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "21": {
+  "generation": 21,
+  "parent": 9,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_21/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "22": {
+  "generation": 22,
+  "parent": 3,
+  "children": [],
+  "loop_score_on_set": 0.76,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_22/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_22.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_22",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "23": {
+  "generation": 23,
+  "parent": 9,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_23/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "24": {
+  "generation": 24,
+  "parent": 9,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_24/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "25": {
+  "generation": 25,
+  "parent": 17,
+  "children": [
+   29,
+   39
+  ],
+  "loop_score_on_set": 0.88,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_25/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_25.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_25",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "26": {
+  "generation": 26,
+  "parent": 3,
+  "children": [],
+  "loop_score_on_set": 0.84,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_26/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_26.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_26",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "27": {
+  "generation": 27,
+  "parent": 13,
+  "children": [
+   36
+  ],
+  "loop_score_on_set": 0.92,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_27/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_27.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_27",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "28": {
+  "generation": 28,
+  "parent": 17,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_28/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "29": {
+  "generation": 29,
+  "parent": 25,
+  "children": [
+   34
+  ],
+  "loop_score_on_set": 0.84,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_29/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_29.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_29",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "30": {
+  "generation": 30,
+  "parent": 3,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_30/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "31": {
+  "generation": 31,
+  "parent": 5,
+  "children": [
+   37,
+   38
+  ],
+  "loop_score_on_set": 1.0,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_31/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_31.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_31",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "32": {
+  "generation": 32,
+  "parent": 20,
+  "children": [],
+  "loop_score_on_set": 0.84,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_32/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_32.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_32",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "33": {
+  "generation": 33,
+  "parent": 20,
+  "children": [],
+  "loop_score_on_set": 0.92,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_33/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_33.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_33",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "34": {
+  "generation": 34,
+  "parent": 29,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_34/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "35": {
+  "generation": 35,
+  "parent": 20,
+  "children": [],
+  "loop_score_on_set": 0.76,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_35/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_35.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_35",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "36": {
+  "generation": 36,
+  "parent": 27,
+  "children": [],
+  "loop_score_on_set": 0.8,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_36/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_36.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_36",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "37": {
+  "generation": 37,
+  "parent": 31,
+  "children": [],
+  "loop_score_on_set": 0.88,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_37/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_37.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_37",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ },
+ "38": {
+  "generation": 38,
+  "parent": 31,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_38/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "39": {
+  "generation": 39,
+  "parent": 25,
+  "children": [],
+  "loop_score_on_set": null,
+  "valid_parent": false,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_39/agent_output/model_patch.diff",
+  "snapshot": null,
+  "code_dir": null,
+  "coach_files_changed_vs_I0": null
+ },
+ "40": {
+  "generation": 40,
+  "parent": 8,
+  "children": [],
+  "loop_score_on_set": 0.84,
+  "valid_parent": true,
+  "patch_file": "runs/source_s2/generate_source_s2/gen_40/agent_output/model_patch.diff",
+  "snapshot": "runs/source_s2/snapshots/gen_40.tar.gz",
+  "code_dir": "archive_export/source_s2/code/gen_40",
+  "coach_files_changed_vs_I0": [
+   "meta_agent.py"
+  ]
+ }
+}

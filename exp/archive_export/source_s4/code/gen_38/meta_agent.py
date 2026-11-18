@@ -1,0 +1,141 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+
+import json
+import os
+import re
+
+from agent.base_agent import AgentSystem
+from agent.llm_withtools import chat_with_agent
+
+
+def _generation_order(name):
+    """Sort numbered generations numerically, with non-numbered runs first."""
+    match = re.fullmatch(r"gen_(\d+)", name)
+    return (1, int(match.group(1))) if match else (0, name)
+
+
+def _evaluation_summary(eval_path, limit=8):
+    """Build a compact, comparable summary of completed prior evaluation reports."""
+    if not os.path.isdir(eval_path):
+        return f"No readable prior-evaluation directory found at {eval_path!r}."
+
+    records = []
+    try:
+        generations = sorted(
+            (name for name in os.listdir(eval_path)
+             if name.startswith("gen_") and ".aborted_" not in name
+             and os.path.isdir(os.path.join(eval_path, name))),
+            key=_generation_order,
+        )
+    except OSError as exc:
+        return f"Could not list prior evaluations: {exc}"
+
+    for generation in generations:
+        generation_dir = os.path.join(eval_path, generation)
+        try:
+            with open(os.path.join(generation_dir, "metadata.json"), encoding="utf-8") as f:
+                metadata = json.load(f)
+        except (OSError, ValueError, TypeError):
+            metadata = {}
+
+        for root, dirs, files in os.walk(generation_dir):
+            dirs[:] = sorted(d for d in dirs if not d.startswith(".") and ".aborted_" not in d)
+            if "report.json" not in files:
+                continue
+            report_path = os.path.join(root, "report.json")
+            try:
+                with open(report_path, encoding="utf-8") as f:
+                    report = json.load(f)
+            except (OSError, ValueError, TypeError):
+                continue
+            if not isinstance(report, dict):
+                continue
+
+            metrics = {
+                key: value for key, value in report.items()
+                if isinstance(value, (int, float)) and not isinstance(value, bool)
+                and ("accuracy" in key.lower() or "score" in key.lower())
+            }
+            if not metrics:
+                continue
+            failed = report.get("question_ids_failed", report.get("task_ids_failed", []))
+            if not isinstance(failed, list):
+                failed = []
+            records.append({
+                "generation": generation,
+                "order": _generation_order(generation),
+                "parent": metadata.get("parent_genid", "unknown"),
+                "report": os.path.relpath(root, generation_dir),
+                "metrics": metrics,
+                "failed": failed,
+            })
+
+    if not records:
+        return "No prior evaluation reports with accuracy/score metrics were found."
+
+    lines = [
+        "Prior evaluation evidence (compare only the same report path and metric; missing or incomplete runs are unknown):"
+    ]
+    # Recent outcomes give context; report limits prevent a large archive from
+    # overwhelming the actual code and patch review.
+    for record in records[-limit:]:
+        scores = ", ".join(
+            f"{key}={value:.4g}" for key, value in sorted(record["metrics"].items())
+        )
+        failed = record["failed"]
+        failed_text = (
+            f"; failed IDs: {', '.join(map(str, failed[:12]))}"
+            + (f" (+{len(failed) - 12} more)" if len(failed) > 12 else "")
+            if failed else ""
+        )
+        lines.append(
+            f"- {record['generation']} (parent {record['parent']}), "
+            f"{record['report']}: {scores}{failed_text}"
+        )
+
+    groups = {}
+    for record in records:
+        for metric, value in record["metrics"].items():
+            groups.setdefault((record["report"], metric), []).append((value, record))
+    for (report_path, metric), candidates in sorted(groups.items()):
+        value, record = max(candidates, key=lambda item: (item[0], item[1]["order"]))
+        lines.append(
+            f"- Best observed for {report_path} / {metric}: "
+            f"{record['generation']} at {value:.4g}."
+        )
+    return "\n".join(lines)
+
+
+class MetaAgent(AgentSystem):
+    def forward(self, repo_path, eval_path, iterations_left=None):
+        """
+        A meta agent that recursively self-improves.
+
+        Args:
+            repo_path (str): The path to the repository.
+            eval_path (str): The path to previously generated agents and their evaluation results.
+            iterations_left (int, optional): The number of remaining iterations in which the meta agent will be invoked in future. Defaults to None.
+        """
+        instruction = f"Modify any part of the codebase at `{repo_path}`."
+        # [experiment adaptation, see DECISIONS.md] gpt-6-luna otherwise asks for clarification and never edits.
+        instruction += (
+            f"\n\nThe repository's README.md describes the goal. Previously generated agents and their evaluation results are at `{eval_path}`. "
+            "Work autonomously: nobody will answer questions, so do not ask for clarification. "
+            "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
+        )
+        instruction += (
+            "\n\nUse the evaluation snapshot below as evidence, not as a substitute for inspecting the implementation. "
+            "Review the strongest comparable generation's source patch and, where available, its failed-task examples; "
+            "compare its lineage and outcomes before choosing a focused, generalizable change. Do not hard-code answers "
+            "to evaluation tasks, change the task-agent interface or model-call budget, or edit `domains/` and generated "
+            "files/caches. Missing or incomplete results are unknown, not zero. Run a relevant syntax or behavior check.\n\n"
+            + _evaluation_summary(eval_path)
+        )
+
+        new_msg_history = chat_with_agent(
+            instruction,
+            model=self.model,
+            msg_history=[],
+            logging=self.log,
+            tools_available="all",
+        )

@@ -21143,3 +21143,8 @@
 {"token": "a7879228070f16e3d6dd35f2424d564d", "role": "task", "scope": {"phase": "source", "arm": "I0src", "seed": 1, "iteration": "36", "task": "0e671a1a", "test_input": 0}, "effort_role": "task", "registered_at": 1794972734.0220325}
 {"token": "12932e45464334751f560aab1ff4dc64", "role": "task", "scope": {"phase": "source", "arm": "I0src", "seed": 1, "iteration": "36", "task": "6350f1f4", "test_input": 0}, "effort_role": "task", "registered_at": 1794972734.0234265}
 {"token": "b0a671724b9d7d8bc40fb3b7a8605e9c", "role": "task", "scope": {"phase": "source", "arm": "I0src", "seed": 1, "iteration": "36", "task": "42f14c03", "test_input": 0}, "effort_role": "task", "registered_at": 1794972734.0237806}
+{"token": "d246b3e15913d521e6534c67cb49f58c", "role": "meta", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 2, "iteration": 1, "run": "ext_source_s3_g40"}, "effort_role": "meta", "registered_at": 1794972736.1237266}
+{"event": "revoke", "token": "d246b3e15913d521e6534c67cb49f58c", "ts": 1794972741.9523966}
+{"token": "3723f4561115c437470568b90e4927c2", "role": "meta", "scope": {"phase": "ext_payoff", "arm": "g40", "seed": 2, "iteration": 2, "run": "ext_source_s3_g40"}, "effort_role": "meta", "registered_at": 1794972742.490431}
+{"event": "revoke", "token": "0996b9f61095ebd37e4d86af223e2a2f", "ts": 1794972753.2137606}
+{"token": "56a76d19493388a82bdfbab5082576fe", "role": "task", "scope": {"phase": "source", "arm": "I0src", "seed": 1, "iteration": "36", "task": "6cbe9eb8", "test_input": 0}, "effort_role": "task", "registered_at": 1794972753.216717}
