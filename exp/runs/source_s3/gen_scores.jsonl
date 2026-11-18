@@ -20,3 +20,5 @@
 {"iteration": "33", "score": 0.76, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "0c371af779d52d3f", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "35", "score": 0.84, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "2d98ad19a30aed51", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "37", "score": 0.76, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "ae5faff625230f9d", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "38", "score": 0.92, "missing": 0, "infra_error_rows": 2, "n_test_inputs": 26, "code_hash": "06eaf6614f32c811", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "40", "score": 0.88, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "ed32ae3a1603368b", "format_failures": 0, "snapshot_skipped": []}

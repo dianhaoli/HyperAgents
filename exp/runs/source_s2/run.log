@@ -21,3 +21,11 @@ generate_loop: generation 35 completed, parent 27
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_36', 'current_genid': 36, 'parent_genid': 27, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
 generate_loop: generation 36 completed, parent 31
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_37', 'current_genid': 37, 'parent_genid': 31, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 37 completed, parent 31
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_38', 'current_genid': 38, 'parent_genid': 31, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 38 completed, parent 25
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_39', 'current_genid': 39, 'parent_genid': 25, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 39 completed, parent 8
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s2/generate_source_s2/gen_40', 'current_genid': 40, 'parent_genid': 8, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 40 completed, parent 27
+RUN DONE source_s2

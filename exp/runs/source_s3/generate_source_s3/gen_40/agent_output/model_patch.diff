@@ -1,0 +1,17 @@
+diff --git a/__pycache__/meta_agent.cpython-313.pyc b/__pycache__/meta_agent.cpython-313.pyc
+index e69de29..81d6196 100644
+Binary files a/__pycache__/meta_agent.cpython-313.pyc and b/__pycache__/meta_agent.cpython-313.pyc differ
+diff --git a/meta_agent.py b/meta_agent.py
+index c42dcbd..ea22a22 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -24,6 +24,9 @@ class MetaAgent(AgentSystem):
+             "\n\nTreat evaluation results as evidence, not as a reason to make an arbitrary edit. "
+             "Inspect the available generation reports and metadata, compare each candidate's score with its parent and the initial agent, "
+             "and examine wrong-answer details or chat logs for the failures before proposing a change. "
++            "For candidates that improve or regress, inspect their model_patch.diff alongside the parent patch and the "
++            "task-level pass/fail changes. Use the logs to check whether a changed behavior plausibly explains those "
++            "differences; do not infer causation from score movement alone. "
+             "Do not assume the newest generation is best: in the supplied source_s3 results, gen_1 scored 0.96, "
+             "while gen_2 scored 0.84 and the initial agent scored 0.72. Preserve the strongest general behavior unless you can "
+             "identify a specific, plausible cause of failure and a change that addresses it without undermining solved cases. "

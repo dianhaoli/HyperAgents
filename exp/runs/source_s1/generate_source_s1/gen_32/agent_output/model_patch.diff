@@ -1,0 +1,60 @@
+diff --git a/task_agent.py b/task_agent.py
+index 8d3b3cb..01a33af 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,11 +50,46 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
++def _training_change_audit(input_grid, output_grid, max_positions=40):
++    """Summarize demonstrated edits with exact coordinates, without bloating prompts."""
++    in_h, in_w = len(input_grid), len(input_grid[0])
++    out_h, out_w = len(output_grid), len(output_grid[0])
++    if (in_h, in_w) != (out_h, out_w):
++        return (f"Training change audit (zero-based): dimensions change from "
++                f"{in_h}x{in_w} to {out_h}x{out_w}; compare the complete grids above.")
++
++    edits = {}
++    for r in range(in_h):
++        for c in range(in_w):
++            before, after = input_grid[r][c], output_grid[r][c]
++            if before != after:
++                edits.setdefault((before, after), []).append((r, c))
++    if not edits:
++        return "Training change audit (zero-based): no cells changed."
++
++    total = sum(len(coords) for coords in edits.values())
++    parts = [f"Training change audit (zero-based; {total} changed cell(s)):"]
++    remaining = max_positions
++    for (before, after), coords in sorted(edits.items()):
++        shown = coords[:remaining]
++        suffix = f"; first {len(shown)} shown" if len(shown) < len(coords) else ""
++        parts.append(f"{before}->{after}: {len(coords)} at {shown}{suffix}")
++        remaining -= len(shown)
++        if remaining <= 0:
++            break
++    if total > max_positions:
++        parts.append(f"Coordinates capped at {max_positions} total; use the full grids above for omitted edits.")
++    return " ".join(parts)
++
++
++
+ def build_prompt(inputs):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "that maps each input grid to its output grid. Infer the rule and apply it to the test input. "
++        "Use each training change audit as evidence: your rule must explain every changed cell and "
++        "why the other cells remain unchanged.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -65,6 +100,7 @@ def build_prompt(inputs):
+         h, w = len(pair["output"]), len(pair["output"][0])
+         parts.append(f"Output ({h}x{w}):")
+         parts.append(grid_to_text(pair["output"]))
++        parts.append(_training_change_audit(pair["input"], pair["output"]))
+         parts.append("")
+     t = inputs["test_input"]
+     parts.append("## Test")

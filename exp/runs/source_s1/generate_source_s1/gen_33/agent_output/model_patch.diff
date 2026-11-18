@@ -1,0 +1,32 @@
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+index e69de29..f9cf51c 100644
+Binary files a/__pycache__/task_agent.cpython-313.pyc and b/__pycache__/task_agent.cpython-313.pyc differ
+diff --git a/task_agent.py b/task_agent.py
+index bba6c6a..a3f8f19 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -225,17 +225,13 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                if attempt == 1 and answers:
+-                    # The second attempt is a verification opportunity, not just a
+-                    # duplicate independent solve. ARC failures often come from a
+-                    # plausible rule that misses a demonstrated change or unchanged
+-                    # cell. Expose the first grid so the model must check it against
+-                    # every pair, and retain its corrected grid as the second answer.
+-                    g = self.solve_once(inputs, candidate=answers[0])
+-                else:
+-                    # If the first response did not contain a parseable grid, there
+-                    # is no candidate to check; use the second call for a fresh solve.
+-                    g = self.solve_once(inputs, independent=(attempt == 1))
++                # Keep the second attempt independent of the first candidate. A
++                # candidate-visible "verification" can anchor the model on an
++                # incorrect rule/grid; the evaluator accepts either returned grid,
++                # so a fresh derivation gives us useful diversity within the same
++                # two-call budget. The candidate verification API remains available
++                # to callers that explicitly request it.
++                g = self.solve_once(inputs, independent=(attempt == 1))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

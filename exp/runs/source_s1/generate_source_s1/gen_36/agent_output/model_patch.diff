@@ -1,0 +1,50 @@
+diff --git a/task_agent.py b/task_agent.py
+index 9042dfd..395cd80 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -137,14 +137,24 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs, candidate=None):
++    def solve_once(self, inputs, candidate=None, independent=False):
+         """One direct model response -> one parsed grid (or None).
+ 
+-        When a candidate is supplied, use this call to verify it against every
+-        demonstration before answering, rather than spending the call on an
+-        unrelated guess.
++        A caller may either request an independent fresh derivation or supply a
++        candidate for explicit verification. Independent solving is preferable
++        for the second budgeted attempt because it avoids anchoring on a wrong
++        first-pass rule.
+         """
+         prompt = build_prompt(inputs)
++        if independent:
++            prompt += (
++                "\n\nFRESH INDEPENDENT SOLVE: derive the transformation from the training "
++                "pairs without assuming any previous answer. Check that the same concrete "
++                "rule reproduces every demonstrated output, including cells that stay "
++                "unchanged and any dimension changes. Only then apply it to the test input; "
++                "verify the output dimensions and changed regions against that rule. Return "
++                "the resulting grid inside <answer> tags, with nothing else inside the tags."
++            )
+         if candidate is not None:
+             # Derive before showing the previous answer to reduce anchoring on a
+             # plausible but incorrect first-pass grid.
+@@ -178,11 +188,11 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                # Use the existing second-call budget to independently derive the
+-                # rule first, then compare with the first grid. The evaluator accepts
+-                # either answer, so preserve both parsed candidates.
+-                candidate = answers[0] if attempt == 1 and answers else None
+-                g = self.solve_once(inputs, candidate=candidate)
++                # Use the second call for a fresh derivation rather than showing the
++                # first grid. Across recurring failures, candidate-visible checks can
++                # reinforce a plausible but incorrect interpretation; independent
++                # candidates add useful diversity without exceeding the two-call budget.
++                g = self.solve_once(inputs, independent=(attempt == 1))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
