@@ -5,9 +5,7 @@ import socket
 import http.client
 import time
 
-# Starting task agent (A_0) for the ARC-AGI-2 domain: one direct model response per attempt.
-# forward() makes two independent plain attempts (the budget is 2 model calls and 2 answers per
-# test input) and returns both parsed grids.
+# ARC task agent: two model calls and up to two candidate answers per test input.
 
 
 class _UnixConn(http.client.HTTPConnection):
@@ -50,11 +48,60 @@ def grid_to_text(grid):
     return "\n".join(" ".join(str(v) for v in row) for row in grid)
 
 
+def _training_change_audit(input_grid, output_grid, coordinate_limit=48):
+    """Summarize demonstrated edits without overwhelming the prompt on large grids."""
+    in_h, in_w = len(input_grid), len(input_grid[0]) if input_grid else 0
+    out_h, out_w = len(output_grid), len(output_grid[0]) if output_grid else 0
+    if (in_h, in_w) != (out_h, out_w):
+        return (
+            f"dimensions {in_h}x{in_w} -> {out_h}x{out_w}; "
+            "cellwise edits and unchanged cells are not aligned across different shapes"
+        )
+
+    changes = {}
+    unchanged_by_value = {}
+    for r, (in_row, out_row) in enumerate(zip(input_grid, output_grid)):
+        for c, (before, after) in enumerate(zip(in_row, out_row)):
+            if before != after:
+                changes.setdefault((before, after), []).append((r, c))
+            else:
+                unchanged_by_value[before] = unchanged_by_value.get(before, 0) + 1
+    unchanged = sum(unchanged_by_value.values())
+    unchanged_summary = ", ".join(
+        f"{value}: {count}" for value, count in sorted(unchanged_by_value.items())
+    ) or "none"
+    if not changes:
+        return f"no cells changed; {unchanged} unchanged (value counts: {unchanged_summary})"
+
+    total = sum(len(cells) for cells in changes.values())
+    descriptions = []
+    for (before, after), cells in sorted(changes.items()):
+        item = f"{before}->{after}: {len(cells)} cell(s)"
+        if total <= coordinate_limit:
+            item += " at " + ", ".join(f"({r},{c})" for r, c in cells)
+        else:
+            row_counts = {}
+            for r, _ in cells:
+                row_counts[r] = row_counts.get(r, 0) + 1
+            item += "; per-row counts " + ", ".join(
+                f"row {r}: {count}" for r, count in sorted(row_counts.items())
+            )
+        descriptions.append(item)
+    return (
+        f"{total} changed cell(s); {unchanged} unchanged "
+        f"(value counts: {unchanged_summary}): " + "; ".join(descriptions)
+    )
+
+
 def build_prompt(inputs):
     parts = [
         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
+        "that maps each input grid to its output grid. Infer the rule and apply it to the test input. "
+        "Use audits as evidence, not as a substitute for full grids: before solving the test, "
+        "check one concrete rule against every cell and output dimension in every training pair. "
+        "Account for unchanged cells, boundaries, overlaps, and the exact extent and direction "
+        "of any pattern; reject a rule that only explains the edits or looks visually plausible.",
         "",
     ]
     for i, pair in enumerate(inputs["train"], 1):
@@ -65,6 +112,10 @@ def build_prompt(inputs):
         h, w = len(pair["output"]), len(pair["output"][0])
         parts.append(f"Output ({h}x{w}):")
         parts.append(grid_to_text(pair["output"]))
+        parts.append(
+            "Change audit (input value -> output value; coordinates are zero-based): "
+            + _training_change_audit(pair["input"], pair["output"])
+        )
         parts.append("")
     t = inputs["test_input"]
     parts.append("## Test")
@@ -72,6 +123,12 @@ def build_prompt(inputs):
     parts.append(grid_to_text(t))
     parts.append("")
     parts.append(
+        "Before applying a rule, audit the demonstrations: identify the relevant objects/colors and "
+        "explain every listed changed cell using one concrete rule that works for every pair. "
+        "Also check the unchanged cells: do not alter cells merely to complete a shape or extend "
+        "a pattern beyond the bounds supported by the examples. If dimensions change, account for "
+        "that explicitly. Reject or revise any rule that cannot explain all demonstrated edits and "
+        "non-edits. Then apply the verified rule to the test and check its dimensions and bounds.\n\n"
         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
         "Put nothing else inside the tags."
@@ -138,40 +195,34 @@ class TaskAgent:
             pass
 
     def solve_once(self, inputs, candidate=None, independent=False):
-        """One direct model response -> one parsed grid (or None).
+        """Make one model call and parse its output grid, if present.
 
-        A caller may either request an independent fresh derivation or supply a
-        candidate for explicit verification. Independent solving is preferable
-        for the second budgeted attempt because it avoids anchoring on a wrong
-        first-pass rule.
+        ``candidate`` retains the explicit verification mode for callers that use it.
+        ``independent`` asks for a fresh derivation without exposing an earlier guess;
+        this is useful for a second attempt because candidate-visible checks can anchor
+        the model on the same incorrect transformation.
         """
         prompt = build_prompt(inputs)
-        if independent:
-            prompt += (
-                "\n\nFRESH INDEPENDENT SOLVE: derive the transformation from the training "
-                "pairs without assuming any previous answer. Check that the same concrete "
-                "rule reproduces every demonstrated output, including cells that stay "
-                "unchanged and any dimension changes. Only then apply it to the test input; "
-                "verify the output dimensions and changed regions against that rule. Return "
-                "the resulting grid inside <answer> tags, with nothing else inside the tags."
-            )
         if candidate is not None:
-            # Derive before showing the previous answer to reduce anchoring on a
-            # plausible but incorrect first-pass grid.
             prompt += (
-                "\n\nSECOND-PASS CHECK (use this order):\n"
-                "1. Ignore any earlier proposed answer. Infer a concrete transformation "
-                "from the training pairs alone, and check that it reproduces every "
-                "demonstration.\n"
-                "2. Apply that transformation from scratch to the test input. Check the "
-                "result's dimensions, color mapping, object placement, and every changed "
-                "region against the rule. Do not copy a demonstration output.\n"
-                "3. Only after deriving your own test grid, compare it cell by cell with "
-                "this previous candidate (which may be wrong): "
+                "\n\nIndependent verification of a previous candidate: "
                 f"{json.dumps(candidate)}\n"
-                "If they differ, resolve the discrepancy using the rule and demonstrations, "
-                "not by favoring either grid. Return the independently verified test grid "
-                "inside <answer> tags, with nothing else inside the tags."
+                "First infer the transformation from the demonstrations and check that it "
+                "reproduces every complete input/output pair cell by cell, including unchanged "
+                "cells and output dimensions. Compare the candidate with the test "
+                "input and that inferred rule; do not copy a demonstration output or accept "
+                "the candidate merely because it looks plausible. If the candidate fails "
+                "any check, correct it. Return the verified test grid in the required "
+                "<answer> tags, with nothing else inside the tags."
+            )
+        elif independent:
+            prompt += (
+                "\n\nMake this a fresh, independent solve: do not assume or reuse any "
+                "earlier proposed rule or grid. Infer a concrete rule from the training "
+                "pairs, check that it reproduces every demonstrated output, then apply it "
+                "to the test input. Verify the dimensions and changed cells against that "
+                "rule before returning the grid in <answer> tags, with nothing else inside "
+                "the tags."
             )
         self.log(f"Input: {prompt}")
         text = call_model(prompt)
@@ -188,10 +239,8 @@ class TaskAgent:
         answers = []
         for attempt in range(2):
             try:
-                # Use the second call for a fresh derivation rather than showing the
-                # first grid. Across recurring failures, candidate-visible checks can
-                # reinforce a plausible but incorrect interpretation; independent
-                # candidates add useful diversity without exceeding the two-call budget.
+                # A fresh second derivation avoids anchoring on a plausible-but-wrong
+                # first grid, while preserving the two-call/two-answer budget.
                 g = self.solve_once(inputs, independent=(attempt == 1))
             except Exception as e:
                 self.log(f"Error: {e}")

@@ -1,0 +1,5 @@
+{"iteration": "2", "score": 0.64, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "72e3aa94d9aa6bf8", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "3", "score": 0.7, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "22b1a7aa932e32b0", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "4", "score": 0.62, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "7f5bd03846f1d582", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "5", "score": 0.58, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "ff28f1be98468ebb", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "6", "score": 0.7, "missing": 0, "infra_error_rows": 5, "n_test_inputs": 26, "code_hash": "86aa1ea7b889281e", "format_failures": 0, "snapshot_skipped": []}

@@ -1,0 +1,26 @@
+diff --git a/task_agent.py b/task_agent.py
+index bbbb268..076e256 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -167,13 +167,15 @@ class TaskAgent:
+         # rather than spending the same call budget on an identical prompt.
+         if first is not None:
+             review = (
+-                "\n\nThis is an independent second attempt. Your first candidate was: "
++                "\n\nMake this a genuinely independent second attempt. Before considering the previous "
++                "candidate below, infer the transformation from the demonstrations again and work out the "
++                "test output on your own. Then use the candidate only as an audit: check that it has the "
++                "right dimensions and that its cells follow the rule demonstrated by every training pair. "
++                "If it disagrees with your independently derived result or fails any check, return your "
++                "corrected result; do not copy it merely because it is provided. If it passes, you may return it. "
++                "Previous candidate (for audit only): "
+                 + json.dumps(first)
+-                + "\nReconsider the transformation from the demonstrations. Check the candidate against "
+-                "each training pair and the test input, paying attention to object positions, orientation, "
+-                "and any changes needed to preserve the demonstrated rule. If it is inconsistent, correct it; "
+-                "if it is consistent, return it. Do not assume the candidate is correct just because it was "
+-                "given to you. Return one output grid in the required <answer> tags."
++                + "\nReturn one output grid in the required <answer> tags."
+             )
+         else:
+             review = (

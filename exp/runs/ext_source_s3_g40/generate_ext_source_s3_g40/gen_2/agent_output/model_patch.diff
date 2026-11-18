@@ -1,0 +1,17 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..445984f 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -137,9 +137,10 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
++    def solve_once(self, inputs, prompt=None):
+         """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++        if prompt is None:
++            prompt = build_prompt(inputs)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")

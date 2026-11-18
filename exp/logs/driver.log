@@ -78,3 +78,4 @@ pick source_s3:g40: source_s3 g40 -> (9, 6, 0.08000000000000007) | max mean chil
    transplant check: True __ARC_SANDBOX_STARTED__
 IMPORT_OK 
 launched extension test ext_source_s3_g40: launched run_ext_source_s3_g40
+launched final exam for ext_source_s3_g40

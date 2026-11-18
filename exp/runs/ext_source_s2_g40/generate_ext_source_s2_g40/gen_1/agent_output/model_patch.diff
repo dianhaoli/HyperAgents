@@ -1,0 +1,120 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..001cd40 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,32 +50,50 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, second_attempt=False):
++    """Build a solve prompt; the second attempt uses a distinct, independent check."""
+     parts = [
+-        "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+-        "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "Solve this ARC-AGI puzzle. Each grid is a rectangular 2D array of colors 0-9. "
++        "All training pairs use the same transformation; infer it and apply it to the test input.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+-        parts.append(f"## Example {i}")
+-        h, w = len(pair["input"]), len(pair["input"][0])
+-        parts.append(f"Input ({h}x{w}):")
+-        parts.append(grid_to_text(pair["input"]))
+-        h, w = len(pair["output"]), len(pair["output"][0])
+-        parts.append(f"Output ({h}x{w}):")
+-        parts.append(grid_to_text(pair["output"]))
++        parts.append(f"## Training example {i}")
++        grid = pair["input"]
++        parts.append(f"Input ({len(grid)}x{len(grid[0])}):")
++        parts.append(grid_to_text(grid))
++        grid = pair["output"]
++        parts.append(f"Output ({len(grid)}x{len(grid[0])}):")
++        parts.append(grid_to_text(grid))
+         parts.append("")
+-    t = inputs["test_input"]
+-    parts.append("## Test")
+-    parts.append(f"Input ({len(t)}x{len(t[0])}):")
+-    parts.append(grid_to_text(t))
+-    parts.append("")
+-    parts.append(
+-        "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+-        "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+-        "Put nothing else inside the tags."
+-    )
++
++    test = inputs["test_input"]
++    parts.extend([
++        "## Test input",
++        f"Input ({len(test)}x{len(test[0])}):",
++        grid_to_text(test),
++        "",
++        "Reason carefully before answering: identify what changes and what stays invariant; "
++        "check that your proposed rule reproduces EVERY training output exactly; then apply "
++        "that same rule to the complete test grid. Do not assume output dimensions equal input "
++        "dimensions. Check row/column counts, colors, and every cell of the final grid.",
++    ])
++
++    if second_attempt:
++        parts.extend([
++            "",
++            "Solve this independently from the examples; do not assume a first interpretation is correct. "
++            "Compare the input-output changes across all examples, consider whether the rule changes "
++            "grid size or acts on objects/regions rather than individual cells, and verify your inferred "
++            "rule against every training pair before constructing the test output. Check that the final "
++            "grid has the correct dimensions and includes every row and cell.",
++        ])
++
++    parts.extend([
++        "",
++        "Return the final output grid inside <answer></answer> tags as a JSON list of integer rows, "
++        "for example <answer>[[0, 1], [2, 3]]</answer>. Put nothing else inside the tags.",
++    ])
+     return "\n".join(parts)
+ 
+ 
+@@ -137,9 +155,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
++    def solve_once(self, inputs, second_attempt=False):
+         """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++        prompt = build_prompt(inputs, second_attempt=second_attempt)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -152,13 +170,23 @@ class TaskAgent:
+         Returns:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
++        # Keep both answers as independent candidates: the grader accepts either, and
++        # retaining diversity avoids making the second call depend on a potentially wrong
++        # first interpretation. Use a more systematic prompt for the second solve.
+         answers = []
+-        for _ in range(2):
+-            try:
+-                g = self.solve_once(inputs)
+-            except Exception as e:
+-                self.log(f"Error: {e}")
+-                g = None
+-            if g is not None:
+-                answers.append(g)
++        first = None
++        try:
++            first = self.solve_once(inputs)
++        except Exception as e:
++            self.log(f"Error on initial solve: {e}")
++        if first is not None:
++            answers.append(first)
++
++        try:
++            second = self.solve_once(inputs, second_attempt=True)
++        except Exception as e:
++            self.log(f"Error on verification solve: {e}")
++            second = None
++        if second is not None:
++            answers.append(second)
+         return answers, []

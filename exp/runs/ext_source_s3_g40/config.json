@@ -25,5 +25,6 @@
   "rng_seed": 7002,
   "workers": 12,
   "name": "ext_source_s3_g40",
-  "root_commit": "4d7643cd83e0e256bb4b9eb87e0ce945e36fd485"
+  "root_commit": "4d7643cd83e0e256bb4b9eb87e0ce945e36fd485",
+  "done": true
 }

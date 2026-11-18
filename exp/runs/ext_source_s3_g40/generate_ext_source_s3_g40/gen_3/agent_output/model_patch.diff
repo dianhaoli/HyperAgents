@@ -1,0 +1,51 @@
+diff --git a/task_agent.py b/task_agent.py
+index 445984f..bbbb268 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -154,12 +154,38 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
+-            try:
+-                g = self.solve_once(inputs)
+-            except Exception as e:
+-                self.log(f"Error: {e}")
+-                g = None
+-            if g is not None:
+-                answers.append(g)
++        prompt = build_prompt(inputs)
++        try:
++            first = self.solve_once(inputs, prompt)
++        except Exception as e:
++            self.log(f"Error: {e}")
++            first = None
++        if first is not None:
++            answers.append(first)
++
++        # Use the second call to review the first candidate against the examples,
++        # rather than spending the same call budget on an identical prompt.
++        if first is not None:
++            review = (
++                "\n\nThis is an independent second attempt. Your first candidate was: "
++                + json.dumps(first)
++                + "\nReconsider the transformation from the demonstrations. Check the candidate against "
++                "each training pair and the test input, paying attention to object positions, orientation, "
++                "and any changes needed to preserve the demonstrated rule. If it is inconsistent, correct it; "
++                "if it is consistent, return it. Do not assume the candidate is correct just because it was "
++                "given to you. Return one output grid in the required <answer> tags."
++            )
++        else:
++            review = (
++                "\n\nA previous attempt did not produce a valid grid. Solve the puzzle independently, "
++                "checking the inferred transformation against every training pair. Return one output grid "
++                "in the required <answer> tags."
++            )
++        try:
++            second = self.solve_once(inputs, prompt + review)
++        except Exception as e:
++            self.log(f"Error: {e}")
++            second = None
++        if second is not None:
++            answers.append(second)
+         return answers, []

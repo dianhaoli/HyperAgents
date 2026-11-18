@@ -1,0 +1,74 @@
+diff --git a/task_agent.py b/task_agent.py
+index 69bbf54..165aadd 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -53,15 +53,25 @@ def _training_change_audit(input_grid, output_grid, coordinate_limit=48):
+     in_h, in_w = len(input_grid), len(input_grid[0]) if input_grid else 0
+     out_h, out_w = len(output_grid), len(output_grid[0]) if output_grid else 0
+     if (in_h, in_w) != (out_h, out_w):
+-        return f"dimensions {in_h}x{in_w} -> {out_h}x{out_w}"
++        return (
++            f"dimensions {in_h}x{in_w} -> {out_h}x{out_w}; "
++            "cellwise edits are not aligned because the shapes differ"
++        )
+ 
+     changes = {}
++    unchanged_by_value = {}
+     for r, (in_row, out_row) in enumerate(zip(input_grid, output_grid)):
+         for c, (before, after) in enumerate(zip(in_row, out_row)):
+             if before != after:
+                 changes.setdefault((before, after), []).append((r, c))
++            else:
++                unchanged_by_value[before] = unchanged_by_value.get(before, 0) + 1
++    unchanged = sum(unchanged_by_value.values())
++    unchanged_summary = ", ".join(
++        f"{value}: {count}" for value, count in sorted(unchanged_by_value.items())
++    ) or "none"
+     if not changes:
+-        return "no cells changed"
++        return f"no cells changed; {unchanged} unchanged (value counts: {unchanged_summary})"
+ 
+     total = sum(len(cells) for cells in changes.values())
+     descriptions = []
+@@ -77,7 +87,10 @@ def _training_change_audit(input_grid, output_grid, coordinate_limit=48):
+                 f"row {r}: {count}" for r, count in sorted(row_counts.items())
+             )
+         descriptions.append(item)
+-    return f"{total} changed cell(s): " + "; ".join(descriptions)
++    return (
++        f"{total} changed cell(s); {unchanged} unchanged "
++        f"(value counts: {unchanged_summary}): " + "; ".join(descriptions)
++    )
+ 
+ 
+ def build_prompt(inputs):
+@@ -85,7 +98,10 @@ def build_prompt(inputs):
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input. "
+-        "Use the change audits as evidence: the same rule must explain every edit and every unchanged cell.",
++        "Use the change audits as evidence, not as a substitute for the full grids. Before applying a rule, "
++        "check that applying it to each complete training input reproduces that pair's output dimensions "
++        "and every cell, including unchanged cells. Pay particular attention to boundaries, overlaps, and "
++        "which side or segment a pattern affects; reject a rule that fits only the listed edits.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -189,11 +205,12 @@ class TaskAgent:
+                 f"{json.dumps(candidate)}\n"
+                 "Candidate edit audit (test input -> candidate; coordinates are zero-based): "
+                 f"{candidate_audit}\n"
+-                "Derive the rule from every training pair before deciding. For a same-size "
+-                "candidate, account for every listed edit and verify that every cell not "
+-                "listed remains unchanged for a reason supported by the demonstrations. "
+-                "Do not extend a pattern beyond its demonstrated bounds or fill a cell just "
+-                "because it appears to complete a shape. Correct unjustified edits or "
++                "Derive the rule from every complete training pair before deciding. Verify "
++                "that the rule reproduces each demonstrated output's dimensions and every "
++                "cell, then account for the candidate's changed and unchanged cells. Check "
++                "boundaries, overlaps, and direction against the examples; do not extend a "
++                "pattern beyond justified bounds or fill a cell just because it appears to "
++                "complete a shape. Correct unjustified edits or "
+                 "omissions, and return the verified grid in <answer> tags only."
+             )
+         elif independent:
