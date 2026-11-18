@@ -96,13 +96,31 @@ Each dot is one finished player's exam score; the bar marks the group's average.
 **Figure 3**: exam scores of every finished player. Think longer was run once.
 
 
+### 3b. Plasticity
+
+[[3b-plasticity.h31]]  <!-- h3 -->
+How well does a coach improve, and does it get better at improving?
+
+[[3b-plasticity.p1]]  <!-- p -->
+**Agent plasticity** is how efficiently an agent turns experience into gains on tasks it has not seen [[3]](#ref-plasticity "cite"). Here we measure it one level up, for the coach.
+
+[[3b-plasticity.li1]]  <!-- li -->
+**First-order plasticity: how well a coach improves the player.** Freeze a coach, let it improve a fresh player for {{int:derived.rounds}} rounds, and compare that player's exam score with the uncoached player's. This is the *improvement@k* measure from the Hyperagents paper [[4]](#ref-hyper "cite"), with k = {{int:derived.rounds}} rounds. The original coach: {{pts:G.est}} points (95% interval {{ci:G}}).
+
+[[3b-plasticity.li2]]  <!-- li -->
+**Second-order plasticity: whether the coach gets better at improving.** Does that first-order gain grow as the coach rewrites itself? Compare players trained by later coaches with players trained by the original coach. Self-improved coach minus original: {{pts:Delta.est}} points (95% interval {{ci:Delta}}). Generation-40 coaches minus original: {{pts:extension.gen40_minus_gen0.est}} points (95% interval {{ci:extension.gen40_minus_gen0}}).
+
+[[3b-plasticity.p2]]  <!-- p -->
+Here both are indistinguishable from zero: coaching did not measurably improve the player, and rewriting itself did not make the coach a better coach. “Second-order plasticity” is our own name; the Hyperagents paper calls a coach rewriting itself *metacognitive self-modification*. That paper's positive result comes from moving evolved coaches to a new kind of task. Ours is a same-task test on ARC-AGI-2, so it does not directly test that claim.
+
+
 ### 4. Generations
 
 [[4-generations.h21]]  <!-- h2 -->
 Did more generations help?
 
 [[4-generations.p1]]  <!-- p -->
-One reason it didn't: coaches rarely changed themselves. A coach's own code changed in only {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations. We then ran a follow-up that wasn't in the original pre-registered plan (its own plan was written down before it ran [[4]](#ref-design2 "cite")). In it, {{int:extension.per_generation.40.n}} runs kept going to generation {{int:derived.extMaxGen}}, and we also tested coaches picked at generations 20 and 40. Often the later pick was literally the same code: in run 1, the coaches picked at generations 12, 20 and 40 were all one version, made back at generation 1.
+One reason it didn't: coaches rarely changed themselves. A coach's own code changed in only {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations. We then ran a follow-up that wasn't in the original pre-registered plan (its own plan was written down before it ran). In it, {{int:extension.per_generation.40.n}} runs kept going to generation {{int:derived.extMaxGen}}, and we also tested coaches picked at generations 20 and 40. Often the later pick was literally the same code: in run 1, the coaches picked at generations 12, 20 and 40 were all one version, made back at generation 1.
 
 [[4-generations.p2]]  <!-- p -->
 That one coach scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}} in its three tests. Same code, different scores: that spread is pure noise, and it's bigger than any difference between generations.
@@ -114,7 +132,7 @@ Coaches from later generations were no better.
 Each dot is one finished player; the line connects the averages. The button circles one coach that was tested three times.
 
 [[4-generations.figcaption1]]  <!-- figcaption -->
-**Figure 4**: exam score by the generation the coach was picked at. Generation 40 minus generation 0: {{pts:extension.gen40_minus_gen0.est}} points (95% interval {{ci:extension.gen40_minus_gen0}}). Generations 20 and 40 come from the follow-up [[4]](#ref-design2 "cite").
+**Figure 4**: exam score by the generation the coach was picked at. Generation 40 minus generation 0: {{pts:extension.gen40_minus_gen0.est}} points (95% interval {{ci:extension.gen40_minus_gen0}}). Generations 20 and 40 come from the follow-up.
 
 
 ### 5. Watch
@@ -344,9 +362,6 @@ Caveats
 [[7-explore.li7]]  <!-- li -->
 **Transcripts are partial.** They were saved only for failed practice answers (1,513 of them) and contain no hidden reasoning.
 
-[[7-explore.p8]]  <!-- p -->
-Every deviation, bug and re-run is logged in `DECISIONS.md` [[5]](#ref-decisions "cite").
-
 [[7-explore.h33]]  <!-- h3 -->
 Method in full
 
@@ -357,7 +372,7 @@ The design, fixed before any results
 **Question.** With equal compute, does a coach that evolved itself train a better player than the original coach?
 
 [[7-explore.li9]]  <!-- li -->
-**Pre-registration.** `DESIGN.md`, `splits.json` and `analysis.py` were committed at `f577cc7` before any test result existed, so the plan and the analysis couldn't be adjusted to fit the results. The follow-up plan, `DESIGN_v2.md`, was committed at `991a237` before any follow-up test.
+**Pre-registration.** The plan, the puzzle splits and the analysis code were committed (`f577cc7`) before any test result existed, so they could not be adjusted to fit the results. The follow-up plan was committed (`991a237`) before any follow-up test.
 
 [[7-explore.li10]]  <!-- li -->
 **Model.** gpt-6-luna via the OpenAI Responses API, for both player and coach. Reasoning effort was *high* for both; the think-longer exam used *xhigh*.
@@ -416,7 +431,7 @@ What was run, in order
 [[7-explore.li27]]  <!-- li -->
 **Code audit.** {{int:diff_audit_summary.hunks}} changed blocks in the picked coaches: {{int:diff_audit_summary.arc_specific}} specific to these puzzles, {{int:diff_audit_summary.general}} general.
 
-[[7-explore.p9]]  <!-- p -->
+[[7-explore.p8]]  <!-- p -->
 Every number on this page is read from `explorer/data/*.json`, built from the experiment's records by `arcexp/build_explorer_data.py`. The full write-up is `WRITEUP.md`.
 
 
@@ -429,16 +444,13 @@ References
 ARC Prize Foundation. *ARC-AGI-2*, public evaluation set, commit `f3283f7`. [github.com/arcprize/ARC-AGI-2](https://github.com/arcprize/ARC-AGI-2)
 
 [[references.li2]]  <!-- li -->
-`DESIGN.md`, the pre-registered design, committed at `f577cc7` before any test result.
-
-[[references.li3]]  <!-- li -->
 B. L. Welch (1947). The generalization of "Student's" problem when several different population variances are involved. *Biometrika* 34(1–2), 28–35.
 
-[[references.li4]]  <!-- li -->
-`DESIGN_v2.md`, the follow-up plan, committed at `991a237` before any follow-up test.
+[[references.li3]]  <!-- li -->
+H. Singh, A. Bakhtin, R. Shao, G. Synnaeve, I. Kulikov, R. Fergus, S. Arora, K. Keutzer, J. Weston, A. Mahajan, A. Goyal (2026). Agent Plasticity: Measuring Self-Improvement Through Experience. arXiv:2610.08902. [arxiv.org/abs/2610.08902](https://arxiv.org/abs/2610.08902)
 
-[[references.li5]]  <!-- li -->
-`DECISIONS.md`: every deviation, bug and re-run.
+[[references.li4]]  <!-- li -->
+J. Zhang, B. Zhao, W. Yang, J. Foerster, J. Clune, M. Jiang, S. Devlin, T. Shavrina (2026). Hyperagents. arXiv:2603.19461. [arxiv.org/abs/2603.19461](https://arxiv.org/abs/2603.19461)
 
 
 ### Footnotes
@@ -447,7 +459,7 @@ B. L. Welch (1947). The generalization of "Student's" problem when several diffe
 In the repository, the "player" is the *task agent* and the "coach" is the *meta agent*. Both run on the same model.
 
 [[fn-2]]
-From each run we took the self-edited coach whose players improved most on practice. This rule was fixed before any exam result existed [[2]](#ref-design "cite").
+From each run we took the self-edited coach whose players improved most on practice. This rule was fixed before any exam result existed.
 
 [[fn-3]]
 The 120 public ARC-AGI-2 evaluation tasks [[1]](#ref-arc "cite"), with {{int:sets.heldout_test_inputs}} test inputs. A puzzle with several test inputs earns partial credit.
@@ -456,7 +468,7 @@ The 120 public ARC-AGI-2 evaluation tasks [[1]](#ref-arc "cite"), with {{int:set
 A gateway that no agent could edit fixed the model, its reasoning effort (*high*; *xhigh* for the think-longer run), the call cap and the budget.
 
 [[fn-5]]
-95% intervals: original coach minus no coach {{ci:G}} points; self-improved minus no coach {{ci:Ig_gain_over_B0}}; self-improved minus original {{pts:Delta.est}} {{ci:Delta}}. All include zero, which means "no difference" fits the data. Welch t-intervals [[3]](#ref-welch "cite"); the headline was pre-registered [[2]](#ref-design "cite").
+95% intervals: original coach minus no coach {{ci:G}} points; self-improved minus no coach {{ci:Ig_gain_over_B0}}; self-improved minus original {{pts:Delta.est}} {{ci:Delta}}. All include zero, which means "no difference" fits the data. Welch t-intervals [[2]](#ref-welch "cite"); the headline was pre-registered.
 
 [[fn-6]]
 Same model, reasoning effort, call cap and practice puzzles as the study, with one difference: the demo asked for “detailed” reasoning summaries, while the study asked for “auto” (which returned none in a short test). We show the only round, out of several tried, that changed the player without breaking it, plus two puzzles picked to illustrate: one the edit fixed and one it didn't. Runs aren't deterministic, so each player was run on each puzzle several times.

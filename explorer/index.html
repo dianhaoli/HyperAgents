@@ -59,7 +59,7 @@
 </figure>
 
 <section class="l-body">
-  <p>We ran step 1 <span data-v="int:n_source_seeds">6</span> separate times, for <span data-v="int:derived.sourceGens">12</span> generations each. To test a coach, we froze it so it could no longer change (either the original coach or the self-improved one from each run<sup class="fn" id="fnref-2"><a href="#fn-2">2</a></sup><span class="sidenote" id="fn-2"><span class="sn-num">2</span>From each run we took the self-edited coach whose players improved most on practice. This rule was fixed before any exam result existed <a class="cite" href="#ref-design">[2]</a>.</span>). We then handed it a fresh, untouched player and gave it <span data-v="int:derived.rounds">8</span> rounds of coaching on a different set of <span data-v="int:sets.payoff_practice_tasks">25</span> practice puzzles. The finished player sat the exam exactly once: <span data-v="int:sets.heldout_tasks">120</span> puzzles it had never seen.<sup class="fn" id="fnref-3"><a href="#fn-3">3</a></sup><span class="sidenote" id="fn-3"><span class="sn-num">3</span>The 120 public ARC-AGI-2 evaluation tasks <a class="cite" href="#ref-arc">[1]</a>, with <span data-v="int:sets.heldout_test_inputs">167</span> test inputs. A puzzle with several test inputs earns partial credit.</span></p>
+  <p>We ran step 1 <span data-v="int:n_source_seeds">6</span> separate times, for <span data-v="int:derived.sourceGens">12</span> generations each. To test a coach, we froze it so it could no longer change (either the original coach or the self-improved one from each run<sup class="fn" id="fnref-2"><a href="#fn-2">2</a></sup><span class="sidenote" id="fn-2"><span class="sn-num">2</span>From each run we took the self-edited coach whose players improved most on practice. This rule was fixed before any exam result existed.</span>). We then handed it a fresh, untouched player and gave it <span data-v="int:derived.rounds">8</span> rounds of coaching on a different set of <span data-v="int:sets.payoff_practice_tasks">25</span> practice puzzles. The finished player sat the exam exactly once: <span data-v="int:sets.heldout_tasks">120</span> puzzles it had never seen.<sup class="fn" id="fnref-3"><a href="#fn-3">3</a></sup><span class="sidenote" id="fn-3"><span class="sn-num">3</span>The 120 public ARC-AGI-2 evaluation tasks <a class="cite" href="#ref-arc">[1]</a>, with <span data-v="int:sets.heldout_test_inputs">167</span> test inputs. A puzzle with several test inputs earns partial credit.</span></p>
   <p>We also needed something to compare against. The uncoached player sat the same exam as it was, and once more with the model set to <b>think longer</b>: one notch higher on its "reasoning effort" setting, which lets the model reason more before it answers. It still got only two calls and two answers per puzzle. That setting was locked, so no coach could change it.<sup class="fn" id="fnref-4"><a href="#fn-4">4</a></sup><span class="sidenote" id="fn-4"><span class="sn-num">4</span>A gateway that no agent could edit fixed the model, its reasoning effort (<i>high</i>; <i>xhigh</i> for the think-longer run), the call cap and the budget.</span></p>
 </section>
 
@@ -83,7 +83,7 @@
 <!-- ============================ 3. Result ============================ -->
 <section class="l-body" aria-labelledby="results">
   <h2 id="results">The result</h2>
-  <p>Players trained by the original coach scored <span data-v="pts:G.est">+0.4</span> points above the uncoached player, and players trained by a self-improved coach <span data-v="pts:Ig_gain_over_B0.est">&#8722;1.4</span> points. Both gaps are smaller than ordinary run-to-run noise, the amount scores bounce around when you simply run the same setup again. In other words, we can't tell either one apart from no effect.<sup class="fn" id="fnref-5"><a href="#fn-5">5</a></sup><span class="sidenote" id="fn-5"><span class="sn-num">5</span>95% intervals: original coach minus no coach <span data-v="ci:G">[&#8722;1.9, +2.8]</span> points; self-improved minus no coach <span data-v="ci:Ig_gain_over_B0">[&#8722;4.0, +1.3]</span>; self-improved minus original <span data-v="pts:Delta.est">&#8722;1.8</span> <span data-v="ci:Delta">[&#8722;4.2, +0.6]</span>. All include zero, which means "no difference" fits the data. Welch t-intervals <a class="cite" href="#ref-welch">[3]</a>; the headline was pre-registered <a class="cite" href="#ref-design">[2]</a>.</span> Thinking longer, by contrast, added about <span data-v="pp0:derived.xhighGain">12</span> points.</p>
+  <p>Players trained by the original coach scored <span data-v="pts:G.est">+0.4</span> points above the uncoached player, and players trained by a self-improved coach <span data-v="pts:Ig_gain_over_B0.est">&#8722;1.4</span> points. Both gaps are smaller than ordinary run-to-run noise, the amount scores bounce around when you simply run the same setup again. In other words, we can't tell either one apart from no effect.<sup class="fn" id="fnref-5"><a href="#fn-5">5</a></sup><span class="sidenote" id="fn-5"><span class="sn-num">5</span>95% intervals: original coach minus no coach <span data-v="ci:G">[&#8722;1.9, +2.8]</span> points; self-improved minus no coach <span data-v="ci:Ig_gain_over_B0">[&#8722;4.0, +1.3]</span>; self-improved minus original <span data-v="pts:Delta.est">&#8722;1.8</span> <span data-v="ci:Delta">[&#8722;4.2, +0.6]</span>. All include zero, which means "no difference" fits the data. Welch t-intervals <a class="cite" href="#ref-welch">[2]</a>; the headline was pre-registered.</span> Thinking longer, by contrast, added about <span data-v="pp0:derived.xhighGain">12</span> points.</p>
 </section>
 
 <figure class="fig l-page" id="fig-results">
@@ -97,10 +97,23 @@
   <figcaption><b>Figure 3</b>: exam scores of every finished player. Think longer was run once.</figcaption>
 </figure>
 
+<!-- ============================ 3b. Plasticity ============================ -->
+<section class="l-body" aria-labelledby="plasticity">
+  <div class="plasticity-box">
+    <h3 id="plasticity">How well does a coach improve, and does it get better at improving?</h3>
+    <p><b>Agent plasticity</b> is how efficiently an agent turns experience into gains on tasks it has not seen <a class="cite" href="#ref-plasticity">[3]</a>. Here we measure it one level up, for the coach.</p>
+    <ul>
+      <li><b>First-order plasticity: how well a coach improves the player.</b> Freeze a coach, let it improve a fresh player for <span data-v="int:derived.rounds">8</span> rounds, and compare that player's exam score with the uncoached player's. This is the <i>improvement@k</i> measure from the Hyperagents paper <a class="cite" href="#ref-hyper">[4]</a>, with k = <span data-v="int:derived.rounds">8</span> rounds. The original coach: <span data-v="pts:G.est">+0.4</span> points (95% interval <span data-v="ci:G">[&#8722;1.9, +2.8]</span>).</li>
+      <li><b>Second-order plasticity: whether the coach gets better at improving.</b> Does that first-order gain grow as the coach rewrites itself? Compare players trained by later coaches with players trained by the original coach. Self-improved coach minus original: <span data-v="pts:Delta.est">&#8722;1.8</span> points (95% interval <span data-v="ci:Delta">[&#8722;4.2, +0.6]</span>). Generation-40 coaches minus original: <span data-v="pts:extension.gen40_minus_gen0.est">+0.6</span> points (95% interval <span data-v="ci:extension.gen40_minus_gen0">[&#8722;6.5, +7.8]</span>).</li>
+    </ul>
+    <p>Here both are indistinguishable from zero: coaching did not measurably improve the player, and rewriting itself did not make the coach a better coach. &#8220;Second-order plasticity&#8221; is our own name; the Hyperagents paper calls a coach rewriting itself <i>metacognitive self-modification</i>. That paper's positive result comes from moving evolved coaches to a new kind of task. Ours is a same-task test on ARC-AGI-2, so it does not directly test that claim.</p>
+  </div>
+</section>
+
 <!-- ============================ 4. Generations ============================ -->
 <section class="l-body" aria-labelledby="generations">
   <h2 id="generations">Did more generations help?</h2>
-  <p>One reason it didn't: coaches rarely changed themselves. A coach's own code changed in only <span data-v="int:derived.selfEditGens">21</span> of <span data-v="int:derived.totalGens">72</span> generations. We then ran a follow-up that wasn't in the original pre-registered plan (its own plan was written down before it ran <a class="cite" href="#ref-design2">[4]</a>). In it, <span data-v="int:extension.per_generation.40.n">4</span> runs kept going to generation <span data-v="int:derived.extMaxGen">40</span>, and we also tested coaches picked at generations 20 and 40. Often the later pick was literally the same code: in run 1, the coaches picked at generations 12, 20 and 40 were all one version, made back at generation 1.</p>
+  <p>One reason it didn't: coaches rarely changed themselves. A coach's own code changed in only <span data-v="int:derived.selfEditGens">21</span> of <span data-v="int:derived.totalGens">72</span> generations. We then ran a follow-up that wasn't in the original pre-registered plan (its own plan was written down before it ran). In it, <span data-v="int:extension.per_generation.40.n">4</span> runs kept going to generation <span data-v="int:derived.extMaxGen">40</span>, and we also tested coaches picked at generations 20 and 40. Often the later pick was literally the same code: in run 1, the coaches picked at generations 12, 20 and 40 were all one version, made back at generation 1.</p>
   <p>That one coach scored <span data-v="pct:derived.sameCoach.g12">26.0%</span>, <span data-v="pct:derived.sameCoach.g20">27.8%</span> and <span data-v="pct:derived.sameCoach.g40">36.0%</span> in its three tests. Same code, different scores: that spread is pure noise, and it's bigger than any difference between generations.</p>
 </section>
 
@@ -112,7 +125,7 @@
     </div>
     <div class="mount" data-fig="generations"><div class="mount-status">Loading figure&#8230;</div></div>
   </div>
-  <figcaption><b>Figure 4</b>: exam score by the generation the coach was picked at. Generation 40 minus generation 0: <span data-v="pts:extension.gen40_minus_gen0.est">+0.6</span> points (95% interval <span data-v="ci:extension.gen40_minus_gen0">[&#8722;6.5, +7.8]</span>). Generations 20 and 40 come from the follow-up <a class="cite" href="#ref-design2">[4]</a>.</figcaption>
+  <figcaption><b>Figure 4</b>: exam score by the generation the coach was picked at. Generation 40 minus generation 0: <span data-v="pts:extension.gen40_minus_gen0.est">+0.6</span> points (95% interval <span data-v="ci:extension.gen40_minus_gen0">[&#8722;6.5, +7.8]</span>). Generations 20 and 40 come from the follow-up.</figcaption>
 </figure>
 
 <!-- ============================ 5. Watch ============================ -->
@@ -250,7 +263,6 @@
         <li><b>An untouched final player.</b> In one follow-up test (the generation-20 coach, run 4), the untouched starting player beat the best edited finalist on practice (<span data-v="num2:derived.untouchedWin.untouched">0.70</span> vs <span data-v="num2:derived.untouchedWin.edited">0.66</span>). So that exam score is the untouched player's own.</li>
         <li><b>Transcripts are partial.</b> They were saved only for failed practice answers (1,513 of them) and contain no hidden reasoning.</li>
       </ul>
-      <p class="small ink2">Every deviation, bug and re-run is logged in <code>DECISIONS.md</code> <a class="cite" href="#ref-decisions">[5]</a>.</p>
 
       <h3 id="appendix">Method in full</h3>
       <div class="appendix">
@@ -258,7 +270,7 @@
         <summary>The design, fixed before any results</summary>
         <div class="body"><ul>
           <li><b>Question.</b> With equal compute, does a coach that evolved itself train a better player than the original coach?</li>
-          <li><b>Pre-registration.</b> <code>DESIGN.md</code>, <code>splits.json</code> and <code>analysis.py</code> were committed at <code>f577cc7</code> before any test result existed, so the plan and the analysis couldn't be adjusted to fit the results. The follow-up plan, <code>DESIGN_v2.md</code>, was committed at <code>991a237</code> before any follow-up test.</li>
+          <li><b>Pre-registration.</b> The plan, the puzzle splits and the analysis code were committed (<code>f577cc7</code>) before any test result existed, so they could not be adjusted to fit the results. The follow-up plan was committed (<code>991a237</code>) before any follow-up test.</li>
           <li><b>Model.</b> gpt-6-luna via the OpenAI Responses API, for both player and coach. Reasoning effort was <i>high</i> for both; the think-longer exam used <i>xhigh</i>.</li>
           <li><b>Player budget.</b> At most 2 model calls and 2 answers per test input. A test input counts as solved if either answer matches exactly.</li>
           <li><b>Coach budget.</b> 600k tokens per coaching round.</li>
@@ -295,10 +307,9 @@
   <h2 id="references">References</h2>
   <ol>
     <li id="ref-arc">ARC Prize Foundation. <i>ARC-AGI-2</i>, public evaluation set, commit <code>f3283f7</code>. <a href="https://github.com/arcprize/ARC-AGI-2">github.com/arcprize/ARC-AGI-2</a></li>
-    <li id="ref-design"><code>DESIGN.md</code>, the pre-registered design, committed at <code>f577cc7</code> before any test result.</li>
     <li id="ref-welch">B. L. Welch (1947). The generalization of "Student's" problem when several different population variances are involved. <i>Biometrika</i> 34(1&#8211;2), 28&#8211;35.</li>
-    <li id="ref-design2"><code>DESIGN_v2.md</code>, the follow-up plan, committed at <code>991a237</code> before any follow-up test.</li>
-    <li id="ref-decisions"><code>DECISIONS.md</code>: every deviation, bug and re-run.</li>
+    <li id="ref-plasticity">H. Singh, A. Bakhtin, R. Shao, G. Synnaeve, I. Kulikov, R. Fergus, S. Arora, K. Keutzer, J. Weston, A. Mahajan, A. Goyal (2026). Agent Plasticity: Measuring Self-Improvement Through Experience. arXiv:2610.08902. <a href="https://arxiv.org/abs/2610.08902">arxiv.org/abs/2610.08902</a></li>
+    <li id="ref-hyper">J. Zhang, B. Zhao, W. Yang, J. Foerster, J. Clune, M. Jiang, S. Devlin, T. Shavrina (2026). Hyperagents. arXiv:2603.19461. <a href="https://arxiv.org/abs/2603.19461">arxiv.org/abs/2603.19461</a></li>
   </ol>
 </section>
 

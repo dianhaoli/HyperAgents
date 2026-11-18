@@ -483,3 +483,10 @@ figure.fig.explore-fig{margin:0 0 40px}
 }
 .numbers-text table.t{font-size:var(--fs-small)}
 .jump a{white-space:nowrap}
+
+/* ---------- plasticity box (results section) ---------- */
+.plasticity-box{background:var(--panel);border-radius:6px;padding:20px 22px;display:flex;flex-direction:column;gap:10px}
+.plasticity-box h3{margin:0;text-wrap:balance}
+.plasticity-box p{margin:0}
+.plasticity-box ul{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:8px}
+@media (max-width:520px){.plasticity-box{padding:16px}}
