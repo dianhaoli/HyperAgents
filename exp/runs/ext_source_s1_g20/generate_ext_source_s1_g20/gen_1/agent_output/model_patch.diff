@@ -1,0 +1,59 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..9c3ff46 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -50,7 +50,7 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs):
++def build_prompt(inputs, candidate=None):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+@@ -71,6 +71,16 @@ def build_prompt(inputs):
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+     parts.append(grid_to_text(t))
+     parts.append("")
++    if candidate is not None:
++        parts.extend([
++            "\nSECOND-PASS VERIFICATION: A previous attempt proposed this grid:",
++            json.dumps(candidate, separators=(",", ":")),
++            "Do not copy it automatically. Independently infer the rule from the demonstrations, "
++            "check that rule against every input/output pair, and check whether this candidate follows "
++            "the rule and has the correct dimensions. If it is consistent, return it; otherwise return "
++            "the corrected grid. Pay particular attention to row/column ordering and exact cell placement.",
++            "",
++        ])
+     parts.append(
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "
+         "tags as a JSON list of rows, for example:\n<answer>[[0, 1, 2], [3, 4, 5]]</answer>\n"
+@@ -137,9 +147,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs):
+-        """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs)
++    def solve_once(self, inputs, candidate=None):
++        """One model response -> one parsed grid (or None)."""
++        prompt = build_prompt(inputs, candidate=candidate)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -153,9 +163,13 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        for _ in range(2):
++        # Spend the existing two-call budget on a solve followed by a deliberate audit,
++        # rather than sending the identical prompt twice. If the first call fails to yield
++        # a grid, the second call still gets the ordinary full task prompt.
++        for attempt in range(2):
++            candidate = answers[0] if attempt == 1 and answers else None
+             try:
+-                g = self.solve_once(inputs)
++                g = self.solve_once(inputs, candidate=candidate)
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

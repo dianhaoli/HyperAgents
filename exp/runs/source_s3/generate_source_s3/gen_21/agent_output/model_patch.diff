@@ -1,0 +1,170 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index 3a03bee..59673b5 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -1,5 +1,6 @@
+ # Copyright (c) Meta Platforms, Inc. and affiliates.
+ 
++import hashlib
+ import json
+ import os
+ 
+@@ -27,11 +28,11 @@ def _report_score(report):
+ 
+ 
+ def _evaluation_summary(eval_path, max_candidates=3):
+-    """Summarize comparable, completed generations without trusting archive order."""
++    """Summarize completed results, comparing only matching evaluation cohorts."""
+     if not os.path.isdir(eval_path):
+         return "No prior evaluation directory was available to inspect."
+ 
+-    completed = {}
++    cohorts = {}
+     incomplete = []
+     try:
+         generation_dirs = sorted(os.listdir(eval_path))
+@@ -50,75 +51,93 @@ def _evaluation_summary(eval_path, max_candidates=3):
+             eval_names = sorted(os.listdir(gen_dir))
+         except OSError:
+             continue
++
+         for eval_name in eval_names:
+-            # Only use the primary report, not validation/test or ensemble reports.
+             if not eval_name.endswith("_eval"):
+                 continue
+             report = _load_json(os.path.join(gen_dir, eval_name, "report.json"))
+             score = _report_score(report)
+             if score is None:
+                 continue
++
+             domain = eval_name[:-len("_eval")]
+-            sample_count = None
+-            for key in ("total_test_inputs", "total", "num_tasks"):
+-                value = report.get(key) if isinstance(report, dict) else None
+-                if isinstance(value, int) and not isinstance(value, bool):
+-                    sample_count = value
+-                    break
+-            scope = (domain, sample_count)
++            sample_count = next((report.get(key) for key in
++                                 ("total_test_inputs", "total", "num_tasks")
++                                 if isinstance(report.get(key), int)
++                                 and not isinstance(report.get(key), bool)), None)
++            task_scores = report.get("per_task_score")
++            if isinstance(task_scores, dict) and task_scores:
++                task_ids = tuple(sorted(map(str, task_scores)))
++                cohort = (domain, sample_count, "task_ids", task_ids)
++                cohort_fingerprint = hashlib.sha1(
++                    "\n".join(task_ids).encode("utf-8")
++                ).hexdigest()[:8]
++                count_label = (f"{sample_count} test inputs" if sample_count is not None
++                               else "test-input count unavailable")
++                cohort_label = (f"{len(task_ids)} task IDs [{cohort_fingerprint}], "
++                                f"{count_label}")
++            else:
++                cohort = (domain, sample_count, "count")
++                count_label = (f"{sample_count} reported samples" if sample_count is not None
++                               else "sample count unavailable")
++                cohort_label = (f"{count_label}; task IDs unavailable, so matching counts "
++                                "do not guarantee identical samples")
++
+             record = {
+                 "generation": "initial" if is_initial else dirname[4:],
+-                "score": score,
+                 "parent": metadata.get("parent_genid"),
++                "score": score,
+                 "report": report,
+-                "complete": is_initial or metadata.get("run_full_eval") is True,
+-                "valid": is_initial or metadata.get("valid_parent") is not False,
+             }
+-            if record["complete"] and record["valid"]:
+-                completed.setdefault(scope, []).append(record)
++            complete = is_initial or metadata.get("run_full_eval") is True
++            valid = is_initial or metadata.get("valid_parent") is not False
++            if complete and valid:
++                cohorts.setdefault((cohort, cohort_label), []).append(record)
+             else:
+-                incomplete.append((domain, record))
+-
+-    lines = ["Prior evaluation evidence (scores are comparable only within the same domain and sample count):"]
+-    if not completed:
+-        lines.append("- No completed, valid generation reports were found; inspect available metadata and reports before making performance claims.")
+-    for (domain, sample_count), records in sorted(completed.items()):
+-        records.sort(key=lambda item: (item["score"], str(item["generation"])), reverse=True)
+-        count_text = "unknown sample count" if sample_count is None else f"{sample_count} test inputs/tasks"
+-        top_records = records[:max_candidates]
+-        # Keep the starting agent visible even when it is not among the top candidates.
+-        baseline = next((record for record in records if record["generation"] == "initial"), None)
+-        if baseline is not None and baseline not in top_records:
+-            top_records.append(baseline)
+-        entries = [
+-            f"gen_{record['generation']}={record['score']:.4f} (parent {record['parent']})"
+-            for record in top_records
+-        ]
+-        lines.append(f"- {domain}, {count_text}: best completed candidates and baseline: " + "; ".join(entries) + ".")
+-
+-        report = records[0]["report"]
+-        failures = report.get("question_ids_failed", []) if isinstance(report, dict) else []
+-        if not failures and isinstance(report, dict):
+-            task_scores = report.get("per_task_score")
+-            if isinstance(task_scores, dict):
+-                failures = [
+-                    task_id for task_id, value in task_scores.items()
+-                    if isinstance(value, (int, float)) and value < 1
+-                ]
+-        if failures:
++                status = "partial evaluation" if not complete else "invalid parent"
++                incomplete.append(f"{eval_name} gen_{record['generation']} ({status})")
++
++    if not cohorts:
++        return "No completed, valid generation reports with scalar scores were found."
++
++    lines = ["Completed evaluation evidence (compare only within the same domain and cohort):"]
++    for (cohort, cohort_label), records in sorted(
++            cohorts.items(), key=lambda item: str(item[0][0])):
++        by_generation = {str(record["generation"]): record for record in records}
++        records.sort(key=lambda record: record["score"], reverse=True)
++        lines.append(f"- {cohort[0]}, {cohort_label}:")
++        for record in records[:max_candidates]:
++            parent = record["parent"]
++            parent_record = (by_generation.get(str(parent))
++                             if parent is not None and str(parent) != str(record["generation"])
++                             else None)
++            comparison = ""
++            if parent_record is not None:
++                delta = record["score"] - parent_record["score"]
++                comparison = f"; matching-cohort parent gen_{parent}={parent_record['score']:.4f}, delta={delta:+.4f}"
+             lines.append(
+-                "  Best candidate's reported failing task IDs: "
+-                + ", ".join(map(str, failures[:12])) + "."
++                f"  gen_{record['generation']}={record['score']:.4f} "
++                f"(parent {parent}){comparison}"
+             )
+ 
++        baseline = next((record for record in records
++                         if record["generation"] == "initial"), None)
++        if baseline is not None and baseline not in records[:max_candidates]:
++            lines.append(f"  gen_initial={baseline['score']:.4f} (baseline)")
++
++        best = records[0]["report"]
++        failures = best.get("question_ids_failed", [])
++        if not failures:
++            task_scores = best.get("per_task_score")
++            if isinstance(task_scores, dict):
++                failures = [task_id for task_id, value in task_scores.items()
++                            if isinstance(value, (int, float)) and value < 1]
++        if failures:
++            lines.append("  Best candidate's reported failing task IDs: "
++                         + ", ".join(map(str, failures[:12])) + ".")
++
+     if incomplete:
+-        descriptions = []
+-        for domain, record in incomplete[:8]:
+-            status = "partial evaluation" if not record["complete"] else "invalid parent"
+-            descriptions.append(
+-                f"{domain} gen_{record['generation']} ({status}, score {record['score']:.4f})"
+-            )
+-        lines.append("- Excluded from best-candidate comparisons: " + "; ".join(descriptions) + ".")
++        lines.append("- Excluded from completed comparisons: " + "; ".join(incomplete[:8]) + ".")
+     return "\n".join(lines)
+ 
+ 

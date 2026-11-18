@@ -51,3 +51,6 @@ pick source_s1:g20: source_s1 g20 -> (1, 13, 0.12) | max mean child improvement 
 IMPORT_OK 
 launched extension test ext_source_s1_g20: launched run_ext_source_s1_g20
 launched final exam for ext_source_s2_g20
+pick source_s4:g30: source_s4 g30 -> (15, 4, 5.551115123125783e-17) | max mean child improvement among changed coaches with >=3 descendants
+   transplant check: True __ARC_SANDBOX_STARTED__
+IMPORT_OK 

@@ -1,0 +1,13 @@
+diff --git a/task_agent.py b/task_agent.py
+index f9c5aaa..395b65a 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -144,7 +144,7 @@ class TaskAgent:
+             prompt += (
+                 "\n\nA first attempt proposed this candidate test output:\n"
+                 f"{json.dumps(previous_candidate)}\n"
+-                "Do not assume that candidate is correct. Independently infer and re-check the rule "
++                "Do not assume that candidate is correct. Independently re-check the inferred rule "
+                 "against every training input-output pair, then compare the rule's result with the "
+                 "candidate. The first candidate will also be kept as an answer, so use this call to "
+                 "maximize the chance of a second exact match: if the examples support a plausible "
