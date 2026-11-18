@@ -24213,3 +24213,4 @@
 {"token": "8d50a1e0cd373dcbead7af09f7de402c", "role": "task", "scope": {"phase": "demo_eval_rpA0", "arm": "demo", "seed": "rpA0", "iteration": "rep3", "task": "d9f24cd1", "test_input": 0}, "effort_role": "task", "registered_at": 1795035880.6733794}
 {"token": "6e2e0cbc3772613ca06bd47d348705bd", "role": "task", "scope": {"phase": "demo_eval_rpA0", "arm": "demo", "seed": "rpA0", "iteration": "rep3", "task": "b15fca0b", "test_input": 0}, "effort_role": "task", "registered_at": 1795035880.6735954}
 {"event": "revoke", "token": "5df5cfbeb401796e4eae06d82dbd02e9", "ts": 1795035891.8301773}
+{"event": "revoke", "token": "8d50a1e0cd373dcbead7af09f7de402c", "ts": 1795035923.993024}
