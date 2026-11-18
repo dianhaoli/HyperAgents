@@ -1,1 +1,8 @@
 [eval] {'phase': 'rescore', 'arm': 'g40', 'seed': 0, 'iteration': 8} round 0: 26 test inputs to run (0 cached)
+ext_source_s1_g40 cand gen_8: loop score 0.700 rescore 0.680 combined 0.690
+[eval] {'phase': 'rescore', 'arm': 'g40', 'seed': 0, 'iteration': 5} round 0: 26 test inputs to run (0 cached)
+ext_source_s1_g40 cand gen_5: loop score 0.680 rescore 0.660 combined 0.670
+[eval] {'phase': 'heldout', 'arm': 'g40', 'seed': 0, 'iteration': 8} round 0: 167 test inputs to run (0 cached)
+ext_source_s1_g40 cand gen_8: loop score 0.700 rescore 0.680 combined 0.690
+ext_source_s1_g40 cand gen_5: loop score 0.680 rescore 0.660 combined 0.670
+[eval] {'phase': 'heldout', 'arm': 'g40', 'seed': 0, 'iteration': 8} round 0: 33 test inputs to run (134 cached)

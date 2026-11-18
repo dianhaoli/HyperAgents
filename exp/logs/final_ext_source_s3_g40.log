@@ -3,3 +3,6 @@ ext_source_s3_g40 cand gen_3: loop score 0.700 rescore 0.640 combined 0.670
 [eval] {'phase': 'rescore', 'arm': 'g40', 'seed': 2, 'iteration': 6} round 0: 26 test inputs to run (0 cached)
 ext_source_s3_g40 cand gen_6: loop score 0.700 rescore 0.580 combined 0.640
 [eval] {'phase': 'heldout', 'arm': 'g40', 'seed': 2, 'iteration': 3} round 0: 167 test inputs to run (0 cached)
+[eval] {'phase': 'heldout', 'arm': 'g40', 'seed': 2, 'iteration': 3} round 1: 11 test inputs to run (156 cached)
+{"run": "ext_source_s3_g40", "arm": "g40", "seed": 2, "source_seed": null, "node_scores": {"initial": 0.62, "2": 0.64, "3": 0.7, "4": 0.62, "5": 0.58, "6": 0.7}, "candidates": ["3", "6"], "combined": {"3": 0.6699999999999999, "6": 0.6399999999999999}, "final_node": "3", "heldout": 0.2486111111111111, "heldout_missing": 0, "n_accepted": 5}
+__JOB_DONE__
