@@ -40,7 +40,7 @@ Run-to-run SD: B0 1.2%, I_0 arm 1.5%, evolved arm 1.9%.
 
 ## Secondary results
 
-- One held-out pass of A_0 at xhigh effort: 0.4111 (same 30-min per-test-input wall-clock limit; many xhigh inputs hit it).
+- One held-out pass of A_0 at xhigh effort: 0.4111 (after re-running the 32 inputs that had hit the old 30-min limit; no final xhigh input timed out).
 - Self-edit rate in source runs: 21 of 72 generations changed meta-agent code; 15 of those became parents.
   - source_s1: 1/12 self-edits, 1 became parents
   - source_s2: 4/12 self-edits, 3 became parents

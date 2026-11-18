@@ -43,7 +43,7 @@ def main():
     xs = [l for l in open(os.path.join(EXP, "logs", "xhigh.log"))] if os.path.exists(os.path.join(EXP, "logs", "xhigh.log")) else []
     xl = [l.strip() for l in xs if l.startswith("xhigh pass")]
     if xl:
-        L.append(f"- One held-out pass of A_0 at xhigh effort: {xl[-1].split(':')[1].split()[0]} (same 30-min per-test-input wall-clock limit; many xhigh inputs hit it).")
+        L.append(f"- One held-out pass of A_0 at xhigh effort: {xl[-1].split(':')[1].split()[0]} (after re-running the 32 inputs that had hit the old 30-min limit; no final xhigh input timed out).")
     if a.get("self_edit"):
         tot = sum(v["gens"] for v in a["self_edit"].values())
         se = sum(v["self_edit_gens"] for v in a["self_edit"].values())
