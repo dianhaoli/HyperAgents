@@ -85,8 +85,8 @@
 
       /* ---------- transcripts (lazy) ---------- */
       var TX = null, txState = 'loading';
-      EX.load('transcripts').then(function(X){
-        TX = {}; (X.coach || []).forEach(function(c){ TX[c.run + ':' + c.node] = c; });
+      EX.load('coach/index').then(function(X){
+        TX = {}; (X.sessions || []).forEach(function(c){ TX[c.run + ':' + c.node] = c; });
         txState = 'ready'; renderSide();
       }, function(){ txState = 'error'; renderSide(); });
 

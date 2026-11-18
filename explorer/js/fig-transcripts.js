@@ -1,9 +1,15 @@
 /* fig-transcripts.js — Explore › Transcripts (mount "transcripts").
-   Tabs: Player | Coach. List on the left (one tab stop, arrow keys), the turns in the middle
-   (all shown at rest), the puzzle and final answers (diffed against the truth) or the coach node's record on the right.
-   Behind "More options": run / kind filters, the evolution-series view, and step-by-step replay (Prev / Next).
-   Data: transcripts.json, tasks.json, trees.json (loaded when the tab is first shown).
-   Emits: select-task (player pick), select-node (coach pick / "Show in tree").
+   Tabs: Player | Coaching sessions.
+   Player: list on the left (one tab stop, arrow keys), the turns in the middle, the puzzle and final answers on the right.
+     Behind "More options": run / kind filters, the evolution-series view, and step-by-step replay (Prev / Next).
+   Coaching sessions: a run picker and that run's sessions by generation (outcome chip + practice score change), then
+     one session as a vertical story: what the coach was shown (collapsed), its messages, each command (output behind
+     a toggle; text written after the call in the same message rides with it), harness reminders, gateway replies and
+     unreadable messages as small markers, the edit (files, +/- lines, diff behind a toggle) and the outcome
+     (score before -> after, puzzles gained / lost as chips, noted as noise when the player was unchanged).
+     "Step through" reveals one step at a time (sticky Back / Next bar, arrow keys, Show all) and scrolls to it.
+   Data: transcripts.json, tasks.json, trees.json, coach/index.json when the tab is first shown; coach/<run>.json lazily.
+   Emits: select-task (player pick, puzzle chip), select-node (session pick / "Show in tree").
    Listens: open-transcript {run, node} (also reads EX.pendingTranscript at start); never switches tabs itself. */
 (function(){
   'use strict';
@@ -63,11 +69,52 @@
   var GROUP_RANK = { source: 0, I0: 1, Ig: 2, g20: 3, g40: 4 };
   function runRank(run){ var g = EX.runGroup(run); return (GROUP_RANK[g] != null ? GROUP_RANK[g] : 9) * 100 + (parseInt((/(\d+)(?!.*\d)/.exec(run) || [0, 0])[1], 10) || 0) + (/g40$/.test(run) ? 50 : 0); }
 
+  /* ---- coaching sessions: module-level helpers ---- */
+  var DEFAULT_SESSION = { run: 'source_s1', node: '2' };   // "use the second call to verify": a clear improving edit
+  var OUTCOME_TEXT = { improved: 'improved', same: 'same', worse: 'worse', broke: 'broke', 'no edit': 'no edit', 'not scored': 'not scored' };
+  var ROLE_TEXT = { player: 'player', coach: 'coach' };
+  var STEP_NAME = { think: 'the coach writes', command: 'a command', edit: 'the edit', outcome: 'the outcome' };
+  var COACH_GROUPS = ['source', 'I0', 'Ig', 'g20', 'g40', 'test'];
+  var COACH_GROUP_LABEL = { source: 'Self-improvement runs', I0: 'Original coach', Ig: 'Self-improved coach', g20: 'Generation-20 coach', g40: 'Generation-40 coach', test: 'Short test runs' };
+  function coachGroup(run){ return EX.runGroup(run) || 'test'; }
+  function coachRunLabel(run){
+    var m;
+    if(run === 'smoke') return 'Smoke test';
+    if((m = /^trial_Ig_source_s(\d)$/.exec(run))) return 'Trial of the self-improved coach from run ' + m[1];
+    return EX.runLabel ? EX.runLabel(run, { plain: true }) : run;
+  }
+  function indexCoach(CI){
+    if(!CI || !CI.sessions) return null;
+    var byKey = {}, byRun = {};
+    CI.sessions.forEach(function(s){
+      s.node = String(s.node);
+      s.in_trees = !!((CI.runs || []).filter(function(r){ return r.run === s.run; })[0] || {}).in_trees;
+      byKey[s.run + ':' + s.node] = s;
+      (byRun[s.run] = byRun[s.run] || []).push(s);
+    });
+    Object.keys(byRun).forEach(function(r){
+      byRun[r].sort(function(a, b){ return a.generation - b.generation || (a.aborted ? -1 : 0) - (b.aborted ? -1 : 0) || (a.node < b.node ? -1 : 1); });
+    });
+    return { runs: CI.runs || [], sessions: CI.sessions, byKey: byKey, byRun: byRun };
+  }
+  function scoreChange(s, words){
+    var a = s.practice_before, b = s.practice_after, k = s.outcome_kind;
+    if(k === 'no edit') return words ? 'no change made' : '—';
+    if(b == null) return words ? 'not scored' : '—';
+    if(a == null) return F.pct(b, 0);
+    return F.pct(a, 0) + (words ? ' to ' : ' → ') + F.pct(b, 0);
+  }
+  function outcomeChip(parent, s){
+    var k = s.outcome_kind || 'not scored';
+    return EX.h('span', { 'class': 'fxc-oc oc-' + k.replace(/\s+/g, '-'), 'aria-hidden': parent.tagName === 'BUTTON' ? 'true' : null }, parent, OUTCOME_TEXT[k] || k);
+  }
+
   EX.mount(NAME, function(node, ctx){
     node.innerHTML = '';
     var root = EX.h('div', { 'class': 'fx-transcripts' }, node);
     EX.h('div', { 'class': 'fxt-loading', role: 'status' }, root, 'Loading transcripts…');
-    var st = { tab: 'player', view: 'single', runF: 'all', kindF: 'all', cur: { player: null, coach: null }, series: 0, step: false, cursor: 0, mode: null };
+    var st = { tab: 'player', view: 'single', runF: 'all', kindF: 'all', cur: { player: null, coach: null }, series: 0, step: false, cursor: 0, mode: null,
+      cstep: false, ccur: 0 };
     var D = null, pendingOpen = null, ui = {};
 
     EX.on('open-transcript', function(p){
@@ -76,9 +123,10 @@
       if(D) applyOpen();
     });
 
-    return EX.loadAll(['transcripts', 'tasks', 'trees']).then(function(res){ build(res[0], res[1], res[2]); });
+    var coachIndex = EX.load('coach/index').catch(function(e){ console.warn('[transcripts] coach index unavailable', e); return null; });
+    return Promise.all([EX.load('transcripts'), EX.load('tasks'), EX.load('trees'), coachIndex]).then(function(res){ build(res[0], res[1], res[2], res[3]); });
 
-    function build(TX, TK, TR){
+    function build(TX, TK, TR, CI){
       var tasks = TK.tasks, trees = TR.trees;
       var player = TX.player.map(function(p, i){ return Object.assign({ uid: 'p' + i, k: kindOf(p) }, p); });
       var solved = TX.solved_replays.map(function(p, i){ return Object.assign({ uid: 's' + i, k: 'solved' }, p); });
@@ -92,15 +140,15 @@
       var allPlayer = player.concat(solved).sort(function(a, b){
         return runRank(a.run) - runRank(b.run) || (a.task < b.task ? -1 : a.task > b.task ? 1 : 0) || genNum(a.generation) - genNum(b.generation);
       });
-      D = { tasks: tasks, trees: trees, player: player, solved: solved, coach: coach, series: series, allPlayer: allPlayer };
+      D = { tasks: tasks, trees: trees, player: player, solved: solved, coach: coach, series: series, allPlayer: allPlayer, CI: indexCoach(CI), runFiles: {} };
 
       st.cur.player = allPlayer.filter(function(p){ return p.k !== 'solved' && p.segments && p.segments.length; })[0] || allPlayer[0];
-      st.cur.coach = coach.filter(function(c){ return /I_g pick/.test(c.why || ''); })[0] || coach[0];
+      st.cur.coach = findSession(DEFAULT_SESSION.run, DEFAULT_SESSION.node) || (D.CI && D.CI.sessions[0]) || null;
 
       var h = EX.hash.get();
       if(h.section === NAME){
         var pr = h.params;
-        if(pr.tab === 'coach'){ st.tab = 'coach'; var c = findCoach(pr.run, pr.node); if(c) st.cur.coach = c; }
+        if(pr.tab === 'coach'){ st.tab = 'coach'; var c = findSession(pr.run, pr.node); if(c) st.cur.coach = c; }
         else if(pr.run){
           var p = allPlayer.filter(function(x){ return x.run === pr.run && String(x.node) === pr.node && x.task === pr.task; })[0];
           if(p) st.cur.player = p;
@@ -112,7 +160,7 @@
       root.innerHTML = '';
       var tl = EX.h('div', { 'class': 'tabs', role: 'tablist', 'aria-label': 'Transcript type' }, root);
       ui.tabs = {};
-      [['player', 'Player', player.length + solved.length], ['coach', 'Coach', coach.length]].forEach(function(t){
+      [['player', 'Player', player.length + solved.length], ['coach', 'Coaching sessions', D.CI ? D.CI.sessions.length : coach.length]].forEach(function(t){
         var b = EX.h('button', { type: 'button', role: 'tab', id: EX.uid('fxt-tab'), 'aria-selected': String(st.tab === t[0]), tabindex: st.tab === t[0] ? '0' : '-1' }, tl, t[1] + ' (' + t[2] + ')');
         b.addEventListener('click', function(){ setTab(t[0], true); });
         ui.tabs[t[0]] = b;
@@ -137,11 +185,11 @@
     function modeFor(w){ return w >= 1000 ? 'wide' : w >= 700 ? 'mid' : 'narrow'; }
     function applyMode(){ root.classList.toggle('mid', st.mode === 'mid'); root.classList.toggle('narrow', st.mode === 'narrow'); }
     function sideWidth(){ var w = ctx.width(); return st.mode === 'wide' ? 320 : st.mode === 'mid' ? w - 220 - 24 : w; }
-    function findCoach(run, nodeId){ return D.coach.filter(function(c){ return c.run === run && String(c.node) === String(nodeId); })[0]; }
+    function findSession(run, nodeId){ return D.CI ? D.CI.byKey[run + ':' + nodeId] || null : null; }
 
     function setTab(t, user){
       if(st.tab === t && user) return;
-      st.tab = t; st.step = false;
+      st.tab = t; st.step = false; st.cstep = false;
       Object.keys(ui.tabs).forEach(function(k){
         ui.tabs[k].setAttribute('aria-selected', String(k === t));
         ui.tabs[k].setAttribute('tabindex', k === t ? '0' : '-1');
@@ -150,32 +198,50 @@
       if(user) writeHash();
     }
     function writeHash(){
-      if(st.tab === 'coach'){ var c = st.cur.coach; EX.hash.set(NAME, { tab: 'coach', run: c.run, node: c.node }); }
+      if(st.tab === 'coach'){ var c = st.cur.coach; if(c) EX.hash.set(NAME, { tab: 'coach', run: c.run, node: c.node }); else EX.hash.set(NAME, { tab: 'coach' }); }
       else { var p = st.cur.player; EX.hash.set(NAME, { tab: 'player', run: p.run, node: p.node, task: p.task }); }
     }
     function applyOpen(){
       var p = pendingOpen; pendingOpen = null;
       if(!p) return;
-      var c = findCoach(p.run, p.node);
-      if(c){ st.cur.coach = c; if(st.tab !== 'coach') setTab('coach', false); else render(); return; }
+      var c = findSession(p.run, p.node);
+      if(c){
+        st.cur.coach = c; st.cstep = false; st.ccur = 0;
+        if(st.tab !== 'coach') setTab('coach', false); else render();
+        if(p.source && p.source !== 'hash') EX.hash.set(NAME, { tab: 'coach', run: c.run, node: c.node }, { replace: false });
+        focusSessionTitle();
+        return;
+      }
       var pl = D.player.filter(function(x){ return x.run === p.run && String(x.node) === String(p.node); })[0];
       if(pl){ st.view = 'single'; st.cur.player = pl; if(st.tab !== 'player') setTab('player', false); else render(); }
     }
 
+    function focusSessionTitle(){
+      setTimeout(function(){
+        var h = ui.cmain && ui.cmain.querySelector('.fxc-head h4');
+        if(!h) return;
+        h.setAttribute('tabindex', '-1');
+        h.scrollIntoView({ block: 'start', behavior: 'auto' });
+        try { h.focus({ preventScroll: true }); } catch(e){ h.focus(); }
+      }, 450);
+    }
     /* ←/→ step turns in step-by-step mode */
     function onKey(e){
-      if(!st.step || e.altKey || e.ctrlKey || e.metaKey) return;
+      var stepping = st.tab === 'coach' ? st.cstep : st.step;
+      if(!stepping || e.altKey || e.ctrlKey || e.metaKey) return;
       var t = e.target, tag = (t.tagName || '').toLowerCase();
-      if(tag === 'select' || tag === 'input' || (t.closest && (t.closest('[role="tablist"]') || t.closest('.fxt-list')))) return;
-      if(e.key === 'ArrowRight'){ e.preventDefault(); stepBy(1); }
-      else if(e.key === 'ArrowLeft'){ e.preventDefault(); stepBy(-1); }
+      if(tag === 'select' || tag === 'input' || tag === 'textarea' || (t.closest && (t.closest('[role="tablist"]') || t.closest('.fxt-list') || t.closest('.fxc-list')))) return;
+      var d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if(!d) return;
+      e.preventDefault();
+      if(st.tab === 'coach') cStepBy(d); else stepBy(d);
     }
 
     function render(){
       ui.panel.innerHTML = '';
       ui.panel.setAttribute('aria-labelledby', ui.tabs[st.tab].id);
       ui.turns = null;
-      if(st.tab === 'coach') renderCoach(); else renderPlayer();
+      if(st.tab === 'coach') renderSessions(); else renderPlayer();
     }
 
     /* "More options": filters, series view, step-by-step */
@@ -335,76 +401,455 @@
       EX.scrollHint(sc);
     }
 
-    /* ======================= COACH ======================= */
-    function renderCoach(){
+    /* ======================= COACHING SESSIONS ======================= */
+    function sessionsOf(run){ return (D.CI && D.CI.byRun[run]) || []; }
+    function renderSessions(){
       var P = ui.panel;
-      buildMoreRow(P);
-      var B = EX.h('div', { 'class': 'fxt-body' }, P);
-      var lc = EX.h('div', { 'class': 'fxt-listcol' }, B);
-      EX.h('p', { 'class': 'fxt-listnote' }, lc, 'Kept: the self-improved picks, two generation-40 picks, and, in source runs, the largest practice-score jumps and the largest drop; plus one original-coach step.');
-      ui.list = EX.h('ul', { 'class': 'fxt-list', 'aria-label': 'Coach transcripts' }, lc);
-      D.coach.forEach(function(c){
-        var li = EX.h('li', null, ui.list);
-        var b = EX.h('button', { type: 'button', 'class': 'fxt-item', tabindex: '-1', 'aria-current': String(c === st.cur.coach) }, li);
-        EX.h('span', { 'class': 'l1' }, b, plain(c.run) + ', node ' + c.node);
-        EX.h('span', { 'class': 'l2' }, b, coachTag(c));
-        b.addEventListener('click', function(){
-          st.cur.coach = c; st.cursor = 0;
-          markCur(b);
-          renderCoachItem();
-          EX.select('node', { run: c.run, node: String(c.node), source: NAME });
-          writeHash();
+      if(!D.CI || !D.CI.sessions.length){
+        EX.h('p', { 'class': 'empty' }, P, 'The coaching sessions could not be loaded.');
+        return;
+      }
+      if(!st.cur.coach) st.cur.coach = D.CI.sessions[0];
+      var c = st.cur.coach;
+      var B = EX.h('div', { 'class': 'fxc' }, P);
+      var pick = EX.h('div', { 'class': 'fxc-pick' }, B);
+      var ctl = EX.h('div', { 'class': 'fxc-runsel' }, pick);
+      var groups = {}, order = [];
+      D.CI.runs.forEach(function(r){
+        var g = coachGroup(r.run);
+        if(!groups[g]){ groups[g] = []; order.push(g); }
+        groups[g].push({ value: r.run, label: coachRunLabel(r.run) + ' (' + r.n_sessions + ')' });
+      });
+      order.sort(function(a, b){ return COACH_GROUPS.indexOf(a) - COACH_GROUPS.indexOf(b); });
+      var opts = order.map(function(g){ return { group: COACH_GROUP_LABEL[g] || g, options: groups[g] }; });
+      var sel = EX.selectBox(ctl, opts, c.run, function(v){ pickRun(v); }, { label: 'Run' });
+      sel.setAttribute('aria-label', 'Run');
+      var list = sessionsOf(c.run);
+      var nEdit = list.filter(function(s){ return s.made_edit; }).length;
+      var nAb = list.filter(function(s){ return s.aborted; }).length;
+      EX.h('p', { 'class': 'fxc-runnote' }, pick, list.length + ' session' + (list.length === 1 ? '' : 's') +
+        (nAb ? ' (' + (list.length - nAb) + ' generations plus ' + nAb + ' restarted attempt' + (nAb === 1 ? '' : 's') + ')' : ', one per generation') +
+        '; ' + nEdit + ' changed the code.');
+      ui.clist = EX.h('ul', { 'class': 'fxc-list', 'aria-label': 'Sessions in ' + coachRunLabel(c.run) }, pick);
+      list.forEach(function(s){
+        var li = EX.h('li', null, ui.clist);
+        var b = EX.h('button', { type: 'button', 'class': 'fxc-item', tabindex: '-1', 'aria-current': String(s === c), 'data-node': s.node }, li);
+        EX.h('span', { 'class': 'g' }, b, 'Gen ' + s.generation);
+        if(s.aborted) EX.h('span', { 'class': 'rs', 'aria-hidden': 'true' }, b, 'restarted');
+        outcomeChip(b, s);
+        EX.h('span', { 'class': 'sc' }, b, scoreChange(s));
+        b.setAttribute('aria-label', 'Generation ' + s.generation + (s.aborted ? ' (restarted round)' : '') + ': ' + OUTCOME_TEXT[s.outcome_kind] + ', ' + scoreChange(s, true));
+        b.addEventListener('click', function(){ pickSession(s, true); });
+      });
+      if(list.length > 10) EX.h('p', { 'class': 'fxc-listhint' }, pick, 'Scroll the list to see all ' + list.length + '.');
+      if(nAb) EX.h('p', { 'class': 'fxc-runnote' }, pick, '“restarted”: an attempt the harness stopped while scoring it; the generation was then run again.');
+      ui.crov = EX.roving(ui.clist, '.fxc-item', { orientation: 'vertical', onActivate: function(el){ el.click(); } });
+      ui.cmain = EX.h('div', { 'class': 'fxc-main' }, B);
+      renderSession();
+      var cur = ui.clist.querySelector('[aria-current="true"]');
+      if(cur){ var li2 = cur.parentNode; ui.clist.scrollTop = Math.max(0, li2.offsetTop - ui.clist.offsetTop - 80); }
+    }
+    function pickRun(run){
+      var list = sessionsOf(run);
+      var s = list.filter(function(x){ return x.outcome_kind === 'improved'; })[0] || list[0];
+      if(!s) return;
+      st.cur.coach = s; st.cstep = false; st.ccur = 0;
+      render(); writeHash();
+      if(ui.clist){ var b = ui.clist.querySelector('[aria-current="true"]'); void b; }
+    }
+    function pickSession(s, user){
+      st.cur.coach = s; st.cstep = false; st.ccur = 0;
+      Array.prototype.forEach.call(ui.clist.querySelectorAll('.fxc-item'), function(x){ x.setAttribute('aria-current', String(x.getAttribute('data-node') === s.node)); });
+      if(ui.crov) ui.crov.refresh();
+      renderSession();
+      if(user){
+        writeHash();
+        if(s.in_trees && !s.aborted) EX.select('node', { run: s.run, node: String(s.node), source: NAME });
+      }
+    }
+
+    function renderSession(){
+      var s = st.cur.coach, M = ui.cmain;
+      M.innerHTML = '';
+      var hd = EX.h('div', { 'class': 'fxc-head' }, M);
+      EX.h('h4', null, hd, coachRunLabel(s.run) + ' · generation ' + s.generation);
+      var meta = [];
+      meta.push(s.parent === 'initial' ? 'Started from the original code (generation 0)' : s.parent ? 'Started from the code of generation ' + String(s.parent).split('.')[0]
+        : s.aborted ? 'Starting generation not recorded' : null);
+      meta.push(s.n_commands + ' command' + (s.n_commands === 1 ? '' : 's'));
+      if(s.coach_tokens) meta.push(F.tokens(s.coach_tokens) + ' tokens');
+      EX.h('p', { 'class': 'fxc-meta' }, hd, meta.filter(Boolean).join(' · '));
+      if(s.aborted) EX.h('p', { 'class': 'fxc-meta' }, hd, 'The coach finished this session, but the harness was stopped while the result was being scored and ran generation ' + s.generation + ' again, so this attempt has no score.');
+      var body = EX.h('div', { 'class': 'fxc-body', 'aria-busy': 'true' }, M);
+      EX.h('p', { 'class': 'fxc-loading', role: 'status' }, body, 'Loading this run’s sessions…');
+      var token = ui.sessToken = {};
+      loadRun(s.run).then(function(R){
+        if(ui.sessToken !== token) return;
+        var rec = R && R.sessions && R.sessions[s.node];
+        body.innerHTML = ''; body.removeAttribute('aria-busy');
+        if(!rec){ EX.h('p', { 'class': 'empty' }, body, 'This session’s steps are missing.'); return; }
+        buildStory(body, s, rec);
+      }, function(err){
+        if(ui.sessToken !== token) return;
+        body.innerHTML = ''; body.removeAttribute('aria-busy');
+        EX.h('p', { 'class': 'empty' }, body, 'This run’s sessions could not be loaded (' + String(err && err.message || err) + ').');
+      });
+    }
+    function loadRun(run){ return EX.load('coach/' + run); }
+
+    /* Turn the step list into story items. Steps (think / command+output / edit / outcome) are what
+       "Step through" walks; nudges and DONE are small markers that ride along with the step before them. */
+    function storyItems(rec){
+      var items = [], steps = rec.steps || [], brief = null;
+      for(var i = 0; i < steps.length; i++){
+        var x = steps[i];
+        if(x.kind === 'brief'){ brief = x; continue; }
+        if(x.kind === 'command'){
+          var after = [];
+          while(steps[i + 1] && steps[i + 1].kind === 'think' && steps[i + 1].after_call) after.push(steps[++i]);
+          var out = steps[i + 1] && steps[i + 1].kind === 'output' ? steps[++i] : null;
+          items.push({ kind: 'command', step: true, cmd: x, out: out, after: after });
+        } else if(x.kind === 'output') items.push({ kind: 'command', step: true, cmd: null, out: x, after: [] });
+        else if(x.kind === 'think' && !x.empty) items.push({ kind: 'think', step: true, s: x });
+        else if(x.kind === 'nudge' || x.kind === 'done' || x.kind === 'think'){
+          var last = items[items.length - 1];
+          if(last && last.kind === 'marks') last.list.push(x);
+          else items.push({ kind: 'marks', step: false, list: [x] });
+        }
+        /* 'edit' is drawn from the index record (files) + rec.diff */
+      }
+      items.push({ kind: 'edit', step: true });
+      items.push({ kind: 'outcome', step: true });
+      return { brief: brief, items: items };
+    }
+
+    function buildStory(body, s, rec){
+      var S = storyItems(rec);
+      var bar = EX.h('div', { 'class': 'fxc-bar' }, body);
+      var modeSeg = EX.seg(bar, [{ value: 'all', label: 'Read all' }, { value: 'step', label: 'Step through' }], st.cstep ? 'step' : 'all', function(v){
+        st.cstep = v === 'step'; st.ccur = 0; applyStep(true);
+        if(st.cstep && ui.cnext) ui.cnext.focus();
+      }, { ariaLabel: 'How to read the session' });
+      var nav = EX.h('div', { 'class': 'fxc-nav', role: 'group', 'aria-label': 'Step through the session' }, bar);
+      ui.cprev = EX.h('button', { type: 'button', 'class': 'btn small', 'aria-label': 'Previous step' }, nav, '‹ Back');
+      ui.cnext = EX.h('button', { type: 'button', 'class': 'btn small', 'aria-label': 'Next step' }, nav, 'Next step ›');
+      var allB = EX.h('button', { type: 'button', 'class': 'btn small quiet' }, nav, 'Show all');
+      ui.cpos = EX.h('span', { 'class': 'fxc-pos', 'aria-hidden': 'true' }, nav);
+      ui.cprev.addEventListener('click', function(){ cStepBy(-1); });
+      ui.cnext.addEventListener('click', function(){ cStepBy(1); });
+      allB.addEventListener('click', function(){ st.cstep = false; modeSeg.set('all'); applyStep(false); });
+      ui.cmodeSeg = modeSeg;
+
+      EX.h('p', { 'class': 'fxc-note' }, body, 'These are the coach’s visible messages and the commands it ran; the model’s hidden reasoning was not recorded. ' +
+        'The harness runs one command per message; when a message has none, it sends a short reminder (small grey lines).');
+
+      var tl = EX.h('ol', { 'class': 'fxc-tl', 'aria-label': 'The session, step by step' }, body);
+      if(S.brief) briefItem(tl, S.brief);
+      ui.citems = [];
+      var stepNo = 0;
+      S.items.forEach(function(it){
+        var li;
+        if(it.kind === 'think') li = thinkItem(tl, it.s);
+        else if(it.kind === 'command') li = commandItem(tl, it);
+        else if(it.kind === 'marks') li = marksItem(tl, it.list);
+        else if(it.kind === 'edit') li = editItem(tl, s, rec);
+        else if(it.kind === 'outcome') li = outcomeItem(tl, s);
+        if(it.step) stepNo++;
+        ui.citems.push({ el: li, step: it.step, n: stepNo, kind: it.kind });
+      });
+      ui.cnSteps = stepNo;
+      applyStep(false);
+    }
+    function applyStep(scroll){
+      var on = st.cstep, n = ui.cnSteps || 0;
+      st.ccur = Math.max(0, Math.min(n - 1, st.ccur));
+      ui.cprev.parentNode.hidden = !on;
+      ui.cprev.parentNode.parentNode.classList.toggle('is-stepping', on);
+      var target = st.ccur + 1, curEl = null;
+      (ui.citems || []).forEach(function(it){
+        var vis = !on || it.n <= target;
+        it.el.hidden = !vis;
+        var isCur = on && it.step && it.n === target;
+        it.el.classList.toggle('is-cur', isCur);
+        if(isCur) curEl = it.el;
+      });
+      ui.cprev.disabled = st.ccur <= 0; ui.cnext.disabled = st.ccur >= n - 1;
+      ui.cpos.textContent = 'Step ' + (st.ccur + 1) + ' of ' + n;
+      if(scroll && curEl) revealStep(curEl);
+    }
+    /* bring the newest step into view below the (sticky) step bar */
+    function revealStep(el){
+      var bar = ui.cprev && ui.cprev.closest('.fxc-bar');
+      var barH = bar ? bar.getBoundingClientRect().height : 0;
+      var r = el.getBoundingClientRect(), vh = window.innerHeight || document.documentElement.clientHeight;
+      var top = barH + 16;
+      if(r.top >= top && r.bottom <= vh - 8) return;
+      var y = window.pageYOffset + r.top - top;
+      if(r.height < vh - top - 8 && r.top > top) y = window.pageYOffset + r.bottom - vh + 24;   // short step below: just scroll it up into view
+      window.scrollTo({ top: Math.max(0, y), behavior: EX.reduceMotion ? 'auto' : 'smooth' });
+    }
+    function cStepBy(d){
+      if(!st.cstep || !ui.citems) return;
+      var before = st.ccur;
+      st.ccur = Math.max(0, Math.min((ui.cnSteps || 1) - 1, st.ccur + d));
+      if(st.ccur === before) return;
+      applyStep(true);
+      var cur = ui.citems.filter(function(it){ return it.step && it.n === st.ccur + 1; })[0];
+      if(ui.live) ui.live.textContent = 'Step ' + (st.ccur + 1) + ' of ' + ui.cnSteps + ': ' + (STEP_NAME[cur && cur.kind] || '');
+    }
+
+    function marker(li, cls){ EX.h('span', { 'class': 'fxc-dot ' + cls, 'aria-hidden': 'true' }, li); }
+    function briefItem(tl, b){
+      var li = EX.h('li', { 'class': 'fxc-step k-brief' }, tl);
+      marker(li, 'd-brief');
+      var det = EX.h('details', { 'class': 'more fxc-brief' }, li);
+      EX.h('summary', null, det, 'What the coach was shown');
+      var inner = EX.h('div', null, det);
+      var what = b.n_traces ? 'The instructions, earlier scores and ' + b.n_traces + ' failed practice puzzle' + (b.n_traces === 1 ? '' : 's') + ' (what the player saw and answered).'
+        : b.has_scores ? 'The instructions, with a summary of earlier scores.' : 'The instructions only; the coach had to look up earlier results itself.';
+      EX.h('p', { 'class': 'fxc-sub' }, inner, what + ' ' + briefTrimText(b));
+      EX.h('pre', { 'class': 'code wrap fxc-pre tall', tabindex: '0', 'aria-label': 'What the coach was shown' }, inner, b.text);
+      return li;
+    }
+    function briefTrimText(b){
+      var t = b.trim;
+      if(!b.truncated || !t) return 'Shown in full.';
+      var cut = [];
+      if(t.grid_rows_cut || t.grids_shortened) cut.push('long puzzle grids (answers included) are cut short');
+      if(t.traces_trimmed) cut.push('each failed puzzle keeps only its start and end');
+      if(t.capped) cut.push('the middle of the text is left out');
+      return 'Shortened for display from ' + F.int(b.full_chars) + ' characters: ' + cut.join('; ') + '.';
+    }
+    function thinkItem(tl, x){
+      var li = EX.h('li', { 'class': 'fxc-step k-think' }, tl);
+      marker(li, 'd-think');
+      sayBox(li, x);
+      return li;
+    }
+    function sayBox(li, x){
+      EX.h('span', { 'class': 'sr-only' }, li, 'Coach: ');
+      if(x.after_call) EX.h('p', { 'class': 'fxc-sub fxc-aftercap' }, li, 'Written after the command, in the same message (before it ran):');
+      var box = EX.h('div', { 'class': 'fxc-say' + (x.empty ? ' is-empty' : '') }, li);
+      var text = x.text || '';
+      prose(box, text);
+      if(x.unparsed_call) EX.h('p', { 'class': 'fxc-sub fxc-warn' }, li, 'This message contains a tool call the harness could not read (or one past the first), so it did not run.');
+      if(text.length > 1400){
+        box.classList.add('is-clamped');
+        var mb = EX.h('button', { type: 'button', 'class': 'fxc-link', 'aria-expanded': 'false' }, li, 'Show the whole message');
+        mb.addEventListener('click', function(){
+          var open = box.classList.toggle('is-clamped') === false;
+          mb.setAttribute('aria-expanded', String(open)); mb.textContent = open ? 'Show less' : 'Show the whole message';
+        });
+      }
+      if(x.collapsed_repeats) EX.h('p', { 'class': 'fxc-sub' }, li, 'A long run of repeated text in this message was collapsed.');
+    }
+    /* light prose: paragraphs, `code`, keep line breaks */
+    function prose(box, text){
+      text.split(/\n{2,}/).forEach(function(par){
+        if(!par.trim()) return;
+        var p = EX.h('p', null, box);
+        var parts = par.split(/(`[^`\n]{1,200}`)/);
+        parts.forEach(function(t){
+          if(/^`[^`]+`$/.test(t)) EX.h('code', null, p, t.slice(1, -1));
+          else if(t) p.appendChild(document.createTextNode(t));
         });
       });
-      listRoving();
-      ui.txcol = EX.h('div', { 'class': 'fxt-txcol' }, B);
-      ui.side = EX.h('div', { 'class': 'fxt-sidecol side-panel' }, B);
-      renderCoachItem();
-      keepCurInView();
     }
-    function coachTag(c){
-      var w = c.why || '', tags = [];
-      if(/I_g pick/.test(w)) tags.push('self-improved pick');
-      var m = /extension pick at generation (\d+)/.exec(w); if(m) tags.push('gen ' + m[1] + ' pick');
-      if(/jump/.test(w)) tags.push('big jump');
-      if(/drop/.test(w)) tags.push('big drop');
-      if(/^I_0/.test(w)) tags.push('original coach');
-      return genText(c.generation) + (tags.length ? ' · ' + tags.join(', ') : '');
+    function commandItem(tl, it){
+      var li = EX.h('li', { 'class': 'fxc-step k-cmd' }, tl);
+      marker(li, 'd-cmd');
+      var x = it.cmd, out = it.out;
+      var line = EX.h('div', { 'class': 'fxc-cmdline' }, li);
+      var tool = x ? (x.tool || 'bash') : (out && out.tool) || 'tool';
+      EX.h('span', { 'class': 'fxc-tool' }, line, toolVerb(tool, x));
+      var one = x ? (x.cmd || x.text || '').split('\n')[0] : '(command not recorded)';
+      EX.h('code', { 'class': 'fxc-cmd' }, line, one);
+      var gist = x && tool === 'bash' ? cmdGist(x.text || x.cmd || '') : '';
+      if(gist) EX.h('div', { 'class': 'fxc-gist' }, li, gist);
+      (it.after || []).forEach(function(a){ var d = EX.h('div', { 'class': 'fxc-after' }, li); sayBox(d, a); });
+      var hasMore = !!(out || (x && x.text && x.text !== x.cmd) || (x && x.ignored_calls));
+      if(hasMore){
+        var pid = EX.uid('fxc-out');
+        var tg = EX.h('button', { type: 'button', 'class': 'fxc-link fxc-tog', 'aria-expanded': 'false', 'aria-controls': pid }, li,
+          out ? 'show output' : 'show details');
+        var panel = EX.h('div', { 'class': 'fxc-out', id: pid, hidden: true }, li);
+        var built = false;
+        tg.addEventListener('click', function(){
+          if(!built){ built = true; fillCommand(panel, x, out); }
+          var open = panel.hidden;
+          panel.hidden = !open;
+          tg.setAttribute('aria-expanded', String(open));
+          tg.textContent = open ? (out ? 'hide output' : 'hide details') : (out ? 'show output' : 'show details');
+        });
+      }
+      return li;
     }
-    function renderCoachItem(){
-      var c = st.cur.coach, T = ui.txcol, S = ui.side;
-      T.innerHTML = ''; S.innerHTML = '';
-      var hd = EX.h('div', { 'class': 'fxt-head' }, T);
-      EX.h('h4', null, hd, plain(c.run) + ', node ' + c.node);
-      EX.h('p', { 'class': 'fxt-why' }, T, 'The coach’s session: the task it was given, its tool calls and what came back. Each turn is clipped to about 900 characters.');
-      buildTurns(T, c.segments, true, null);
-
-      var tree = D.trees[c.run];
-      var nd = tree && tree.nodes.filter(function(n){ return n.id === String(c.node); })[0];
-      var tb = EX.h('table', { 'class': 'kv' }, S), body = EX.h('tbody', null, tb);
-      function row(k, v){ var r = EX.h('tr', null, body); EX.h('th', { scope: 'row' }, r, k); EX.h('td', null, r, v); }
-      row('Generation', String(genNum(c.generation)));
-      row('Practice score', F.pct(c.parent_practice_score, 0) + ' → ' + F.pct(c.practice_score, 0));
-      var files = (nd && nd.files_changed) || c.files_changed || [];
+    /* editor calls: view / create / str_replace / insert / undo_edit */
+    function toolVerb(tool, x){
+      if(tool === 'bash') return 'ran';
+      if(tool !== 'editor') return tool;
+      var op = (/^editor (\S+)/.exec((x && x.cmd) || '') || [])[1];
+      return { view: 'viewed', create: 'created', str_replace: 'edited', insert: 'edited', undo_edit: 'undid an edit in' }[op] || 'editor';
+    }
+    /* a plain hint of what a shell command touched: the files and folders it names */
+    function cmdGist(c){
+      var seen = {}, names = [];
+      var re = /(?:^|[\s'"=(<>])((?:\/?[\w.\-*{}]+\/)*[\w\-*{}]+\.(?:py|md|json|jsonl|txt|log|diff|sh|ya?ml|toml|cfg))\b/g, m;
+      while((m = re.exec(c)) && names.length < 8){
+        var n = m[1].replace(/^\/hyperagents\//, '').replace(/^\/tmp\/generate_[^/]+\//, '');
+        if(!seen[n] && !/[*{}]/.test(n)){ seen[n] = true; names.push(n); }
+      }
+      if(!names.length) return '';
+      var more = names.length > 5 ? ' …' : '';
+      return 'Files named: ' + names.slice(0, 5).join(', ') + more;
+    }
+    function fillCommand(panel, x, out){
+      if(x && x.text && x.text !== x.cmd){
+        EX.h('div', { 'class': 'fxc-cap' }, panel, x.tool === 'editor' ? 'The edit' : 'Full command');
+        EX.h('pre', { 'class': 'code wrap fxc-pre', tabindex: '0' }, panel, x.text);
+        if(x.truncated) EX.h('p', { 'class': 'fxc-sub' }, panel, 'Shortened: ' + F.int(x.full_chars) + ' characters in full.');
+      }
+      if(x && x.ignored_calls) EX.h('p', { 'class': 'fxc-sub' }, panel, 'The same message asked for ' + x.ignored_calls + ' more command' + (x.ignored_calls > 1 ? 's' : '') + '; the harness runs only the first.');
+      if(out){
+        EX.h('div', { 'class': 'fxc-cap' }, panel, 'What came back');
+        EX.h('pre', { 'class': 'code wrap fxc-pre', tabindex: '0' }, panel, out.text || '(no output)');
+        if(out.truncated) EX.h('p', { 'class': 'fxc-sub' }, panel, 'Shortened to the start and end: ' + F.int(out.full_chars) + ' characters in full.');
+      }
+    }
+    function marksItem(tl, list){
+      var li = EX.h('li', { 'class': 'fxc-step k-mark' }, tl);
+      marker(li, 'd-mark');
+      var nudges = list.filter(function(x){ return x.kind === 'nudge' && !x.gateway; });
+      var std = nudges.filter(function(x){ return /^\(standard nudge\)/.test(x.text); }).length;
+      var other = nudges.filter(function(x){ return !/^\(standard nudge\)/.test(x.text); });
+      var gw = list.filter(function(x){ return x.gateway; }).length;
+      var empty = list.filter(function(x){ return x.kind === 'think'; });
+      var bits = [];
+      if(empty.length){
+        var raw = empty.map(function(x){ return x.raw; }).filter(Boolean);
+        bits.push([(empty.length === 1 ? 'A coach message with no readable text' : empty.length + ' coach messages with no readable text') +
+          (raw.length ? ' (' + raw.slice(0, 3).map(function(r){ return '“' + r.slice(0, 24) + '”'; }).join(', ') + ')' : '') + '.', 'is-noise']);
+      }
+      if(std) bits.push([std === 1 ? 'Reminder: no command in that message.' : std + ' reminders: no command in those messages.', 'is-nudge']);
+      if(gw) bits.push([(gw === 1 ? 'The model gateway replied' : 'The model gateway replied ' + gw + ' times') + ' in place of the coach: its token budget for this round (600k) was spent.', 'is-gw']);
+      other.forEach(function(x){ bits.push(['Harness: ' + x.text.replace(/^\[harness\]\s*/, '').replace(/^\(standard nudge\)\s*/, ''), '']); });
+      if(list.some(function(x){ return x.kind === 'done'; })) bits.push(['The coach said DONE.', '']);
+      bits.forEach(function(t){ EX.h('div', { 'class': 'fxc-mark ' + t[1] }, li, t[0]); });
+      return li;
+    }
+    function editItem(tl, s, rec){
+      var li = EX.h('li', { 'class': 'fxc-step k-edit' }, tl);
+      marker(li, 'd-edit');
+      EX.h('div', { 'class': 'fxc-label' }, li, 'Edit');
+      var files = (s.files_edited || []).filter(function(f){ return !(/__pycache__|\.pyc$/.test(f.path) && !f.added && !f.removed); });
+      if(!s.made_edit || !files.length){
+        EX.h('p', { 'class': 'fxc-plain' }, li, s.made_edit ? 'Only compiled cache files changed.' : 'The coach changed no code in this round.');
+        return li;
+      }
       var roles = {}; files.forEach(function(f){ roles[f.role] = true; });
-      row('What changed', roles.coach && roles.player ? 'player and coach' : roles.coach ? 'coach' : roles.player ? 'player' : files.length ? 'other files' : 'nothing');
-      var acts = EX.h('div', { 'class': 'fxt-acts' }, S);
-      if(tree){
-        var bt = EX.h('button', { type: 'button', 'class': 'btn small' }, acts, 'Show in tree');
-        bt.addEventListener('click', function(){
-          if(EX.explore && EX.explore.open) EX.explore.open('tree', { scroll: true });
-          EX.select('node', { run: c.run, node: String(c.node), source: NAME });
-        });
-      }
-      if(nd && nd.diff){
-        var det = EX.h('details', { 'class': 'more fxt-diffdet' }, S);
+      EX.h('p', { 'class': 'fxc-plain' }, li, roles.coach && roles.player ? 'The coach changed both the player’s code and its own (coach) code.' :
+        roles.coach ? 'The coach changed only its own (coach) code; the player stayed the same.' : roles.player ? 'The coach changed the player’s code.' : 'The coach changed only other files; the player stayed the same.');
+      var ul = EX.h('ul', { 'class': 'fxc-files' }, li);
+      files.forEach(function(f){
+        var r = EX.h('li', null, ul);
+        EX.h('code', { 'class': 'p' }, r, f.path);
+        if(ROLE_TEXT[f.role]) EX.h('span', { 'class': 'role' }, r, ROLE_TEXT[f.role]);
+        EX.h('span', { 'class': 'add' }, r, '+' + f.added);
+        EX.h('span', { 'class': 'del' }, r, F.MINUS + f.removed);
+      });
+      if(rec.diff){
+        var det = EX.h('details', { 'class': 'more fxc-diff' }, li);
         EX.h('summary', null, det, 'Show code change');
-        var pre = EX.h('pre', { 'class': 'code diff wrap', tabindex: '0', 'aria-label': 'Code change for node ' + c.node }, det);
-        nd.diff.split('\n').forEach(function(l){
-          var cls = /^(diff |index |\+\+\+|---|new file|deleted file|similarity|rename|Binary)/.test(l) ? 'meta' : /^@@/.test(l) ? 'hunk' : /^\+/.test(l) ? 'add' : /^-/.test(l) ? 'del' : '';
-          EX.h('span', { 'class': 'ln' + (cls ? ' ' + cls : '') }, pre, l || ' ');
+        var built = false;
+        det.addEventListener('toggle', function(){
+          if(!det.open || built) return; built = true;
+          var pre = EX.h('pre', { 'class': 'code diff wrap fxc-pre tall', tabindex: '0', 'aria-label': 'Code change' }, det);
+          rec.diff.split('\n').forEach(function(l){
+            var cls = /^(diff |index |\+\+\+|---|new file|deleted file|similarity|rename|Binary)/.test(l) ? 'meta' : /^@@/.test(l) ? 'hunk' : /^\+/.test(l) ? 'add' : /^-/.test(l) ? 'del' : '';
+            EX.h('span', { 'class': 'ln' + (cls ? ' ' + cls : '') }, pre, l || ' ');
+          });
+          if(rec.diff_note) EX.h('p', { 'class': 'fxc-sub' }, det, rec.diff_note);
         });
       }
+      return li;
+    }
+    function outcomeItem(tl, s){
+      var li = EX.h('li', { 'class': 'fxc-step k-outcome' }, tl);
+      marker(li, 'd-out');
+      var lab = EX.h('div', { 'class': 'fxc-label' }, li, 'Outcome ');
+      outcomeChip(lab, s);
+      EX.h('p', { 'class': 'fxc-plain' }, li, outcomeSentence(s));
+      var g = s.gained || [], l = s.lost || [];
+      if(!g.length && !l.length){ treeBtn(); return li; }
+      function treeBtn(){
+        if(s.in_trees && !s.aborted && D.trees[s.run]){
+          var acts = EX.h('div', { 'class': 'fxc-acts' }, li);
+          var bt = EX.h('button', { type: 'button', 'class': 'btn small' }, acts, 'Show in tree');
+          bt.addEventListener('click', function(){
+            EX.hash.set('tree', { run: s.run, node: String(s.node) }, { replace: false });
+            if(EX.explore && EX.explore.open) EX.explore.open('tree', { scroll: true });
+            EX.select('node', { run: s.run, node: String(s.node), source: NAME });
+          });
+        }
+      }
+      var prev = null;
+      function chips(title, ids, cls){
+        if(!ids.length) return;
+        var row = EX.h('div', { 'class': 'fxc-chiprow' }, li);
+        EX.h('span', { 'class': 'fxc-chiplab' }, row, title + ' (' + ids.length + ')');
+        var wrap = EX.h('span', { 'class': 'fxc-chips', role: 'group', 'aria-label': title }, row);
+        ids.forEach(function(id){
+          var b = EX.h('button', { type: 'button', 'class': 'fxc-chip ' + cls, 'aria-pressed': 'false', 'aria-label': 'Puzzle ' + id }, wrap, id);
+          b.addEventListener('click', function(){ showPuzzle(id, b); });
+        });
+      }
+      chips('Puzzles gained', g, 'up');
+      chips('Puzzles lost', l, 'down');
+      var pv = EX.h('div', { 'class': 'fxc-puz', 'aria-live': 'polite' }, li);
+      EX.h('p', { 'class': 'fxc-sub' }, li, 'A puzzle counts as gained when its practice score went up, for example from one of its two tests to both.' +
+        (s.player_changed === false ? ' With the player unchanged, these differences come from scoring it again.' : ''));
+      treeBtn();
+      function showPuzzle(id, b){
+        var same = b.getAttribute('aria-pressed') === 'true';
+        Array.prototype.forEach.call(li.querySelectorAll('.fxc-chip'), function(x){ x.setAttribute('aria-pressed', 'false'); });
+        pv.innerHTML = ''; prev = null;
+        if(same) return;
+        prev = b; b.setAttribute('aria-pressed', 'true');
+        var t = D.tasks[id];
+        if(!t){ EX.h('p', { 'class': 'fxc-sub' }, pv, 'Puzzle ' + id + ' (no picture saved for this one).'); return; }
+        var n = Math.min(2, (t.train || []).length);
+        EX.h('p', { 'class': 'fxc-sub' }, pv, 'Puzzle ' + id + ': ' + (n > 1 ? 'the first two of its ' + t.train.length + ' examples' : 'its first example') + ' (input → output).');
+        var w = Math.max(56, Math.min(100, Math.floor((ui.cmain.clientWidth - 60) / (n > 1 && ui.cmain.clientWidth > 560 ? 4 : 2))));
+        var row = EX.h('div', { 'class': 'fxc-puzrow' }, pv);
+        for(var i = 0; i < n; i++) EX.arcPair(row, t.train[i].input, t.train[i].output, { maxSize: w, labels: ['Example ' + (i + 1), null] });
+        var px = D.allPlayer.filter(function(q){ return q.task === id && q.run === s.run && q.k !== 'solved' && q.segments && q.segments.length; });
+        var acts = EX.h('div', { 'class': 'fxc-acts' }, pv);
+        if(px.length){
+          var pick = px.filter(function(q){ return String(q.node) === String(s.node); })[0] ||
+            px.filter(function(q){ return String(q.node) === String(s.parent); })[0] || px[0];
+          var rb = EX.h('button', { type: 'button', 'class': 'btn small' }, acts, 'Read the player’s failed attempt (' + genText(pick.generation).toLowerCase() + ')');
+          rb.addEventListener('click', function(){
+            st.cur.player = pick;
+            st.view = 'single'; st.runF = 'all'; st.kindF = 'all';
+            setTab('player', true);
+          });
+        } else EX.h('span', { 'class': 'fxc-sub' }, acts, 'No player transcript was saved for this puzzle in this run.');
+        EX.select('task', { task: id, set: t.set, source: NAME });
+      }
+      return li;
+    }
+    function outcomeSentence(s){
+      var a = s.practice_before, b = s.practice_after, k = s.outcome_kind;
+      if(k === 'no edit') return s.aborted ? 'No code changed in this attempt, and it was not scored.' : 'No code changed, so the player stayed as it was.';
+      if(k === 'not scored') return s.aborted ? 'The harness was stopped while scoring this attempt, so the edit has no score.' : 'This edit was not scored.';
+      if(k === 'broke') return b === 0 ? 'The edited player broke: it scored 0% on practice puzzles' + (a != null ? ' (it had ' + F.pct(a, 0) + ').' : '.') : 'The edited player broke and could not be scored.';
+      if(a == null || b == null) return 'Practice score: ' + F.pct(b, 0) + '.';
+      var d = Math.round((b - a) * 100), t;
+      if(k === 'same' || d === 0) t = 'The practice score stayed at ' + F.pct(b, 0) + '.';
+      else t = 'The practice score ' + (d > 0 ? 'rose' : 'fell') + ' from ' + F.pct(a, 0) + ' to ' + F.pct(b, 0) + ' (' + (d > 0 ? '+' : F.MINUS) + Math.abs(d) + ' points).';
+      if(s.player_changed === false) t += ' The player itself was not changed, so ' + (d === 0 ? 'this' : 'the change') + ' only reflects scoring the same player again (run-to-run noise).';
+      if(s.valid === false && s.in_trees) t += ' The harness marked this version invalid, so later rounds could not start from it.';
+      return t;
     }
 
     /* ======================= TURNS ======================= */
