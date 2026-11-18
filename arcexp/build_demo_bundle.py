@@ -160,6 +160,16 @@ def coach_round(rnd, traces):
     return summ, turns, instr
 
 
+def other_rounds(chosen, notes):
+    out = []
+    for d in sorted(os.listdir(DEMO)):
+        if d.startswith("coach_") and d != f"coach_{chosen}" and os.path.exists(os.path.join(DEMO, d, "summary.json")):
+            sm = json.load(open(os.path.join(DEMO, d, "summary.json")))
+            out.append({"round": sm["tag"], "coach_calls": sm["meta_calls"], "patch_bytes": sm["patch_bytes"],
+                        "practice_score_after_child_eval": sm["child_score"], "note": notes.get("round:" + sm["tag"])})
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--round", required=True)
@@ -235,11 +245,13 @@ def main():
             "practice_score_before": summ["baseline_score"], "practice_score_after_child_eval": summ["child_score"],
             "baseline_failures_shown": sorted({x.rsplit('_', 1)[0] for x in shown}),
             "baseline_failures_read": read,
-            "baseline_failures_read_note": "Task ids whose failure log (chat_history_<task>_0.md) the coach named in a tool command.",
+            "baseline_failures_read_note": ("Task ids whose failure log (chat_history_<task>_0.md) the coach named in a tool command. "
+                                            "It did not read them in full: see that turn's command for exactly what it printed."),
             "baseline_report": {"overall_accuracy": base_rep.get("overall_accuracy"),
                                 "per_task_score": base_rep.get("per_task_score")},
         },
         "puzzles": puzzles,
+        "other_rounds": other_rounds(a.round, notes),
     }
     # validation
     for p in puzzles:

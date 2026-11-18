@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="assets/fig-results.css">
 <link rel="stylesheet" href="assets/fig-extension.css">
 <link rel="stylesheet" href="assets/fig-watch.css">
+<link rel="stylesheet" href="assets/fig-demo.css">
 <link rel="stylesheet" href="assets/fig-tree.css">
 <link rel="stylesheet" href="assets/fig-replay.css">
 <link rel="stylesheet" href="assets/fig-transcripts.css">
@@ -35,7 +36,7 @@
     <p class="hl-note">Average exam score: share of the <span data-v="int:sets.heldout_tasks">120</span> exam puzzles solved.</p>
   </div>
   <p class="facts">Model: gpt-6-luna. Every player gets at most 2 model calls and 2 answers per puzzle. Total cost <span data-v="usd:spend.total">$152.23</span>. November 2026.</p>
-  <p class="jump">Jump to: <a href="#results">The result</a> &#183; <a href="#watch">Watch them answer</a> &#183; <a href="#explore">Explore the data</a></p>
+  <p class="jump">Jump to: <a href="#results">The result</a> &#183; <a href="#watch">Watch them answer</a> &#183; <a href="#demo">Inside one coaching round</a> &#183; <a href="#explore">Explore the data</a></p>
 </header>
 
 <main>
@@ -131,13 +132,31 @@
   <figcaption><b>Figure 5</b>: one run of each kind, answering the puzzle's first test input; "solved by k of n" counts every run of that kind. Shown: puzzles where the four disagree, those only the think-longer player solved first.</figcaption>
 </figure>
 
-<!-- ============================ 6. Takeaways ============================ -->
+<!-- ============================ 6. Inside one round (demo) ============================ -->
+<section class="l-body" aria-labelledby="demo">
+  <h2 id="demo">Inside one coaching round</h2>
+  <p>The study did not record what the model was thinking. So we re-ran one coaching round with the model's reasoning summaries saved, and you can follow what the player and the coach were thinking, step by step. This is a separate illustrative run, not part of the results. A summary is the model's own short account of its hidden reasoning, not its raw thoughts, and only some calls returned one.<sup class="fn" id="fnref-6"><a href="#fn-6">6</a></sup><span class="sidenote" id="fn-6"><span class="sn-num">6</span>Same model, reasoning effort, call cap and practice puzzles as in the study. We show the only round, of several tried, that changed the player without breaking it, and two puzzles picked to illustrate: one the edit fixed and one it did not. Runs are not deterministic, so each player was run on each puzzle several times.</span></p>
+</section>
+
+<figure class="fig l-page" id="fig-demo">
+  <div class="fig-panel">
+    <div class="fig-head">
+      <div class="fig-title">The coach turned the player's second try into a self-check. It fixed one puzzle and not the other.</div>
+      <p class="fig-text">Pick a puzzle, then step through: the player tries, the coach reads and edits, the player tries again.</p>
+    </div>
+    <div class="mount" data-fig="demo"><div class="mount-status">Loading figure&#8230;</div></div>
+  </div>
+  <figcaption><b>Figure 6</b>: a traced re-run of one coaching round on the practice puzzles, made after the study. Thoughts are the model's reasoning summaries; commands and outputs are as the coach saw them, with long outputs shortened. Not part of the results.</figcaption>
+</figure>
+
+<!-- ============================ 7. Takeaways ============================ -->
 <section class="l-body takeaways" aria-labelledby="takeaways">
   <h2 id="takeaways">What to take away</h2>
   <ul>
     <li>No coach, original or self-improved, trained a player that beat the uncoached one on this exam.</li>
     <li>Letting the model think longer was worth about <span data-v="pp0:derived.xhighGain">12</span> points; no coaching came close.</li>
     <li>Coaches seldom rewrote themselves, and testing one unchanged coach three times moved its score by <span data-v="pp0:derived.sameCoachSpread">10</span> points, so small differences here are noise.</li>
+    <li>Up close, a coach's edit can be sensible and still help only some puzzles: in the traced round, a self-check on the second try fixed one puzzle and not another. That is one round, so it illustrates how coaching works; it is not evidence about how well it works.</li>
   </ul>
   <p>Below, you can browse every run, every exam answer and every change a coach made to itself (<a href="#audit">Code changes</a>). The caveats, costs and full method are under <a href="#numbers">Numbers &amp; method</a>.</p>
 </section>
@@ -147,7 +166,7 @@
 <!-- ============================ 7. Explore ============================ -->
 <section id="explore" class="l-wide explore" aria-labelledby="explore-h">
   <h2 id="explore-h">Explore the data</h2>
-  <p class="explore-lead">Everything behind the five figures. Pick a tab.</p>
+  <p class="explore-lead">Everything behind Figures 1 to 5. Pick a tab.</p>
 
   <div class="explore-tabs tabs" role="tablist" aria-label="Explore the data">
     <button type="button" role="tab" id="tab-tree" data-tab="tree" aria-controls="panel-tree" aria-selected="true">Evolution trees</button>
@@ -292,6 +311,7 @@
 <script src="js/fig-results.js" charset="utf-8"></script>
 <script src="js/fig-extension.js" charset="utf-8"></script>
 <script src="js/fig-watch.js" charset="utf-8"></script>
+<script src="js/fig-demo.js" charset="utf-8"></script>
 <script src="js/fig-tree.js" charset="utf-8"></script>
 <script src="js/fig-replay.js" charset="utf-8"></script>
 <script src="js/fig-transcripts.js" charset="utf-8"></script>

@@ -1,0 +1,46 @@
+{
+  "tag": "rpA0",
+  "code": "A0",
+  "tasks": [
+    "a9f96cdd",
+    "a78176bb",
+    "d9f24cd1",
+    "b15fca0b"
+  ],
+  "reps": [
+    {
+      "rep": 1,
+      "score": 0.25,
+      "missing": 0,
+      "per_task": {
+        "a9f96cdd": 0.0,
+        "a78176bb": 1.0,
+        "d9f24cd1": 0.0,
+        "b15fca0b": 0.0
+      }
+    },
+    {
+      "rep": 2,
+      "score": 0.5,
+      "missing": 0,
+      "per_task": {
+        "a9f96cdd": 1.0,
+        "a78176bb": 0.0,
+        "d9f24cd1": 0.0,
+        "b15fca0b": 1.0
+      }
+    },
+    {
+      "rep": 3,
+      "score": 0.25,
+      "missing": 0,
+      "per_task": {
+        "a9f96cdd": 0.0,
+        "a78176bb": 0.0,
+        "d9f24cd1": 1.0,
+        "b15fca0b": 0.0
+      }
+    }
+  ],
+  "finished": 1795036280.9233716
+}
