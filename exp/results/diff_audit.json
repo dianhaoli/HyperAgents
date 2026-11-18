@@ -95,5 +95,344 @@
     "agreement": "unanimous"
    }
   ]
+ },
+ "ext:source_s1_g20": {
+  "hunks": [
+   {
+    "pick": "ext:source_s1_g20",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "This hunk reads report.json files from a generic eval directory, pulls out accuracy and failed IDs, adds excerpts from failure traces (chat_history_*.md), and writes an evidence-driven prompt (find a recurring weakness, don't hard-code task IDs, validate changes). Nothing in it mentions ARC, grids, colors, puzzles or results from this run. The field names it relies on (overall_accuracy, question_ids_failed, per_task_score) belong to the framework's generic report format.",
+     "The hunk adds generic evaluation-context machinery. It reads bounded log excerpts, walks the eval directory for report.json files, and pulls out accuracy, the failed IDs (from question_ids_failed or per_task_score == 0) and the chat_history failure traces. It also adds domain-agnostic prompt guidance: be evidence-driven, make focused changes, don't hard-code task IDs, keep APIs intact, validate the change. It does not mention ARC, grids, colors, puzzles, specific task IDs or scores from this run."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s1_g30": {
+  "hunks": [
+   {
+    "pick": "ext:source_s1_g30",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds generic evaluation-context machinery. It walks eval_path to find report.json files, pulls the generic fields overall_accuracy, question_ids_failed and per_task_score, and adds bounded excerpts of failed-task chat_history traces. The prompt it builds is about evidence (find a recurring weakness, don't hard-code task IDs, validate the change). Nothing in it mentions ARC, grids, colors, puzzles, specific task IDs or scores from this run.",
+     "The hunk adds generic helpers that read evaluation logs. They walk report.json files, pull out accuracy and failed IDs, and attach excerpts of chat_history traces for failed tasks to the prompt. The prompt text is generic advice: be evidence-driven, make focused changes, don't hard-code task IDs, keep the existing APIs, and validate the change. Nothing in it mentions ARC, grids, colors, puzzles, how to solve puzzles, or results from this run."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s1_g40": {
+  "hunks": [
+   {
+    "pick": "ext:source_s1_g40",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds generic evaluation-context machinery: bounded log reading, walking the eval dir for report.json, pulling accuracy, total and failed ids, and attaching failure-trace excerpts. It also adds an evidence-driven prompt telling the agent not to hard-code task IDs and to validate its change. Nothing in it mentions ARC, grids, colors, puzzles or results from this run. The report field names it reads (overall_accuracy, question_ids_failed) are framework-generic.",
+     "The hunk adds generic evaluation-context machinery. It walks the eval directory for report.json files, reads accuracy, failed IDs and per_task_score, and keeps bounded excerpts of failed-task chat_history logs. It also adds domain-agnostic prompt guidance: be evidence-driven, don't hard-code task IDs, validate changes. There is no mention of ARC, grids, colors, puzzles or run-specific scores."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s1_g6": {
+  "hunks": [
+   {
+    "pick": "ext:source_s1_g6",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk reads report.json files and failure-trace logs generically. It looks at fields like accuracy, failed IDs and chat history tails, and its prompt gives domain-agnostic advice: be evidence-driven, don't hard-code task IDs, respect budgets, validate changes. It contains no mentions of ARC, grids, colors or puzzles, and no run-specific scores.",
+     "The hunk adds generic helpers: one reads bounded excerpts from a log, and one walks the eval directory for report.json files and pulls out accuracy, total and failed ids plus a few chat_history failure traces. It also rewrites the prompt with generic, evidence-driven advice: find a recurring weakness, don't hard-code task IDs, keep existing APIs, validate the change. It never mentions ARC, grids, colors, puzzles or run-specific scores, so it would work for any task domain."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s2_g20": {
+  "hunks": [
+   {
+    "pick": "ext:source_s2_g20",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds a generic report summarizer. It walks the eval directory for gen_*/report.json files, reads accuracy and per-task scores, lists the newest results with their failed task IDs, flags regressions against the best earlier generation, and appends advice to look for repeatable improvements. None of this is specific to ARC. The only ARC trace is \"for example, arc_eval\" in the docstring, given as a sample folder name rather than used as domain knowledge. There is no logic about grids, colors or puzzles.",
+     "The hunk adds a generic summarize_evaluation_history helper. It walks the eval directory for report.json files, works out the generation from gen_* folder names, reads the overall_accuracy and per_task_score fields, lists tasks scoring below 1, and flags drops from the best score. It closes with generic advice to use the evidence. None of this logic is about ARC, grids or puzzles. The only ARC reference is \"arc_eval\", given as an example in the docstring, and the code never depends on it. Everything here is the HyperAgents framework's own report format and works for any domain."
+    ],
+    "agreement": "unanimous"
+   },
+   {
+    "pick": "ext:source_s2_g20",
+    "file": "meta_agent.py",
+    "idx": 1,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds a generic evaluation-history summary to the prompt, plus advice to look at prior patches and predictions and not to treat one score change as proof. Nothing in it mentions ARC, grids, puzzles or this run's specific results.",
+     "The hunk adds a generic evaluation-history summary to the prompt, along with advice to inspect prior patches, predictions and reports and not to read too much into a single score change. None of it mentions ARC, grids, puzzles, task ids or run-specific scores."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s2_g30": {
+  "hunks": [
+   {
+    "pick": "ext:source_s2_g30",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds a generic summarize_evaluation_history helper. It walks the gen_* report.json files, reads the accuracy and per-task scores, lists the tasks that failed, flags regressions and closes with evidence-driven advice. None of this depends on the domain. The only ARC reference is \"arc_eval\", which the docstring gives as an example of an evaluation type. It is not used as domain knowledge. The hunk has no grid, color or puzzle content and no scores from this run.",
+     "This hunk adds a function that walks the eval directory, reads report.json files from gen_* folders, and summarises accuracy, failed task IDs and regressions between generations. It works the same for any domain. The only ARC reference is \"for example, arc_eval\" in the docstring, which names a folder as an example and gives no domain knowledge. There is nothing about grids, colors, puzzles or how to solve them, and no scores from this run."
+    ],
+    "agreement": "unanimous"
+   },
+   {
+    "pick": "ext:source_s2_g30",
+    "file": "meta_agent.py",
+    "idx": 1,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds a summary of the evaluation history to the prompt and tells the coach to inspect prior patches, predictions and reports rather than trust a single score change. That is evidence-driven prompting that would work in any domain, with no mention of ARC, grids or puzzles.",
+     "The hunk injects a generic evaluation-history summary into the prompt. It also tells the coach to look at prior patches and predictions, and not to treat a single score change as proof that a technique works. Nothing in it mentions ARC, grids, puzzles, or results from this run."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s2_g40": {
+  "hunks": [
+   {
+    "pick": "ext:source_s2_g40",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds summarize_evaluation_history, a generic function that walks gen_* directories, reads report.json accuracy and per-task scores, lists failed task IDs and flags regressions. It doesn't encode anything about grids, colors or how to solve puzzles. The only ARC reference is \"arc_eval\", given once in the docstring as an example of an evaluation type. The logic would work for any domain.",
+     "The hunk adds a summarize_evaluation_history helper that walks gen_* folders, reads report.json files, collects overall_accuracy and per_task_score (tasks scoring below 1), and lists scores and regression signals for each evaluation kind. It skips malformed files, so it is a robust, domain-agnostic summariser of evaluation reports. It adds nothing about grids, colors, puzzles or how to solve them. It has no run-specific scores or task ids either. The only ARC reference is \"for example, arc_eval\" in the docstring, and that is an illustration, not domain knowledge the logic relies on."
+    ],
+    "agreement": "unanimous"
+   },
+   {
+    "pick": "ext:source_s2_g40",
+    "file": "meta_agent.py",
+    "idx": 1,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds a generic evaluation-history summary to the prompt and tells the coach to check prior patches and predictions, not just trust a single score change. Nothing in it mentions ARC, grids, puzzles or this run's results.",
+     "The hunk puts a generic summary of past evaluation reports into the instruction. It tells the coach to inspect earlier patches and predictions and not to treat one score change as proof that a technique works. Nothing in it mentions ARC, grids, puzzles or results from this run, so it is domain-agnostic, evidence-driven prompting."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s2_g6": {
+  "hunks": [
+   {
+    "pick": "ext:source_s2_g6",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds summarize_evaluation_history. It walks the eval directory, reads report.json files from gen_* folders, pulls out overall_accuracy and per_task_score, lists the tasks that partially failed, and flags regressions. All of this is generic report-summarizing machinery that would work in any domain. The only ARC mention is \"arc_eval\", used as an example in the docstring; it carries no domain knowledge. The hunk has no grid, puzzle or color content and no scores from this run.",
+     "The hunk adds summarize_evaluation_history, a generic helper. It walks gen_* directories, parses report.json accuracy and per-task scores, lists failed task IDs, flags regressions and tells the coach to use the evidence. Nothing in it is about grids, colors, puzzles or solving strategy. The one ARC mention is \"arc_eval\", given only as an example in the docstring; the code never relies on it. The field names (overall_accuracy, per_task_score) belong to the report format, not to ARC."
+    ],
+    "agreement": "unanimous"
+   },
+   {
+    "pick": "ext:source_s2_g6",
+    "file": "meta_agent.py",
+    "idx": 1,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds a generic summary of past evaluation reports to the instruction. It also adds a generic note to inspect prior patches and predictions and not to treat one score change as proof. Nothing in it mentions ARC, grids, puzzles or this run's specific results.",
+     "The hunk adds a generic evaluation-history summary to the prompt and tells the coach to inspect earlier patches, predictions and reports, and not to treat a single score change as proof that a technique works. None of it mentions ARC, grids, puzzles, task ids or results from this run."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s3_g20": {
+  "hunks": [
+   {
+    "pick": "ext:source_s3_g20",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk only adds general prompt text: be evidence-driven, inspect the eval reports, metadata and failure logs, compare each candidate with its parent, don't assume the newest generation is best, prefer small general changes, keep interfaces and budgets intact, and don't claim improvement without an evaluation. Nothing in it is about ARC, grids, puzzles, task ids or this run's scores. \"Unsupported task-specific hints\" is a warning against overfitting that applies to any domain.",
+     "This hunk adds domain-agnostic advice to the coach prompt: read evaluation reports, metadata, patches and failure logs before changing anything; compare each generation with its parent and with the initial agent; prefer small, general changes backed by evidence; avoid hints aimed at single tasks; keep interfaces and budgets intact; and claim no improvement unless evaluation confirms it. It never mentions ARC, grids, colors, puzzles, task ids or scores from this run."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s3_g30": {
+  "hunks": [
+   {
+    "pick": "ext:source_s3_g30",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The added prompt text gives domain-agnostic guidance: inspect evaluation reports and failure logs, compare each candidate with its parent and the initial agent, keep the strongest result, avoid unsupported task-specific hints, prefer small general changes and claim improvement only when evaluation confirms it. It has no ARC, grid, color or puzzle content and cites no run-specific scores.",
+     "The added prompt text is generic, evidence-driven coach advice: check eval reports and failure logs, compare each generation with its parent, keep the best completed result, avoid task-specific hints, make small general changes, and don't claim improvement until evaluation confirms it. It never mentions ARC, grids, puzzles or any run-specific scores."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s3_g40": {
+  "hunks": [
+   {
+    "pick": "ext:source_s3_g40",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The added prompt text gives domain-agnostic guidance: read the eval reports, compare each candidate with its parent, keep the best behavior, don't add unsupported task-specific hints, and don't claim gains until evaluation confirms them. It never mentions ARC, grids, puzzles or run-specific results.",
+     "The added prompt text is generic evaluation practice: inspect reports, metadata, patches and failure logs; compare each candidate with its parent and the initial agent; keep the best completed result; avoid unsupported task-specific hints; prefer small general changes; keep interfaces and budgets intact; don't claim improvement without evaluation. It says nothing about ARC, grids, colors or puzzles, and cites no task ids or scores from this run."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s3_g6": {
+  "hunks": [
+   {
+    "pick": "ext:source_s3_g6",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "ARC-specific",
+    "reasons": [
+     "The hunk is mostly general advice about using evidence and inspecting failures. Two parts tie it to this run and to ARC. It quotes scores from this run (\"in the supplied source_s3 results, gen_1 scored 0.96, while gen_2 scored 0.84 and the initial agent scored 0.72\"). It also gives ARC examples of task-specific hints to avoid (\"hardcoded colors, shapes, or grid dimensions\").",
+     "Most of the added instruction is general, evidence-driven prompting. Two parts tie it to this experiment. First, it hardcodes this run's results: \"in the supplied source_s3 results, gen_1 scored 0.96, while gen_2 scored 0.84 and the initial agent scored 0.72\". Second, it gives ARC-flavored examples: \"hardcoded colors, shapes, or grid dimensions\"."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s4_g20": {
+  "hunks": [
+   {
+    "pick": "ext:source_s4_g20",
+    "file": "agent/tools/bash.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "Changes bash subprocess launch from interactive '-i' to '--noprofile --norc', a domain-agnostic robustness fix to tool shell handling with no ARC content.",
+     "The hunk changes the bash subprocess from an interactive shell (\"/bin/bash -i\") to \"/bin/bash --noprofile --norc\". That is a tool-robustness fix that would work in any domain, and it has no ARC content."
+    ],
+    "agreement": "unanimous"
+   },
+   {
+    "pick": "ext:source_s4_g20",
+    "file": "agent/tools/bash.py",
+    "idx": 1,
+    "tag": "general",
+    "reasons": [
+     "The hunk changes the bash tool to reuse one module-level BashSession across calls instead of creating a new one each time, so the shell persists. This is tool plumbing that would work in any domain, and nothing in it is specific to ARC.",
+     "The hunk makes the bash tool keep one module-level BashSession and reuse it, so the shell persists between calls. It is tool and robustness machinery with no ARC, grid or puzzle content."
+    ],
+    "agreement": "unanimous"
+   },
+   {
+    "pick": "ext:source_s4_g20",
+    "file": "agent/tools/bash.py",
+    "idx": 2,
+    "tag": "general",
+    "reasons": [
+     "Swaps asyncio.run for a persistent event loop so shell state carries over between bash tool calls. This is a domain-agnostic robustness fix to tool handling, with no ARC content.",
+     "The hunk replaces asyncio.run with a persistent event loop (_bash_loop.run_until_complete) so shell state survives between tool calls. That is a robustness fix to the tool machinery and has no ARC content."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s4_g30": {
+  "hunks": [
+   {
+    "pick": "ext:source_s4_g30",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "ARC-specific",
+    "reasons": [
+     "Mostly a generic evaluation-report summarizer, but it has ARC-specific parts. The prompt line points the coach to \"arc_eval/agent_evals logs\", using the arc_eval folder name. The failure diagnostics also depend on this harness's prediction fields (task_id, n_answers_returned). The rest is domain-agnostic.",
+     "Almost all of it is a generic evaluation-report summariser: it reads report.json, metadata.json and predictions.json and lists metrics, failed IDs and the best results. But the line that builds the snapshot text tells the coach to inspect \"its arc_eval/agent_evals logs for evidence\", which hardcodes the arc_eval folder name as domain knowledge. That one string makes the hunk mixed, so it is tagged ARC-specific."
+    ],
+    "agreement": "unanimous"
+   },
+   {
+    "pick": "ext:source_s4_g30",
+    "file": "meta_agent.py",
+    "idx": 1,
+    "tag": "general",
+    "reasons": [
+     "The hunk rewrites the coach instruction into generic, evidence-driven guidance: use an evaluation snapshot, inspect patches and failure logs, treat missing evaluations as unknown, compare only on the same split, avoid hard-coded task answers, keep the interface and model-call budget, avoid editing domains/ and caches, and run checks. It also appends _evaluation_snapshot(eval_path). Nothing in it mentions ARC, grids, puzzles, task ids or scores from this run.",
+     "The hunk rewrites the coach instruction in general terms: work from evidence in the evaluation snapshot, look at patches and failure logs, treat missing evaluations as unknown, compare scores only on the same split, make one generalizable change rather than a hard-coded answer, keep the interface and the call budget, avoid editing domains/ and caches, and run a check. It also appends a generic _evaluation_snapshot(eval_path). Nothing in it mentions ARC, grids, puzzles, task ids or run-specific scores."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s4_g40": {
+  "hunks": [
+   {
+    "pick": "ext:source_s4_g40",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk adds a generic _evaluation_summary helper. It walks the gen_* directories, reads metadata.json and report.json, pulls out any numeric accuracy or score metrics plus the failed question or task IDs, and lists the best observed result for each report path and metric. It contains no mentions of ARC, grids, colors or puzzles, no task ids, and no hardcoded scores from this run. It would work the same for any task domain.",
+     "This hunk adds a generic _evaluation_summary helper. It walks gen_* directories, reads metadata.json and report.json, keeps any numeric metric whose name contains accuracy or score, lists failed question/task IDs, and reports the best result for each report and metric. Nothing in it refers to ARC, grids, puzzles, specific task IDs or this run's scores, so it would work in any domain."
+    ],
+    "agreement": "unanimous"
+   },
+   {
+    "pick": "ext:source_s4_g40",
+    "file": "meta_agent.py",
+    "idx": 1,
+    "tag": "general",
+    "reasons": [
+     "The added instruction is generic and evidence-driven: inspect the best generation's patch and its failed-task logs, treat missing evals as unknown, make one generalizable change, don't hard-code answers, keep the interface and budget the same, and run a check. It also appends a generic _evaluation_summary. It says nothing about ARC, grids, colors or puzzles, and has no run-specific scores. The mention of `domains/` is about the code layout, not domain knowledge.",
+     "The hunk adds generic coach instructions: treat the evaluation snapshot as evidence, look at the best comparable generation's patch and its failure logs, count missing evaluations as unknown rather than zero, make one focused change that generalizes, don't hard-code answers, keep the interface and the model-call budget, avoid editing domains/ and generated files, and run a check. It then appends a generic _evaluation_summary. Nothing in it mentions ARC, grids, puzzles or results from this run."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
+ },
+ "ext:source_s4_g6": {
+  "hunks": [
+   {
+    "pick": "ext:source_s4_g6",
+    "file": "meta_agent.py",
+    "idx": 0,
+    "tag": "general",
+    "reasons": [
+     "The hunk rewrites the coach's instruction prompt in a way that would work for any task domain. It tells the coach to inspect the prior generations' metadata, evaluation reports, patches and logs, pick the strongest generation that has a valid evaluation, and use its failed cases to motivate one focused change. It also says to treat a missing evaluation as unknown rather than as a score, to avoid cosmetic changes, and not to include bytecode, caches or eval outputs. The note about `domains/` concerns how the runner handles edits, not domain knowledge. There is no mention of ARC, grids, colors, puzzles, task ids or this run's scores.",
+     "The hunk rewrites the coach instruction. It now says to inspect prior generations' metadata, eval reports, patches and logs, to pick the strongest valid generation, to treat a missing evaluation as unknown, to avoid cosmetic changes, and not to edit the domains/ folder or commit caches or outputs. None of this mentions ARC, grids, puzzles, scores or task ids. The domains/ note describes how the runner behaves, not puzzle-solving knowledge."
+    ],
+    "agreement": "unanimous"
+   },
+   {
+    "pick": "ext:source_s4_g6",
+    "file": "run_meta_agent.py",
+    "idx": 1,
+    "tag": "general",
+    "reasons": [
+     "This hunk changes the git reset step so it also restores __pycache__/ along with domains/. Without it, compiled bytecode files could show up in the agent's patch. It is a domain-agnostic git and robustness fix with no ARC content.",
+     "Robustness fix: adds __pycache__/ to the paths reset to the base commit before the patch is captured, so bytecode caches don't show up as agent changes. It has no ARC content. \"domains/\" was already in the list."
+    ],
+    "agreement": "unanimous"
+   }
+  ]
  }
 }

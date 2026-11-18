@@ -1,0 +1,16 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..810b103 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -55,6 +55,7 @@ def build_prompt(inputs):
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "Before answering, check your proposed rule against every demonstration pair: mentally apply it to each input and confirm that it reproduces the full output, including dimensions, row/column ordering, and cell values. If any pair disagrees, revise the rule rather than extrapolating from only one example. Then apply the validated rule to the test input and check the resulting grid's dimensions and ordering.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+new file mode 100644
+index 0000000..f9dd09c
+Binary files /dev/null and b/__pycache__/task_agent.cpython-313.pyc differ
