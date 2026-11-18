@@ -257,7 +257,7 @@
 
   /* ---------------- theme ---------------- */
   var THEME_KEY = 'ex-theme';
-  function storedTheme(){ try { return localStorage.getItem(THEME_KEY) || 'auto'; } catch(e){ return 'auto'; } }
+  function storedTheme(){ try { return localStorage.getItem(THEME_KEY) || 'dark'; } catch(e){ return 'dark'; } }  /* default: dark */
   EX.theme = {
     get: function(){ return root.getAttribute('data-theme') || 'auto'; },
     effective: function(){
