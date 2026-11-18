@@ -1,0 +1,17 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index ee6b15e..caa5031 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -18,6 +18,12 @@ class MetaAgent(AgentSystem):
+         instruction += (
+             f"\n\nThe repository's README.md describes the goal. Previously generated agents and their evaluation results are at `{eval_path}`. "
+             "Work autonomously: nobody will answer questions, so do not ask for clarification. "
++            "Before editing, inspect the relevant implementation and the available prior-run artifacts. "
++            "Use evaluation results and generated-agent changes as evidence: compare multiple runs where possible, "
++            "identify a recurring weakness or a promising improvement, and avoid treating a single noisy result as conclusive. "
++            "Make a focused change to the generation/improvement system that addresses that evidence; preserve existing interfaces "
++            "and execution constraints unless the evidence calls for changing them. Do not assume a particular artifact format: "
++            "discover it from the files. After editing, run an appropriate lightweight check or test when feasible and review the diff. "
+             "Use the tools to inspect the code and make your changes; a response without a tool call ends the session, so only reply without one when you are done."
+         )
+ 

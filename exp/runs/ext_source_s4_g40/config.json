@@ -1,0 +1,29 @@
+{
+  "phase": "ext_payoff",
+  "arm": "g40",
+  "seed": 3,
+  "source_run": "source_s4",
+  "coach_generation": 40,
+  "coach_node": 13,
+  "task_set": "payoff",
+  "max_generation": 8,
+  "template_dir": "exp/transplants_ext/source_s4_g40/template",
+  "freeze_paths": [
+    "agent",
+    "agent/base_agent.py",
+    "agent/llm.py",
+    "agent/llm_withtools.py",
+    "agent/tools/__init__.py",
+    "agent/tools/bash.py",
+    "agent/tools/edit.py",
+    "meta_agent.py",
+    "run_meta_agent.py",
+    "utils",
+    "utils/git_utils.py",
+    "utils/thread_logger.py"
+  ],
+  "rng_seed": 7003,
+  "workers": 12,
+  "name": "ext_source_s4_g40",
+  "root_commit": "fa20ab7351cb19969ed8e9e5f3099fd438e5885e"
+}

@@ -17,3 +17,4 @@
 {"iteration": "32", "score": 0.92, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "ff99c08c22737a3a", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "33", "score": 0.92, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "4c4e430f1d50119b", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "38", "score": 0.84, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "f55e455275e98bc4", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "40", "score": 0.96, "missing": 0, "infra_error_rows": 3, "n_test_inputs": 26, "code_hash": "a58f6eebdd36318c", "format_failures": 0, "snapshot_skipped": []}

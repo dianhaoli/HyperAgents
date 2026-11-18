@@ -59,3 +59,7 @@ pick source_s2:g30: source_s2 g30 -> (9, 9, -0.03999999999999998) | max mean chi
    transplant check: True __ARC_SANDBOX_STARTED__
 IMPORT_OK 
 launched final exam for ext_source_s1_g20
+pick source_s4:g40: source_s4 g40 -> (13, 3, 0.08000000000000002) | max mean child improvement among changed coaches with >=3 descendants
+   transplant check: True __ARC_SANDBOX_STARTED__
+IMPORT_OK 
+launched extension test ext_source_s4_g40: launched run_ext_source_s4_g40

@@ -35,3 +35,5 @@ payoff_Ig_source_s6 cand gen_2: loop score 0.660 rescore 0.620 combined 0.640
 payoff_Ig_source_s6 cand gen_8: loop score 0.620 rescore 0.500 combined 0.560
 [eval] {'phase': 'heldout', 'arm': 'Ig', 'seed': 6, 'iteration': 2} round 0: 101 test inputs to run (66 cached)
 [eval] {'phase': 'heldout', 'arm': 'Ig', 'seed': 6, 'iteration': 2} round 1: 3 test inputs to run (164 cached)
+{"run": "payoff_Ig_source_s6", "arm": "Ig", "seed": 6, "source_seed": 6, "node_scores": {"initial": 0.62, "1": 0.6, "2": 0.66, "4": 0.56, "7": 0.5, "8": 0.62}, "candidates": ["2", "8"], "combined": {"2": 0.64, "8": 0.56}, "final_node": "2", "heldout": 0.2791666666666667, "heldout_missing": 0, "n_accepted": 5}
+__JOB_DONE__

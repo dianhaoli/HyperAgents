@@ -1,0 +1,58 @@
+diff --git a/task_agent.py b/task_agent.py
+index 3f0eb6f..bba6c6a 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -48,6 +48,45 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
++def _change_audit(source, target, max_coordinates=40):
++    """Summarize every training edit and the unchanged-cell count compactly."""
++    in_h, in_w = len(source), len(source[0])
++    out_h, out_w = len(target), len(target[0])
++    changes = {}
++    unchanged = 0
++    # Treat cells outside either grid as absent, so size-changing examples are
++    # auditable too. Coordinates use the output/input shared top-left origin.
++    for r in range(max(in_h, out_h)):
++        for c in range(max(in_w, out_w)):
++            before = source[r][c] if r < in_h and c < in_w else None
++            after = target[r][c] if r < out_h and c < out_w else None
++            if before == after:
++                unchanged += 1
++            else:
++                changes.setdefault((before, after), []).append((r, c))
++
++    if not changes:
++        details = "no changed cells"
++    else:
++        pieces = []
++        remaining = max_coordinates
++        for (before, after), coords in sorted(
++                changes.items(), key=lambda item: (str(item[0][0]), str(item[0][1]))):
++            shown = coords[:remaining]
++            remaining -= len(shown)
++            old = "outside" if before is None else str(before)
++            new = "outside" if after is None else str(after)
++            piece = f"{old}->{new}: {len(coords)}"
++            if shown:
++                piece += " at " + ", ".join(f"({r},{c})" for r, c in shown)
++            if len(shown) < len(coords):
++                piece += f" (+{len(coords) - len(shown)} coordinates omitted)"
++            pieces.append(piece)
++        details = "; ".join(pieces)
++    return (f"Change audit (input {in_h}x{in_w} -> output {out_h}x{out_w}; "
++            f"{unchanged} unchanged cell(s)): {details}")
++
++
+ def build_prompt(inputs):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+@@ -63,6 +102,7 @@ def build_prompt(inputs):
+         h, w = len(pair["output"]), len(pair["output"][0])
+         parts.append(f"Output ({h}x{w}):")
+         parts.append(grid_to_text(pair["output"]))
++        parts.append(_change_audit(pair["input"], pair["output"]))
+         parts.append("")
+     t = inputs["test_input"]
+     parts.append("## Test")

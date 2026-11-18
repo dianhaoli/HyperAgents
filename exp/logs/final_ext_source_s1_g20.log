@@ -1,1 +1,7 @@
 [eval] {'phase': 'rescore', 'arm': 'g20', 'seed': 0, 'iteration': 4} round 0: 26 test inputs to run (0 cached)
+[eval] {'phase': 'rescore', 'arm': 'g20', 'seed': 0, 'iteration': 4} round 1: 2 test inputs to run (24 cached)
+ext_source_s1_g20 cand gen_4: loop score 0.640 rescore 0.560 combined 0.600
+[eval] {'phase': 'rescore', 'arm': 'g20', 'seed': 0, 'iteration': 6} round 0: 26 test inputs to run (0 cached)
+[eval] {'phase': 'rescore', 'arm': 'g20', 'seed': 0, 'iteration': 6} round 1: 3 test inputs to run (23 cached)
+ext_source_s1_g20 cand gen_6: loop score 0.620 rescore 0.700 combined 0.660
+[eval] {'phase': 'heldout', 'arm': 'g20', 'seed': 0, 'iteration': 6} round 0: 167 test inputs to run (0 cached)

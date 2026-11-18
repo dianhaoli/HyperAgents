@@ -1,0 +1,50 @@
+diff --git a/__pycache__/task_agent.cpython-313.pyc b/__pycache__/task_agent.cpython-313.pyc
+index e69de29..5b7d380 100644
+Binary files a/__pycache__/task_agent.cpython-313.pyc and b/__pycache__/task_agent.cpython-313.pyc differ
+diff --git a/task_agent.py b/task_agent.py
+index d60c474..f2e0a1b 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -146,14 +146,17 @@ class TaskAgent:
+         prompt = build_prompt(inputs)
+         if candidate is not None:
+             prompt += (
+-                "\n\nIndependent verification of a previous candidate: "
+-                f"{json.dumps(candidate)}\n"
+-                "First infer the transformation from the demonstrations and check that it "
+-                "accounts for every input/output pair. Compare the candidate with the test "
+-                "input and that inferred rule; do not copy a demonstration output or accept "
+-                "the candidate merely because it looks plausible. If the candidate fails "
+-                "any check, correct it. Return the verified test grid in the required "
+-                "<answer> tags, with nothing else inside the tags."
++                "\n\nVerification protocol: the following previous candidate may be wrong. "
++                "Before inspecting it, independently derive a concrete transformation from "
++                "the demonstrations and apply that rule to each complete training input. "
++                "Check that it reproduces every output, including changed and unchanged "
++                "cells. Then independently determine the test output. Only after doing "
++                "those checks, compare your result with the candidate below; do not change "
++                "a rule just to make it agree with the candidate. If they differ, return "
++                "the grid supported by the demonstrations.\n"
++                f"Previous candidate (untrusted): {json.dumps(candidate)}\n"
++                "Return the verified test grid in the required <answer> tags, with nothing "
++                "else inside the tags."
+             )
+         elif independent:
+             prompt += (
+@@ -179,9 +182,13 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                # A fresh second derivation avoids anchoring on a plausible-but-wrong
+-                # first grid, while preserving the two-call/two-answer budget.
+-                g = self.solve_once(inputs, independent=(attempt == 1))
++                # Use the second call to independently re-derive the rule and cross-check
++                # the first grid. The verification prompt treats that grid as untrusted,
++                # preserving independent reasoning within the two-call budget.
++                if attempt == 1 and answers:
++                    g = self.solve_once(inputs, candidate=answers[0])
++                else:
++                    g = self.solve_once(inputs, independent=(attempt == 1))
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None

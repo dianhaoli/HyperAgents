@@ -10,11 +10,7 @@ from agent.llm_withtools import chat_with_agent
 
 
 def summarize_evaluation_history(eval_path, max_reports=12):
-    """Summarize evaluation scores, task regressions, and compact prediction diagnostics.
-
-    Malformed reports or predictions are ignored so incomplete history cannot prevent
-    an improvement run. Answer grids are deliberately excluded from the summary.
-    """
+    """Summarize evaluation trends and compact per-test failure diagnostics."""
     if not eval_path or not os.path.isdir(eval_path):
         return "No evaluation reports were found (evaluation directory is unavailable)."
 
@@ -23,6 +19,7 @@ def summarize_evaluation_history(eval_path, max_reports=12):
     task_observations = {}
     task_failures = {}
     prediction_diagnostics = []
+
     for root, dirs, files in os.walk(eval_path):
         dirs.sort()
         if "report.json" not in files:
@@ -39,6 +36,7 @@ def summarize_evaluation_history(eval_path, max_reports=12):
                 break
         if generation is None:
             continue
+
         try:
             with open(os.path.join(root, "report.json"), encoding="utf-8") as stream:
                 data = json.load(stream)
@@ -77,6 +75,7 @@ def summarize_evaluation_history(eval_path, max_reports=12):
                 task_observations.setdefault(key, set()).add(generation)
                 if not passed:
                     task_failures.setdefault(key, set()).add(generation)
+
         task_statuses[(kind, generation)] = outcomes
         failed = sorted(task for task, passed in outcomes.items() if not passed)
         total = data.get("total")
@@ -84,6 +83,8 @@ def summarize_evaluation_history(eval_path, max_reports=12):
             total = None
         reports.append((generation, label, kind, score, total, failed))
 
+        # Reports aggregate outcomes by task, while predictions have one record
+        # per test input. Keep the distinction and omit potentially large grids.
         if failed:
             try:
                 with open(os.path.join(root, "predictions.json"), encoding="utf-8") as stream:
@@ -91,7 +92,13 @@ def summarize_evaluation_history(eval_path, max_reports=12):
             except (OSError, ValueError, TypeError):
                 predictions = []
             if isinstance(predictions, dict):
-                predictions = list(predictions.values())
+                normalized = []
+                for task_id, prediction in predictions.items():
+                    if isinstance(prediction, dict):
+                        prediction = dict(prediction)
+                        prediction.setdefault("task_id", task_id)
+                        normalized.append(prediction)
+                predictions = normalized
             if isinstance(predictions, list):
                 failed_ids = set(failed)
                 for prediction in predictions:
@@ -103,11 +110,16 @@ def summarize_evaluation_history(eval_path, max_reports=12):
                     count = prediction.get("n_answers_returned")
                     count_text = (f"{count} candidate(s)" if isinstance(count, int)
                                   and not isinstance(count, bool) else "answer count unavailable")
-                    status = "solved" if prediction.get("solved") is True else "not solved"
-                    detail = f"gen_{label} [{kind}] {task_id}: {status}, {count_text}"
+                    status = ("test input solved" if prediction.get("solved") is True
+                              else "test input not solved")
+                    detail = f"gen_{label} [{kind}] {task_id}: {status}"
                     test_input = prediction.get("test_input")
                     if isinstance(test_input, (int, str)) and not isinstance(test_input, bool):
-                        detail += f", test input {test_input}"
+                        detail += f" (test input {test_input})"
+                    detail += f", {count_text}"
+                    wrong = prediction.get("wrong_answers")
+                    if isinstance(wrong, list) and wrong:
+                        detail += f", {len(wrong)} wrong answer set(s)"
                     error = prediction.get("agent_error")
                     if error:
                         error_text = " ".join(str(error).split())[:120]
@@ -118,8 +130,6 @@ def summarize_evaluation_history(eval_path, max_reports=12):
         return "No usable evaluation reports were found in the supplied history."
 
     reports.sort(key=lambda row: (row[0], row[2]))
-    # Keep recent results, but don't let the report limit hide the best historical
-    # checkpoint for an evaluation type.
     if max_reports is None:
         report_limit = len(reports)
     else:
@@ -127,8 +137,11 @@ def summarize_evaluation_history(eval_path, max_reports=12):
             report_limit = max(1, int(max_reports))
         except (TypeError, ValueError, OverflowError):
             report_limit = 12
-    recent_reports = reports[-report_limit:]
-    selected_keys = {(row[0], row[2]) for row in recent_reports}
+
+    # Preserve the recent trend and the strongest checkpoint for each evaluation
+    # type, preferring the latest generation when scores tie.
+    selected_reports = reports[-report_limit:]
+    selected_keys = {(row[0], row[2]) for row in selected_reports}
     best_by_kind = {}
     for row in reports:
         previous = best_by_kind.get(row[2])
@@ -136,11 +149,11 @@ def summarize_evaluation_history(eval_path, max_reports=12):
             best_by_kind[row[2]] = row
     for row in best_by_kind.values():
         if (row[0], row[2]) not in selected_keys:
-            recent_reports.append(row)
-    recent_reports.sort(key=lambda row: (row[0], row[2]))
+            selected_reports.append(row)
+    selected_reports.sort(key=lambda row: (row[0], row[2]))
 
     lines = ["Prior evaluation results (accuracy; lower-scoring generations are useful regression evidence):"]
-    for _, generation_label, kind, score, total, failed in recent_reports:
+    for _, generation_label, kind, score, total, failed in selected_reports:
         count = f", {total} tasks" if total is not None else ""
         failures = (f"; partial/failed task IDs: {', '.join(failed[:12])}"
                     if failed else "; no partial/failed tasks reported")
@@ -152,7 +165,7 @@ def summarize_evaluation_history(eval_path, max_reports=12):
     for kind, entries in sorted(by_kind.items()):
         if len(entries) < 2:
             continue
-        best = max(entries, key=lambda row: row[3])
+        best = max(entries, key=lambda row: (row[3], row[0]))
         latest = entries[-1]
         if latest[3] < best[3]:
             lines.append(
@@ -166,8 +179,10 @@ def summarize_evaluation_history(eval_path, max_reports=12):
             previous = task_statuses.get((kind, previous_generation), {})
             current = task_statuses.get((kind, latest_generation), {})
             common_tasks = previous.keys() & current.keys()
-            newly_partial = sorted(task for task in common_tasks if previous[task] and not current[task])
-            recovered = sorted(task for task in common_tasks if not previous[task] and current[task])
+            newly_partial = sorted(task for task in common_tasks
+                                   if previous[task] and not current[task])
+            recovered = sorted(task for task in common_tasks
+                               if not previous[task] and current[task])
             if newly_partial or recovered:
                 changes = []
                 if newly_partial:
@@ -199,7 +214,7 @@ def summarize_evaluation_history(eval_path, max_reports=12):
 
     lines.append(
         "Inspect cited generations' agent_output/model_patch.diff and arc_eval/predictions.json; "
-        "for recurring task IDs, inspect per-task predictions and available agent chat history. "
+        "for recurring task IDs, inspect per-test-input predictions and available agent chat history. "
         "Use this evidence to identify repeatable improvements, investigate recurring failures, and "
         "preserve changes that improve overall performance without causing avoidable regressions."
     )
