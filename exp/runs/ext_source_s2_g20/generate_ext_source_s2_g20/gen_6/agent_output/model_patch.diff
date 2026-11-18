@@ -1,0 +1,93 @@
+diff --git a/task_agent.py b/task_agent.py
+index 07e3684..c917d8b 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -4,6 +4,7 @@ import re
+ import socket
+ import http.client
+ import time
++from collections import deque
+ 
+ # Starting task agent (A_0) for the ARC-AGI-2 domain: one direct model response per attempt.
+ # forward() makes two independent plain attempts (the budget is 2 model calls and 2 answers per
+@@ -50,6 +51,53 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
++def grid_inventory(grid):
++    """Return compact color counts and 4-connected component bounds for a grid."""
++    height, width = len(grid), len(grid[0])
++    seen = set()
++    by_color = {}
++    for r in range(height):
++        for c in range(width):
++            color = grid[r][c]
++            by_color.setdefault(color, []).append((r, c))
++
++    lines = []
++    for color in sorted(by_color):
++        cells = by_color[color]
++        components = []
++        for start in cells:
++            if start in seen:
++                continue
++            seen.add(start)
++            queue = deque([start])
++            component = []
++            while queue:
++                r, c = queue.popleft()
++                component.append((r, c))
++                for neighbor in ((r - 1, c), (r + 1, c), (r, c - 1), (r, c + 1)):
++                    nr, nc = neighbor
++                    if (0 <= nr < height and 0 <= nc < width
++                            and grid[nr][nc] == color and neighbor not in seen):
++                        seen.add(neighbor)
++                        queue.append(neighbor)
++            components.append(component)
++        parts = [f"color {color}: {len(cells)} cells, {len(components)} four-connected component(s)"]
++        if len(components) <= 8:
++            bounds = []
++            for component in components:
++                rows = [r for r, _ in component]
++                cols = [c for _, c in component]
++                bounds.append(
++                    f"{len(component)}@r{min(rows)}-{max(rows)},c{min(cols)}-{max(cols)}"
++                )
++            parts.append("[" + "; ".join(bounds) + "]")
++        else:
++            largest = sorted((len(component) for component in components), reverse=True)[:5]
++            parts.append("(largest component sizes: " + ", ".join(map(str, largest)) + ")")
++        lines.append(" ".join(parts))
++    return "; ".join(lines)
++
++
+ def build_prompt(inputs):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+@@ -59,6 +107,8 @@ def build_prompt(inputs):
+         "against each pair before using it. Account for changes in grid dimensions, cell positions, "
+         "colors, and cells that stay unchanged. Use all examples to distinguish plausible rules; "
+         "do not assume the test output has the same dimensions as its input or guess by visual similarity.",
++        "Mechanical inventories follow each grid: color counts and four-connected component sizes/bounds (coordinates start at 0). "
++        "Use them only as aids, not as assumptions about which cells form a semantic object; verify the proposed rule on the exact grids.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -66,14 +116,17 @@ def build_prompt(inputs):
+         h, w = len(pair["input"]), len(pair["input"][0])
+         parts.append(f"Input ({h}x{w}):")
+         parts.append(grid_to_text(pair["input"]))
++        parts.append("Inventory: " + grid_inventory(pair["input"]))
+         h, w = len(pair["output"]), len(pair["output"][0])
+         parts.append(f"Output ({h}x{w}):")
+         parts.append(grid_to_text(pair["output"]))
++        parts.append("Inventory: " + grid_inventory(pair["output"]))
+         parts.append("")
+     t = inputs["test_input"]
+     parts.append("## Test")
+     parts.append(f"Input ({len(t)}x{len(t[0])}):")
+     parts.append(grid_to_text(t))
++    parts.append("Inventory: " + grid_inventory(t))
+     parts.append("")
+     parts.append(
+         "Give the output grid for the test input. End your response with the grid inside <answer></answer> "

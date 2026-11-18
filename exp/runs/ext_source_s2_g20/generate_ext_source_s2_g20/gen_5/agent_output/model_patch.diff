@@ -1,0 +1,79 @@
+diff --git a/task_agent.py b/task_agent.py
+index d078279..07e3684 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -55,6 +55,10 @@ def build_prompt(inputs):
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "First identify a precise rule that explains every demonstration pair, then check that rule "
++        "against each pair before using it. Account for changes in grid dimensions, cell positions, "
++        "colors, and cells that stay unchanged. Use all examples to distinguish plausible rules; "
++        "do not assume the test output has the same dimensions as its input or guess by visual similarity.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -79,17 +83,6 @@ def build_prompt(inputs):
+     return "\n".join(parts)
+ 
+ 
+-def build_verification_prompt(inputs, candidate):
+-    """Ask the second attempt to check the first candidate against the demonstrations."""
+-    return (
+-        build_prompt(inputs)
+-        + "\n\nA first attempt proposed this test output candidate:\n"
+-        + json.dumps(candidate)
+-        + "\nIndependently infer the transformation from all demonstration pairs. Check whether this exact candidate follows the rule, including its dimensions and cell values. "
+-        + "If it is wrong, correct it; if it is consistent, return it unchanged. Return only the final grid inside <answer></answer> tags as a JSON list of rows."
+-    )
+-
+-
+ def _valid(g):
+     return (isinstance(g, list) and len(g) > 0 and all(isinstance(r, list) and len(r) > 0 for r in g)
+             and len({len(r) for r in g}) == 1
+@@ -148,10 +141,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs, candidate=None):
++    def solve_once(self, inputs):
+         """One model response -> one parsed grid (or None)."""
+-        prompt = (build_prompt(inputs) if candidate is None
+-                  else build_verification_prompt(inputs, candidate))
++        prompt = build_prompt(inputs)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -165,22 +157,14 @@ class TaskAgent:
+             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
+         """
+         answers = []
+-        first = None
+-        try:
+-            first = self.solve_once(inputs)
+-        except Exception as e:
+-            self.log(f"Error: {e}")
+-        if first is not None:
+-            answers.append(first)
+-
+-        # The saved evaluation histories show repeated identical answers from two plain attempts.
+-        # Use the second allowed call to verify/correct the first; keep the first candidate so this
+-        # added check cannot remove a potentially correct answer from the two-answer budget.
+-        try:
+-            second = self.solve_once(inputs, candidate=first) if first is not None else self.solve_once(inputs)
+-        except Exception as e:
+-            self.log(f"Error: {e}")
+-            second = None
+-        if second is not None:
+-            answers.append(second)
++        # Keep attempts independent: the evaluation comparison showed that replacing
++        # the second attempt with candidate verification had mixed task-level results.
++        for _ in range(2):
++            try:
++                grid = self.solve_once(inputs)
++            except Exception as e:
++                self.log(f"Error: {e}")
++                grid = None
++            if grid is not None:
++                answers.append(grid)
+         return answers, []

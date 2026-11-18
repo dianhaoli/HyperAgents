@@ -1,0 +1,58 @@
+diff --git a/meta_agent.py b/meta_agent.py
+index 4c2a7b9..4517c61 100644
+--- a/meta_agent.py
++++ b/meta_agent.py
+@@ -89,8 +89,23 @@ def summarize_evaluation_history(eval_path, max_reports=12):
+             report_limit = max(1, int(max_reports))
+         except (TypeError, ValueError, OverflowError):
+             report_limit = 12
++
++    # Retain the strongest historical checkpoint per evaluation kind, even
++    # when it falls outside the recent window used to show current trends.
++    selected_reports = reports[-report_limit:]
++    selected_keys = {(row[0], row[2]) for row in selected_reports}
++    best_by_kind = {}
++    for row in reports:
++        previous = best_by_kind.get(row[2])
++        if previous is None or (row[3], row[0]) > (previous[3], previous[0]):
++            best_by_kind[row[2]] = row
++    for row in best_by_kind.values():
++        if (row[0], row[2]) not in selected_keys:
++            selected_reports.append(row)
++    selected_reports.sort(key=lambda row: (row[0], row[2]))
++
+     lines = ["Prior evaluation results (accuracy; lower-scoring generations are useful regression evidence):"]
+-    for _, generation_label, kind, score, total, failed in reports[-report_limit:]:
++    for _, generation_label, kind, score, total, failed in selected_reports:
+         count = f", {total} tasks" if isinstance(total, int) and not isinstance(total, bool) else ""
+         failures = f"; partial/failed task IDs: {', '.join(failed[:12])}" if failed else "; no partial/failed tasks reported"
+         lines.append(f"- gen_{generation_label} [{kind}]: {score:.3f}{count}{failures}")
+diff --git a/tests/test_meta_agent.py b/tests/test_meta_agent.py
+index 1cde8ce..a8e0556 100644
+--- a/tests/test_meta_agent.py
++++ b/tests/test_meta_agent.py
+@@ -38,6 +38,24 @@ class EvaluationHistorySummaryTests(unittest.TestCase):
+             self.assertIn("Regression signal for arc_eval", summary)
+             self.assertIn("gen_1 best 0.750", summary)
+ 
++    def test_report_limit_keeps_the_best_historical_checkpoint(self):
++        with tempfile.TemporaryDirectory() as root:
++            reports = {
++                "gen_1/arc_eval/report.json": {"overall_accuracy": 1.0, "total": 1, "per_task_score": {"task": 1.0}},
++                "gen_2/arc_eval/report.json": {"overall_accuracy": 0.4, "total": 1, "per_task_score": {"task": 0.0}},
++                "gen_3/arc_eval/report.json": {"overall_accuracy": 0.6, "total": 1, "per_task_score": {"task": 0.0}},
++            }
++            for relative, data in reports.items():
++                path = os.path.join(root, relative)
++                os.makedirs(os.path.dirname(path), exist_ok=True)
++                with open(path, "w", encoding="utf-8") as stream:
++                    json.dump(data, stream)
++
++            summary = summarize_evaluation_history(root, max_reports=1)
++            self.assertIn("gen_1 [arc_eval]: 1.000", summary)
++            self.assertIn("gen_3 [arc_eval]: 0.600", summary)
++            self.assertNotIn("gen_2 [arc_eval]", summary)
++
+     def test_unavailable_or_invalid_history_is_safe(self):
+         self.assertIn("unavailable", summarize_evaluation_history("/path/that/does/not/exist"))
+         with tempfile.TemporaryDirectory() as root:
