@@ -18,41 +18,36 @@
 
 </div>
 
-## ARC-AGI-2 improver experiment (branch `arc2-improver`)
+## ARC-AGI-2 coach experiment (branch `arc2-improver`)
 
-Pre-registered experiment: does a self-evolved meta agent improve a fresh task agent more than the original
-meta agent does, given equal pay-off compute? See `DESIGN.md` (pre-registration), `DECISIONS.md` (every choice
-and deviation), `STATUS.md` (progress and resume), and `RESULTS.md`.
+**Question.** Does a coach (meta agent) that rewrites itself train a better player (task agent) than the original
+coach, given the same compute? Tested on ARC-AGI-2 with a pre-registered design.
 
-Layout: `arcexp/` holds the experiment infrastructure (root-only, never visible to agents). It contains
-`gateway.py` (budget gateway and the only route to the model), `sandbox.py`, `run_loop.py` (the repo's
-`generate_loop.py` without Docker), `arc_eval.py`, `phases.py`, `evolved.py` (I_g selection and transplant),
-`orchestrate.py` and `isolation_check.py`. The rest: `agent_template/` (A_0 + I_0), `domains/arc/`, `analysis.py`,
-`exp/` (all logs, results JSONL, ledger, runs) and `splits.json`.
+**Answer.** No. On the 120-puzzle exam, players trained by the original coach scored 29.7%, players trained by
+self-improved coaches 27.9%, and the uncoached player 29.3%; none of the differences is distinguishable from
+run-to-run noise. Coaches picked at later generations (20 and 40) were no better. Letting the model think longer
+(higher reasoning effort, no coaching) scored 41.1%. Total cost $152.23.
 
-Exact commands, in order (each is resumable; long ones run detached via `arcexp/run_bg.sh`):
+| Read | What it is |
+|---|---|
+| [`WRITEUP.md`](WRITEUP.md) | The plain-language write-up, with a list of every experiment at the end |
+| [`RESULTS.md`](RESULTS.md) | All numbers and the analysis output |
+| [`explorer/`](explorer/) | Interactive explorer (static web page): try a puzzle, results, evolution trees, every exam answer, every coaching session, a traced coaching round. Run with `python3 -m http.server -d explorer` |
+| [`DESIGN.md`](DESIGN.md), [`DESIGN_v2.md`](DESIGN_v2.md) | Pre-registered design (`f577cc7`) and follow-up plan (`991a237`) |
+| [`DECISIONS.md`](DECISIONS.md) | Every deviation, bug and re-run, numbered |
+| [`REPRODUCE.md`](REPRODUCE.md) | Setup and the exact commands, in order |
+| [`STATUS.md`](STATUS.md) | What has run (everything is finished) |
 
-```bash
-bash arcexp/setup_env.sh                      # once per VM: deps, agent user, private ARC data, sysctls
-bash arcexp/start_gateway.sh                  # budget gateway (idempotent)
-python3 -m arcexp.isolation_check <phase>     # answer-isolation check; run before each phase
-python3 -m arcexp.make_splits stage1          # held-out / screen / smoke ids
-python3 -m arcexp.run_loop --config exp/runs/smoke/config.json            # step 1 smoke test
-python3 -m arcexp.phases screen               # step 3: 100 training tasks x 3 single calls
-python3 -m arcexp.make_splits stage2 --set_size 25                        # source / pay-off sets
-for r in 0 1 2; do python3 -m arcexp.phases b0 --only $r; done            # step 3: B0 x3
-python3 -m arcexp.phases xhigh                # step 3: one held-out pass at xhigh
-python3 -m arcexp.orchestrate pilot           # step 5: 2 I_0 pay-off runs
-python3 -m arcexp.phases final --run payoff_I0_1; python3 -m arcexp.phases final --run payoff_I0_2
-python3 -m arcexp.orchestrate source          # step 6: 6 source runs x 12 generations
-python3 -m arcexp.evolved select              # step 6: choose I_g per seed
-python3 -m arcexp.evolved transplant          # transplant each I_g's meta code onto A_0
-python3 -m arcexp.orchestrate trial           # step 7: one trial iteration per I_g
-python3 -m arcexp.orchestrate payoff          # step 8: I_g pay-off runs + remaining I_0 runs (freeze mode)
-python3 -m arcexp.phases final --run <run>    # step 9: per pay-off run
-python3 -m arcexp.evolved stats               # self-edit statistics
-python3 analysis.py                           # results
-```
+**Layout.**
+- `arcexp/`: experiment infrastructure (root-only, never visible to agents): the budget gateway (`gateway.py`, the
+  only route to the model), sandbox, loop adapter, scoring, orchestration, analysis helpers, explorer data builders.
+- `agent_template/`: the starting player A_0 and original coach I_0. `domains/arc/`: the ARC domain.
+- `analysis.py` (pre-registered analysis), `analysis_ext.py` (follow-up), `splits.json` (all task splits).
+- `exp/`: every record: `results/` (rollouts and analysis outputs), `runs/` (configs, snapshots, per-generation
+  logs and transcripts), `archive_export/` (every agent's code), `ledger/` (every model call and its cost), `logs/`,
+  `crashed/` (runs restarted after harness bugs), `demo/` (the traced demo run, not part of the results).
+
+The rest of this README is the upstream HyperAgents documentation.
 
 ## Setup
 ```bash

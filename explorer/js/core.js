@@ -2,7 +2,7 @@
    core.js — shared runtime for "Coaching the Coach" (window.EX)
    Plain script, no modules. Loaded after d3 7.8.5 and before js/fig-*.js.
 
-   API (see CONTRACT.md for the full contract)
+   API (see dev/CONTRACT.md for the full contract)
    ---------------------------------------------------------------------
    Data
      EX.load(name) -> Promise<object>     cached fetch of data/<name>.json

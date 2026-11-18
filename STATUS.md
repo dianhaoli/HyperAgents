@@ -16,5 +16,12 @@ All runs, exams and analyses are finished; nothing is running. Results: RESULTS.
 ## Spend
 $152.23 total (task $148.03, meta $4.19) of the $200 cap.
 
+## After the experiment (not part of the results)
+- **Interactive explorer** (`explorer/`): static page with the story, figures and every record; data built by
+  `arcexp/build_explorer_data.py` and `arcexp/build_coach_sessions.py`. All page text is in `explorer/PAGE_TEXT.md`
+  (edit, then `python3 -m arcexp.page_text apply`).
+- **Traced demo** (DECISIONS 41): one coaching round re-run with reasoning summaries saved (`exp/demo/`,
+  `arcexp/demo_trace.py`). Cost $0.75 under its own $8 cap; total ledger spend is now $152.97 of $200.
+
 ## Reproduce
 See REPRODUCE.md. After a VM restart: `bash arcexp/resume.sh` (no-op now: everything is finished).

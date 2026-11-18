@@ -27,9 +27,9 @@ Then open http://localhost:8000. Opening `index.html` from disk (file://) does n
 | `js/fig-*.js` | One file per figure; each registers with `EX.mount('NAME', fn)`. |
 | `data/*.json` | All numbers and records shown. Never type numbers into the page; read them from here. |
 | `data/coach/*.json` | Every recorded coaching session, one file per run (loaded on demand). |
-| `CONTRACT.md` | Module contract: which file owns which mount, events, data used. |
-| `DESIGN_BRIEF.md` | Design principles and the chosen visual direction (beige + one blue accent, Distill / Transformer Circuits style). |
-| `SIMPLIFY_PLAN.md` | Why the page is structured the way it is (simple main story, details under Explore). |
+| `dev/CONTRACT.md` | Module contract: which file owns which mount, events, data used. |
+| `dev/DESIGN_BRIEF.md` | Design principles and the chosen visual direction (beige + one blue accent, Distill / Transformer Circuits style). |
+| `dev/SIMPLIFY_PLAN.md` | Why the page is structured the way it is (simple main story, details under Explore). |
 
 ## Figures (mount name -> file)
 
