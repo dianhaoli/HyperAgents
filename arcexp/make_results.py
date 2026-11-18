@@ -70,7 +70,7 @@ def main():
     L += ["", "## Spend by role (USD, ledger)", ""]
     for k, v in sorted(a.get("spend_by_role", {}).items()):
         L.append(f"- {k}: ${v:.2f}")
-    L.append(f"- **total: ${a.get('spend_total', 0):.2f}** (hard stop at $150)")
+    L.append(f"- **total: ${a.get('spend_total', 0):.2f}** (hard stop: $150 under DESIGN.md, raised to $200 by the user; projection posted before the extension tests: ~$135-165)")
     L += ["", "## Crashes, aborts and reruns", ""]
     for d in sorted(glob.glob(os.path.join(EXP, "crashed", "*"))):
         L.append(f"- {os.path.basename(d)} (see DECISIONS.md)")
@@ -117,6 +117,11 @@ def main():
     for k, v in ea.get("paired_changes", {}).items():
         L.append(f"- Paired change {k} (seeds 0-3): " + (", ".join(f"seed {s}: {pts(d)}" for s, d in v["per_seed"].items()) or "n/a")
                  + (f"; mean {pts(v['mean'])}" if v.get("mean") is not None else ""))
+    L.append("\n**Caveat (identical coaches).** Several extension picks are the same coach node at several generations (DECISIONS 37). "
+             "Seed 0's picks at generations 12, 20 and 40 are all node 1, and seed 2's at 20 and 40 are node 9. For those seeds the 'change' "
+             "between generations is run-to-run variation of one coach's 8-round run. Seed 0's identical coach scored "
+             + ", ".join(pct(x) for x in [p_["heldout"] for p_ in ea.get("points", []) if p_.get("seed_index") == 0])
+             + " (a spread of about 10 points), so the trend cannot be separated from that variation.")
     pc = ea.get("picks_changed_code", {})
     L.append(f"- Picks with changed coach code: generation 12 (part A rule) {pc.get('gen12 (part A rule)')}; extension {pc.get('extension picks with changed coach code')} ({pc.get('extension picks')}).")
     au_p = os.path.join(EXP, "results", "diff_audit.json")

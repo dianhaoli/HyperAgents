@@ -188,3 +188,13 @@ The user allowed deviations from the prompt's design where clearly better; each 
 34. **Pilot gate (step 5): passed.** Both pilot runs had accepted candidates. Held-out exams: payoff_I0_1 = 26.9% (gen 4), payoff_I0_2 = 29.4% (gen 4), vs B0 = 29.3% (30.1, 27.9, 29.7). Not both below B0.
 35. Gateway fix: a mid-stream 'invalid_prompt' (flagged) refusal is now handled like the earlier non-streamed 400: retried twice, then a client error (the caller's own failure, not infrastructure). Before this, source_s3 aborted repeatedly at generation 15 because the same coach context was flagged each time. The driver now also resumes runs stopped by an infrastructure abort (at most 15 per run).
 36. VM restarted (third time). Resumed with `orchestrate resume`. Exam (final) jobs now use 10 workers, and unfinished loop runs at most 10, to lower peak memory (about 250 concurrent sandboxes were running before the restart).
+37. **Extension picks (DESIGN_v2 rule).** All 16 picks (seeds 0-3 x generations 6/20/30/40) have changed coach code and pass the import check.
+    Fallback rule used (no changed coach with >=3 descendants): source_s2:g6, source_s3:g6, source_s4:g20, source_s4:g6. Picked node per seed and generation
+    (A's generation-12 pick shown for reference): {"source_s1": {"g12": 1, "g6": 1, "g20": 1, "g30": 1, "g40": 1}, "source_s2": {"g12": 5, "g6": 5, "g20": 9, "g30": 9, "g40": 5}, "source_s3": {"g12": 3, "g6": 3, "g20": 9, "g30": 9, "g40": 9}, "source_s4": {"g12": null, "g6": 6, "g20": 12, "g30": 15, "g40": 13}}. Several picks are the **same coach node** at
+    several generations: seed 0 is node 1 at 12/20/40 (and 6/30); seed 2 is node 9 at 20/40; seed 1's generation-40 pick
+    is node 5, its generation-12 pick. As DESIGN_v2 requires, each was tested fresh and no result was copied. For those
+    seeds, the paired change between such generations measures run-to-run noise of identical coach code, not coach evolution.
+38. **Final isolation check passed** (68,132 agent-readable files and 6,424 agent-visible files scanned; no test output or
+    held-out grid found; private stores, admin socket and network blocked for the agent user).
+39. **VM restarts:** the VM restarted 6 times during the run. Every restart was resumed with `bash arcexp/resume.sh`. Only
+    in-flight work was redone; cached rollouts were never re-run and no result was lost.

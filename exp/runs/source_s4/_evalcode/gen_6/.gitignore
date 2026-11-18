@@ -1,4 +1,0 @@
-# Python-generated files should never be captured as agent source changes.
-__pycache__/
-*.py[cod]
-.pytest_cache/

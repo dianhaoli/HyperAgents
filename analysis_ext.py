@@ -117,18 +117,25 @@ def main():
                         color=ink2, fontsize=9)
     others = [p for p in pts if p[1] is None or p[1] not in SEEDS]
     if others:
-        ax.scatter([p[0] for p in others], [100 * p[2] for p in others], s=40, color="#8a8984", zorder=2,
+        # small deterministic horizontal jitter so runs with identical scores stay visible
+        seen = {}
+        xs_j = []
+        for p in others:
+            k = (p[0], round(p[2], 4))
+            seen[k] = seen.get(k, 0) + 1
+            xs_j.append(p[0] - 0.6 * (seen[k] - 1))
+        ax.scatter(xs_j, [100 * p[2] for p in others], s=40, color="#8a8984", zorder=2,
                    edgecolor="#fcfcfb", linewidth=1.5, label="other runs (gen 0: original coach; gen 12: seeds 4-5)")
     for g, v in per_gen.items():
         if v["n"] >= 2:
-            ax.errorbar(g + 0.9, 100 * v["mean"], yerr=[[100 * (v["mean"] - v["lo"])], [100 * (v["hi"] - v["mean"])]],
+            ax.errorbar(g - 1.6, 100 * v["mean"], yerr=[[100 * (v["mean"] - v["lo"])], [100 * (v["hi"] - v["mean"])]],
                         fmt="_", color=ink, ms=12, capsize=3, lw=1.2, zorder=4)
     if B0 is not None:
         ax.axhline(100 * B0, color=ink2, lw=1, ls="--", zorder=1)
-        ax.annotate(f"B0 {100 * B0:.1f}%", (41.5, 100 * B0), va="center", color=ink2, fontsize=9)
+        ax.annotate(f"B0 {100 * B0:.1f}%", (2.0, 100 * B0 - 0.25), va="top", ha="left", color=ink2, fontsize=9)
     if xh is not None:
         ax.axhline(100 * xh, color=ink2, lw=1, ls=":", zorder=1)
-        ax.annotate(f"xhigh {100 * xh:.1f}%", (41.5, 100 * xh), va="center", color=ink2, fontsize=9)
+        ax.annotate(f"A_0 at xhigh {100 * xh:.1f}%", (-1.8, 100 * xh + 0.25), va="bottom", ha="left", color=ink2, fontsize=9)
     ax.set_xticks(GENS)
     ax.set_xlim(-2, 48)
     ax.set_xlabel("Coach generation", color=ink2)
