@@ -1,0 +1,63 @@
+diff --git a/task_agent.py b/task_agent.py
+index adc0a0f..b815a01 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -5,9 +5,9 @@ import socket
+ import http.client
+ import time
+ 
+-# Starting task agent (A_0) for the ARC-AGI-2 domain: one direct model response per attempt.
+-# forward() makes two independent plain attempts (the budget is 2 model calls and 2 answers per
+-# test input) and returns both parsed grids.
++# ARC-AGI-2 task agent: forward() uses at most two model calls and returns up to
++# two distinct parsed grids. The second call independently re-solves the task without
++# seeing the first candidate, to avoid anchoring on an incorrect answer.
+ 
+ 
+ class _UnixConn(http.client.HTTPConnection):
+@@ -146,20 +146,24 @@ class TaskAgent:
+         return parse_grid(text)
+ 
+     def refine_once(self, inputs, candidate):
+-        """Use the second budgeted call to check a candidate against all demonstrations."""
++        """Independently solve again, without exposing the first candidate to the model.
++
++        Keep the candidate parameter for compatibility with callers, but deliberately do
++        not include it in the prompt: prior traces show that a verification call can repeat
++        an incorrect candidate despite being asked to check it.
++        """
+         prompt = build_prompt(inputs)
+         prompt += (
+-            "\n\nA first solver proposed this test output candidate (treat it as untrusted):\n"
+-            + json.dumps(candidate)
+-            + "\nIndependently infer the transformation from the demonstrations. Check it against "
+-              "EVERY input/output pair, including dimensions, row and column ordering, and cell "
+-              "values. Compare the resulting rule with the candidate; correct any disagreement, "
+-              "then apply the validated rule to the test input. Return the final grid in the required "
+-              "<answer> JSON format. Do not merely repeat the candidate without checking it."
++            "\n\nThis is an independent second solution. Do not rely on any earlier proposed "
++            "test answer; solve from the demonstrations and test input shown here. First infer a "
++            "single rule, then check that it reproduces EVERY demonstration's complete output, "
++            "including dimensions, row and column ordering, and cell values. If your rule fails "
++            "any pair, revise it before applying it to the test input. Return only the final grid "
++            "in the required <answer> JSON format."
+         )
+-        self.log(f"Refinement input: {prompt}")
++        self.log(f"Independent second-solve input: {prompt}")
+         text = call_model(prompt)
+-        self.log(f"Refinement output: {text}")
++        self.log(f"Independent second-solve output: {text}")
+         return parse_grid(text)
+ 
+     def forward(self, inputs):
+@@ -178,8 +182,8 @@ class TaskAgent:
+         if first is not None:
+             answers.append(first)
+ 
+-        # Spend the existing second-call allowance on verification rather than a fully
+-        # independent guess. If the first response could not be parsed, use it for a retry.
++        # Spend the existing second-call allowance on an independent solve. If the first
++        # response could not be parsed, use the same allowance for a clean retry.
+         try:
+             second = self.refine_once(inputs, first) if first is not None else self.solve_once(inputs)
+         except Exception as e:
