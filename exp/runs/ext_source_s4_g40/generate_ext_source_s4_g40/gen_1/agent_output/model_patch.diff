@@ -1,0 +1,18 @@
+diff --git a/task_agent.py b/task_agent.py
+index 4e1c9e3..c9ffde9 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -56,6 +56,13 @@ def build_prompt(inputs):
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
+         "",
++        "Use all demonstration pairs as evidence, not just the most visually salient feature. "
++        "Compare input and output dimensions, colors, objects, and positions in each pair; infer a rule "
++        "that explains every pair, then check the proposed test output against that rule. Distinguish "
++        "objects from background or isolated markers, and check alignment or repetition when relevant. "
++        "Do not assume cells are unchanged unless the examples support it. Make the output dimensions "
++        "consistent with the demonstrated transformation and include every output cell.",
++        "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+         parts.append(f"## Example {i}")

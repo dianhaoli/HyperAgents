@@ -15,3 +15,11 @@ generate_loop: generation 27 completed, parent 16
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3/gen_28', 'current_genid': 28, 'parent_genid': 16, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
 generate_loop: generation 28 completed, parent 1
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3/gen_29', 'current_genid': 29, 'parent_genid': 1, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 29 completed, parent 3
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3/gen_30', 'current_genid': 30, 'parent_genid': 3, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 30 completed, parent 2
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3/gen_31', 'current_genid': 31, 'parent_genid': 2, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 31 completed, parent 23
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3/gen_32', 'current_genid': 32, 'parent_genid': 23, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 32 completed, parent 25
+{'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s3/generate_source_s3/gen_33', 'current_genid': 33, 'parent_genid': 25, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
