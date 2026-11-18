@@ -39,3 +39,5 @@ generate_loop: generation 38 completed, parent 22
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s1/generate_source_s1/gen_39', 'current_genid': 39, 'parent_genid': 22, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
 generate_loop: generation 39 completed, parent 26
 {'gen_output_dir': '/home/user/HyperAgents/exp/runs/source_s1/generate_source_s1/gen_40', 'current_genid': 40, 'parent_genid': 26, 'run_baseline': None, 'prev_patch_files': [], 'curr_patch_files': [], 'parent_agent_success': False, 'optimize_option': 'only_agent', 'agent_archive_path': None, 'can_select_next_parent': True, 'run_eval': False}
+generate_loop: generation 40 completed, parent initial
+RUN DONE source_s1

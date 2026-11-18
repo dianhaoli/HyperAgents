@@ -27,3 +27,4 @@
 {"iteration": "36", "score": 0.84, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "0330ad9338e49629", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "37", "score": 0.92, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "5fe8365a0ce37d32", "format_failures": 0, "snapshot_skipped": []}
 {"iteration": "39", "score": 0.8, "missing": 0, "infra_error_rows": 0, "n_test_inputs": 26, "code_hash": "9cdb961d138a423e", "format_failures": 0, "snapshot_skipped": []}
+{"iteration": "40", "score": 0.92, "missing": 0, "infra_error_rows": 4, "n_test_inputs": 26, "code_hash": "f5c808558bf667f0", "format_failures": 0, "snapshot_skipped": []}

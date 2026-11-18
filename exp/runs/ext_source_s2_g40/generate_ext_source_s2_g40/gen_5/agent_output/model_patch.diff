@@ -1,0 +1,61 @@
+diff --git a/task_agent.py b/task_agent.py
+index 95bae53..d4850d9 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -49,8 +49,8 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
+-def build_prompt(inputs, second_attempt=False):
+-    """Build a solve prompt; the second attempt uses a distinct, independent check."""
++def build_prompt(inputs, second_attempt=False, candidate=None):
++    """Build a solve prompt, optionally auditing the first attempt on pass two."""
+     parts = [
+         "Solve this ARC-AGI puzzle. Each grid is a rectangular 2D array of colors 0-9. "
+         "All training pairs use the same transformation; infer it and apply it to the test input.",
+@@ -81,12 +81,19 @@ def build_prompt(inputs, second_attempt=False):
+     if second_attempt:
+         parts.extend([
+             "",
+-            "Solve this independently from the examples; do not assume a first interpretation is correct. "
+-            "Compare the input-output changes across all examples, consider whether the rule changes "
+-            "grid size or acts on objects/regions rather than individual cells, and verify your inferred "
+-            "rule against every training pair before constructing the test output. Check that the final "
+-            "grid has the correct dimensions and includes every row and cell.",
++            "Second-pass audit: first infer the transformation from the training examples without "
++            "assuming any proposed test answer is correct. Compare input-output changes across all "
++            "examples, including grid dimensions and object/region behavior, and verify that the rule "
++            "reproduces every training output exactly. Then independently reconstruct the test result "
++            "and check every row and cell. If a first-pass candidate is provided below, treat it only as "
++            "a hypothesis: keep it only if it agrees with the rule you inferred; otherwise correct it.",
+         ])
++        if candidate is not None:
++            parts.extend([
++                "",
++                "First-pass candidate to audit (JSON grid; not guaranteed correct):",
++                json.dumps(candidate),
++            ])
+ 
+     parts.extend([
+         "",
+@@ -154,9 +161,9 @@ class TaskAgent:
+         except Exception:
+             pass
+ 
+-    def solve_once(self, inputs, second_attempt=False):
++    def solve_once(self, inputs, second_attempt=False, candidate=None):
+         """One direct model response -> one parsed grid (or None)."""
+-        prompt = build_prompt(inputs, second_attempt=second_attempt)
++        prompt = build_prompt(inputs, second_attempt=second_attempt, candidate=candidate)
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)
+         self.log(f"Output: {text}")
+@@ -182,7 +189,7 @@ class TaskAgent:
+             answers.append(first)
+ 
+         try:
+-            second = self.solve_once(inputs, second_attempt=True)
++            second = self.solve_once(inputs, second_attempt=True, candidate=first)
+         except Exception as e:
+             self.log(f"Error on verification solve: {e}")
+             second = None
