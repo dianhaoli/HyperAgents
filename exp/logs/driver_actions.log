@@ -39,3 +39,7 @@ IMPORT_OK
 23:52:30 launched final exam for payoff_Ig_source_s6
 23:57:40 launched final exam for payoff_Ig_source_s6
 00:12:47 launched final exam for ext_source_s4_g20
+00:22:55 pick source_s3:g20: source_s3 g20 -> (9, 3, 0.08000000000000007) | max mean child improvement among changed coaches with >=3 descendants
+   transplant check: True __ARC_SANDBOX_STARTED__
+IMPORT_OK 
+00:22:55 launched extension test ext_source_s3_g20: launched run_ext_source_s3_g20

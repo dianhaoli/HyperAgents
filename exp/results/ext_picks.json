@@ -411,5 +411,130 @@
     "meta_agent.py"
    ]
   }
+ },
+ "source_s3:g20": {
+  "run": "source_s3",
+  "generation": 20,
+  "n_changed_coaches": 9,
+  "candidates": [
+   {
+    "gen": 3,
+    "score": 0.8,
+    "n_descendants": 6,
+    "n_children": 3,
+    "n_scored_children": 2,
+    "mean_child_improvement": 0.019999999999999962,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 6,
+    "score": 0.8,
+    "n_descendants": 3,
+    "n_children": 3,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 9,
+    "score": 0.84,
+    "n_descendants": 3,
+    "n_children": 2,
+    "n_scored_children": 1,
+    "mean_child_improvement": 0.08000000000000007,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 11,
+    "score": 0.8,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 12,
+    "score": 0.92,
+    "n_descendants": 3,
+    "n_children": 3,
+    "n_scored_children": 2,
+    "mean_child_improvement": -0.10000000000000003,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 13,
+    "score": 0.92,
+    "n_descendants": 1,
+    "n_children": 1,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 15,
+    "score": 0.76,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 16,
+    "score": 0.88,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 19,
+    "score": 0.84,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   }
+  ],
+  "pick": {
+   "gen": 9,
+   "score": 0.84,
+   "n_descendants": 3,
+   "n_children": 2,
+   "n_scored_children": 1,
+   "mean_child_improvement": 0.08000000000000007,
+   "meta_files_changed_vs_I0": [
+    "meta_agent.py"
+   ]
+  },
+  "rule": "max mean child improvement among changed coaches with >=3 descendants",
+  "transplant_check": {
+   "ok": true,
+   "msg": "__ARC_SANDBOX_STARTED__\nIMPORT_OK\n",
+   "files_differing_from_I0": [
+    "meta_agent.py"
+   ]
+  }
  }
 }

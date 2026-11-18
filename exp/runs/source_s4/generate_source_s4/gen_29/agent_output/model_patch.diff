@@ -1,0 +1,35 @@
+diff --git a/task_agent.py b/task_agent.py
+index f9c5aaa..260a233 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -54,7 +54,9 @@ def build_prompt(inputs):
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+         "that maps each input grid to its output grid. Infer the rule, check that it reproduces every "
+-        "demonstration exactly, and apply it to the test input.",
++        "demonstration exactly, and apply it to the test input. Analyze object relationships and "
++        "repeated motifs, accounting for all changed and unchanged regions rather than only the most "
++        "obvious instance.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -144,13 +146,12 @@ class TaskAgent:
+             prompt += (
+                 "\n\nA first attempt proposed this candidate test output:\n"
+                 f"{json.dumps(previous_candidate)}\n"
+-                "Do not assume that candidate is correct. Independently infer and re-check the rule "
+-                "against every training input-output pair, then compare the rule's result with the "
+-                "candidate. The first candidate will also be kept as an answer, so use this call to "
+-                "maximize the chance of a second exact match: if the examples support a plausible "
+-                "different interpretation, return the test grid for that alternative; otherwise "
+-                "confirm the original candidate. Do not invent an unsupported alternative. Return "
+-                "one grid in the required <answer> tags."
++                "Treat this candidate as a hypothesis, not as evidence. Independently derive the rule "
++                "from all demonstrations and test it against each complete input-output pair, checking "
++                "dimensions and the exact changed and unchanged regions. Check whether the same motif "
++                "or object relationship occurs in multiple places. Change the candidate only when a "
++                "different result is supported consistently by the demonstrations; do not invent an "
++                "alternative merely for variety. Return your best final grid in the required <answer> tags."
+             )
+         self.log(f"Input: {prompt}")
+         text = call_model(prompt)

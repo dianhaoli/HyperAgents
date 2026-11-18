@@ -57,3 +57,9 @@ drwxr-xr-x 3 arcagent arcagent 4096 Nov 18 00:07 gen_initial
 -rw-r--r-- 1 arcagent arcagent 5119 Nov 17 23:52 generate_loop.log
 
 2026-11-18 00:07:47,721 - MainThread - INFO - Running meta agent...
+2026-11-18 00:13:23,116 - MainThread - INFO - Container output: reset_paths_to_commit: Checked out ['domains/'] from 6778e0c
+reset_paths_to_commit: Cleaned untracked files in ['domains/']
+
+2026-11-18 00:13:23,190 - MainThread - INFO - Container output: 
+2026-11-18 00:13:23,242 - MainThread - INFO - Container output: 
+2026-11-18 00:13:23,483 - ThreadPoolExecutor-2_0 - INFO - [eval] {'phase': 'source', 'arm': 'I0src', 'seed': 1, 'iteration': '20'} round 0: 26 test inputs to run (0 cached)
