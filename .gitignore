@@ -6,3 +6,4 @@ __pycache__/
 *.pyc
 exp/runs/*/generate_*/gen_initial/hyperagents/
 exp/runs/*/final_agents/
+exp/demo/**/hyperagents/
