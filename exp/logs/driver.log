@@ -50,3 +50,4 @@ pick source_s1:g20: source_s1 g20 -> (1, 13, 0.12) | max mean child improvement 
    transplant check: True __ARC_SANDBOX_STARTED__
 IMPORT_OK 
 launched extension test ext_source_s1_g20: launched run_ext_source_s1_g20
+launched final exam for ext_source_s2_g20

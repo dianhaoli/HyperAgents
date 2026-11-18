@@ -82,12 +82,7 @@ def build_prompt(inputs):
 
 
 def build_review_prompt(inputs, previous_candidate=None):
-    """Build an unanchored second solve from the demonstrations alone.
-
-    The argument is retained for compatibility with callers, but deliberately is not
-    included in the prompt: showing a plausible-looking first guess can make the model
-    repeat it instead of producing a useful alternative.
-    """
+    """Build an unanchored second solve from the demonstrations alone."""
     return (
         build_prompt(inputs)
         + "\n\n## Independent second attempt\n"
@@ -128,72 +123,6 @@ def _parse_block(s):
     return rows if _valid(rows) else None
 
 
-def _dihedral_grids(grid):
-    """Return the four rotations of a grid and of its horizontal reflection."""
-    variants = []
-    for base in (grid, [row[::-1] for row in grid]):
-        current = [list(row) for row in base]
-        for _ in range(4):
-            variants.append(current)
-            # One clockwise quarter-turn; works for rectangular grids too.
-            current = [list(row) for row in zip(*current[::-1])]
-    return variants
-
-
-def _infer_geometric_solution(inputs):
-    """Infer an unambiguous D4 transform plus global color remapping from demonstrations.
-
-    This deliberately handles only a narrow, exactly verifiable class of rules. A
-    hypothesis is considered only when it reproduces every demonstration cell-for-cell.
-    If multiple hypotheses imply different test grids, defer to the model instead of
-    arbitrarily choosing one.
-    """
-    train = inputs.get("train") or []
-    test_grid = inputs.get("test_input")
-    if not train or not _valid(test_grid):
-        return None
-
-    possible_outputs = set()
-
-    for orientation_index in range(8):
-        color_map = {}
-        hypothesis_valid = True
-        for pair in train:
-            source = pair.get("input")
-            target = pair.get("output")
-            if not _valid(source) or not _valid(target):
-                hypothesis_valid = False
-                break
-            oriented = _dihedral_grids(source)[orientation_index]
-            if len(oriented) != len(target) or len(oriented[0]) != len(target[0]):
-                hypothesis_valid = False
-                break
-            for source_row, target_row in zip(oriented, target):
-                for source_color, target_color in zip(source_row, target_row):
-                    previous = color_map.setdefault(source_color, target_color)
-                    if previous != target_color:
-                        hypothesis_valid = False
-                        break
-                if not hypothesis_valid:
-                    break
-            if not hypothesis_valid:
-                break
-        if not hypothesis_valid:
-            continue
-
-        # A color absent from all demonstrations has no observed mapping. Do not
-        # silently assume it is unchanged and turn an underdetermined rule into an answer.
-        if any(color not in color_map for row in test_grid for color in row):
-            continue
-        oriented_test = _dihedral_grids(test_grid)[orientation_index]
-        prediction = [[color_map[color] for color in row] for row in oriented_test]
-        possible_outputs.add(tuple(tuple(row) for row in prediction))
-
-    if len(possible_outputs) != 1:
-        return None
-    return [list(row) for row in next(iter(possible_outputs))]
-
-
 def parse_grid(text):
     """Extract the answer grid from a model response; None if no valid grid is found."""
     if not text:
@@ -225,13 +154,9 @@ class TaskAgent:
         except Exception:
             pass
 
-    def solve_once(self, inputs, previous_candidate=None):
-        """One model response -> one parsed grid (or None), optionally auditing a prior answer."""
-        prompt = (
-            build_prompt(inputs)
-            if previous_candidate is None
-            else build_review_prompt(inputs, previous_candidate)
-        )
+    def solve_once(self, inputs, independent=False):
+        """One model response -> one parsed grid (or None)."""
+        prompt = build_review_prompt(inputs) if independent else build_prompt(inputs)
         self.log(f"Input: {prompt}")
         text = call_model(prompt)
         self.log(f"Output: {text}")
@@ -244,16 +169,9 @@ class TaskAgent:
         Returns:
             tuple: (prediction, msg_history) where prediction is a list of up to 2 candidate grids.
         """
-        # First apply a small, exact local solver for geometric symmetries and global
-        # color substitutions. It is used only when all demonstrations agree and every
-        # consistent geometric hypothesis yields the same test grid.
-        local_solution = _infer_geometric_solution(inputs)
-        if local_solution is not None:
-            return [local_solution], []
-
         answers = []
-        # Preserve the first candidate as a fallback. The second call gets a different task:
-        # independently derive and audit the first answer against all demonstrations.
+        # Preserve the first candidate; spend the second call on a fresh derivation rather
+        # than repeating the same prompt or anchoring the model on its first guess.
         try:
             first = self.solve_once(inputs)
         except Exception as e:
@@ -263,7 +181,7 @@ class TaskAgent:
             answers.append(first)
 
         try:
-            second = self.solve_once(inputs, previous_candidate=first)
+            second = self.solve_once(inputs, independent=True)
         except Exception as e:
             self.log(f"Error: {e}")
             second = None

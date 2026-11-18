@@ -1,0 +1,108 @@
+diff --git a/task_agent.py b/task_agent.py
+index d60c474..b5a84da 100644
+--- a/task_agent.py
++++ b/task_agent.py
+@@ -48,11 +48,45 @@ def grid_to_text(grid):
+     return "\n".join(" ".join(str(v) for v in row) for row in grid)
+ 
+ 
++def _training_change_audit(input_grid, output_grid, coordinate_limit=48):
++    """Describe exact demonstrated edits, including dimension changes."""
++    in_shape = (len(input_grid), len(input_grid[0]) if input_grid else 0)
++    out_shape = (len(output_grid), len(output_grid[0]) if output_grid else 0)
++    if in_shape != out_shape:
++        return f"dimensions {in_shape[0]}x{in_shape[1]} -> {out_shape[0]}x{out_shape[1]}"
++
++    changes = {}
++    for r, (in_row, out_row) in enumerate(zip(input_grid, output_grid)):
++        for c, (before, after) in enumerate(zip(in_row, out_row)):
++            if before != after:
++                changes.setdefault((before, after), []).append((r, c))
++    if not changes:
++        return "no cells changed"
++
++    total = sum(len(cells) for cells in changes.values())
++    descriptions = []
++    for (before, after), cells in sorted(changes.items()):
++        item = f"{before}->{after}: {len(cells)} cell(s)"
++        if total <= coordinate_limit:
++            item += " at " + ", ".join(f"({r},{c})" for r, c in cells)
++        else:
++            row_counts = {}
++            for r, _ in cells:
++                row_counts[r] = row_counts.get(r, 0) + 1
++            item += "; per-row counts " + ", ".join(
++                f"row {r}: {count}" for r, count in sorted(row_counts.items())
++            )
++        descriptions.append(item)
++    return f"{total} changed cell(s): " + "; ".join(descriptions)
++
++
+ def build_prompt(inputs):
+     parts = [
+         "You are solving an ARC-AGI puzzle. Each grid is a rectangular 2D array of integers 0-9 "
+         "(each integer is a color). The demonstration pairs below share one hidden transformation rule "
+-        "that maps each input grid to its output grid. Infer the rule and apply it to the test input.",
++        "that maps each input grid to its output grid. Infer the rule and apply it to the test input. "
++        "Use the cell-change audit for each example as evidence: the inferred rule must explain "
++        "every edit and every unchanged cell.",
+         "",
+     ]
+     for i, pair in enumerate(inputs["train"], 1):
+@@ -63,6 +97,10 @@ def build_prompt(inputs):
+         h, w = len(pair["output"]), len(pair["output"][0])
+         parts.append(f"Output ({h}x{w}):")
+         parts.append(grid_to_text(pair["output"]))
++        parts.append(
++            "Change audit (input value -> output value; coordinates are zero-based): "
++            + _training_change_audit(pair["input"], pair["output"])
++        )
+         parts.append("")
+     t = inputs["test_input"]
+     parts.append("## Test")
+@@ -145,15 +183,21 @@ class TaskAgent:
+         """
+         prompt = build_prompt(inputs)
+         if candidate is not None:
++            # Expose the candidate's exact edits, not just its grid, so verification checks
++            # both questionable fills and omitted edits against the demonstrated rule.
++            candidate_audit = _training_change_audit(inputs["test_input"], candidate)
+             prompt += (
+-                "\n\nIndependent verification of a previous candidate: "
++                "\n\nCheck this first-pass candidate against the demonstrations; it is a "
++                "hypothesis, not a trusted answer: "
+                 f"{json.dumps(candidate)}\n"
+-                "First infer the transformation from the demonstrations and check that it "
+-                "accounts for every input/output pair. Compare the candidate with the test "
+-                "input and that inferred rule; do not copy a demonstration output or accept "
+-                "the candidate merely because it looks plausible. If the candidate fails "
+-                "any check, correct it. Return the verified test grid in the required "
+-                "<answer> tags, with nothing else inside the tags."
++                "Candidate edit audit (test input -> candidate; coordinates are zero-based): "
++                f"{candidate_audit}\n"
++                "Derive the rule from every training pair before deciding. For a same-size "
++                "candidate, account for every listed edit and verify that every cell not "
++                "listed remains unchanged for a reason supported by the demonstrations. "
++                "Do not extend a pattern beyond its demonstrated bounds or fill a cell just "
++                "because it appears to complete a shape. Correct unjustified edits or "
++                "omissions, and return the verified grid in <answer> tags only."
+             )
+         elif independent:
+             prompt += (
+@@ -179,9 +223,13 @@ class TaskAgent:
+         answers = []
+         for attempt in range(2):
+             try:
+-                # A fresh second derivation avoids anchoring on a plausible-but-wrong
+-                # first grid, while preserving the two-call/two-answer budget.
+-                g = self.solve_once(inputs, independent=(attempt == 1))
++                # Spend the second permitted call auditing the first grid cell-by-cell.
++                # If the first call produced no parseable candidate, use a fresh solve.
++                g = self.solve_once(
++                    inputs,
++                    candidate=answers[0] if attempt == 1 and answers else None,
++                    independent=(attempt == 1 and not answers),
++                )
+             except Exception as e:
+                 self.log(f"Error: {e}")
+                 g = None
