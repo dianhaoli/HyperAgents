@@ -90,7 +90,10 @@
 .fx-demo .fxd-turn:last-child{border-left-color:transparent;padding-bottom:4px}
 .fx-demo .fxd-turn::before{content:"";position:absolute;left:-6px;top:6px;width:11px;height:11px;border-radius:50%;background:var(--panel);border:1px solid var(--ink-2)}
 .fx-demo .fxd-turnh{font-weight:600;margin:0 0 6px;line-height:1.4}
-.fx-demo .fxd-said{color:var(--ink-2);border-left:2px solid var(--rule-strong);padding-left:14px;white-space:pre-wrap;overflow-wrap:anywhere}
+.fx-demo .fxd-said{color:var(--ink-2);border-left:2px solid var(--rule-strong);padding-left:14px;overflow-wrap:anywhere}
+.fx-demo .fxd-said p{margin:0 0 .6em}
+.fx-demo .fxd-said p:last-child{margin-bottom:0}
+.fx-demo .fxd-tbody code,.fx-demo .fxd-said code{font-family:var(--font-mono,ui-monospace,monospace);font-size:.92em}
 
 /* the edit */
 .fx-demo .fxd-edit{background:var(--bg);border:1px solid var(--rule);border-radius:4px;padding:14px 16px 4px}
@@ -123,6 +126,15 @@
 .fx-demo .fxd-runmark.no{color:var(--wrong)}
 .fx-demo .fxd-runlab{font-size:var(--fs-axis);color:var(--ink-muted)}
 
+/* colour key, our reading, notes */
+.fx-demo .fxd-key{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 14px;font-size:var(--fs-axis);color:var(--ink-2)}
+.fx-demo .fxd-key li{display:inline-flex;align-items:center;gap:5px}
+.fx-demo .fxd-sw{display:inline-block;width:12px;height:12px;border-radius:2px;box-shadow:inset 0 0 0 1px var(--rule-strong)}
+.fx-demo .fxd-reading{margin:14px 0 0;padding:10px 14px 2px;background:var(--bg);border:1px solid var(--rule);border-radius:4px;max-width:72ch}
+.fx-demo .fxd-caveats{margin:12px 0 0}
+.fx-demo .fxd-cavlist{margin:4px 0 0;padding-left:20px;font-size:var(--fs-axis);color:var(--ink-2);max-width:80ch}
+.fx-demo .fxd-cavlist li{margin:0 0 6px}
+
 /* nav */
 .fx-demo .fxd-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:20px 0 0;padding:14px 0 0;border-top:1px solid var(--rule)}
 .fx-demo .fxd-back{font-size:var(--fs-fig-text);min-height:44px}
@@ -137,6 +149,7 @@
 .fx-demo.narrow .fxd-holdrow{grid-template-columns:minmax(0,1fr);gap:8px}
 .fx-demo.narrow .fxd-run{min-width:56px}
 .fx-demo.narrow .fxd-runs{gap:8px 10px}
+.fx-demo.narrow .fxd-diff{white-space:pre;word-break:normal;overflow-x:auto}
 
 @media (prefers-reduced-motion: reduce){
   .fx-demo .fxd-num,.fx-demo details.fxd-coll>summary::before{transition:none}

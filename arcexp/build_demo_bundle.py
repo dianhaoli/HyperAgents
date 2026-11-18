@@ -150,10 +150,20 @@ def coach_round(rnd, traces):
                 kind = "harness_nudge"
                 tool_out = nxt
         to, trunc = clip(tool_out, 3000)
+        # the per-log failure excerpts a command printed ("### chat_history_<task>_0.md" blocks), kept whole
+        excerpts = {}
+        if tool_out and "### chat_history_" in tool_out:
+            for blk in re.split(r"(?m)^(?=### chat_history_)", tool_out)[1:]:
+                m2 = re.match(r"### chat_history_(\w+?)_\d+\.md\n", blk)
+                if m2:
+                    body = blk[m2.end():]
+                    stop = re.search(r"(?m)^\n?--- ", body)
+                    excerpts[m2.group(1)] = (body[: stop.start()] if stop else body).rstrip("\n")
         turns.append({"turn": i + 1, "reasoning_summary": t.get("reasoning_summary") or "",
                       "visible_message": visible, "tool_command": cmd,
                       "next_input_kind": kind, "tool_output": to,
                       "tool_output_note": (f"truncated from {len(tool_out)} characters to ~3 KB" if trunc else None),
+                      "failure_log_excerpts": excerpts or None,
                       "cost_usd": round(t.get("cost") or 0, 5)})
     first_in = rs[0]["input"][0]["content"]
     instr = first_in.split(TOOL_PROMPT_END, 1)[1].strip() if TOOL_PROMPT_END in first_in else first_in
@@ -183,6 +193,7 @@ def main():
     ap.add_argument("--choice-notes", default="{}")
     a = ap.parse_args()
     traces = traces_by_token()
+    shown_phases = {f"demo_coach_{a.round}"} | {f"demo_eval_{x}" for x in (a.before, a.after, a.rep_before, a.rep_after)}
     summ, turns, instr = coach_round(a.round, traces)
     cdir = os.path.join(DEMO, f"coach_{a.round}")
     base_rep = json.load(open(os.path.join(cdir, "baseline_eval", "report.json")))
@@ -222,17 +233,27 @@ def main():
             spend[p] = spend.get(p, 0) + (r.get("cost") or 0)
     some = next(iter(traces.values()))[0]
     efforts = sorted({(t[0]["role"], t[0].get("effort")) for t in traces.values()})
+    used = [t for v in traces.values() for t in v if (t.get("scope") or {}).get("phase") in shown_phases]
+    modes = sorted({t.get("summary_mode") for t in used})
+    child = json.load(open(os.path.join(cdir, "child_eval", "report.json")))
+    shown_run = json.load(open(os.path.join(DEMO, f"eval_{a.after}.summary.json")))
     diff = open(os.path.join(cdir, "model_patch.diff")).read()
+    for p in puzzles:
+        p["repeats"]["edited_child_eval_solved"] = (child.get("per_task_score") or {}).get(p["task"], 0) >= 1
     bundle = {
         "meta": {
             "built": datetime.date.today().isoformat(), "model": some["model"],
             "effort_by_role": {r: e for r, e in efforts},
-            "summary_mode": "detailed",
+            "summary_mode": modes[0] if len(modes) == 1 else modes,
+            "summary_mode_study": "auto",
             "demo_cost_usd_total": round(sum(spend.values()), 4),
             "demo_cost_usd_by_phase": {k: round(v, 4) for k, v in sorted(spend.items())},
             "caveats": [
-                "Reasoning summaries are short summaries the model writes about its hidden reasoning, not the raw thoughts. "
-                "The API returns them for only some reasoning steps, so some calls have none.",
+                "Reasoning summaries are summaries of the model's hidden reasoning returned by the API, not the raw thoughts. "
+                "We cannot check how they are produced; they can be long (thousands of words), lossy or garbled. "
+                "The API returns them for only some calls, so some calls have none.",
+                "The demo asked the API for 'detailed' summaries; the study asked for 'auto' (in a two-call smoke test, "
+                "'auto' returned none). Everything else (model, reasoning effort, call cap, practice puzzles) is as in the study.",
                 "Runs are not deterministic: the same player on the same puzzle can succeed one time and fail the next.",
                 "This is a separate illustrative run made after the experiment. It is not part of the experiment's results.",
                 "Tool calls are not separate events in the trace: the coach writes each tool call as text in its reply, "
@@ -243,6 +264,7 @@ def main():
             "round": a.round, "instruction": instr, "turns": turns, "diff": diff,
             "editor_summary": a.edit_summary,
             "practice_score_before": summ["baseline_score"], "practice_score_after_child_eval": summ["child_score"],
+            "practice_score_after_shown_run": shown_run["reps"][0]["score"],
             "baseline_failures_shown": sorted({x.rsplit('_', 1)[0] for x in shown}),
             "baseline_failures_read": read,
             "baseline_failures_read_note": ("Task ids whose failure log (chat_history_<task>_0.md) the coach named in a tool command. "

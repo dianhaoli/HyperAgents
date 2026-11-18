@@ -218,3 +218,6 @@ The user allowed deviations from the prompt's design where clearly better; each 
     reuses the real sandbox, per-token caps, host-side scoring and run_loop/generate_loop (one coach generation of
     I_0 from A_0 on the source practice set, meta files frozen as in the pay-off runs). Its results go to
     `exp/demo/results/`, never `exp/results/`, and no analysis file reads `exp/demo/`.
+    One difference from the study: demo tokens request reasoning summary mode `"detailed"` (gateway `DEMO_SUMMARY`);
+    the study requested `"auto"`, which returned no summary text in the two-call smoke test (`demo_eval_smoke`).
+    Model, reasoning effort, call cap and practice puzzles are as in the study.
