@@ -128,6 +128,17 @@ Does the coach get better at coaching over generations? Exam score of the player
 - Paired change 20->40 (seeds 0-3): seed 0: +8.2, seed 1: +0.0, seed 2: -6.9, seed 3: +1.0; mean +0.6
 
 **Caveat (identical coaches).** Several extension picks are the same coach node at several generations (DECISIONS 37). Seed 0's picks at generations 12, 20 and 40 are all node 1, and seed 2's at 20 and 40 are node 9. For those seeds the 'change' between generations is run-to-run variation of one coach's 8-round run. Seed 0's identical coach scored 26.0%, 27.8%, 36.0% (a spread of about 10 points), so the trend cannot be separated from that variation.
+
+**Pick rules compared at generation 12** (extension rule vs committed rule, same archive):
+
+| seed | committed rule | extension rule | same coach? |
+|---|---|---|---|
+| 0 (source_s1) | 1 | 1 | yes |
+| 1 (source_s2) | 5 | 5 | yes |
+| 2 (source_s3) | 3 | 3 | yes |
+| 3 (source_s4) | none | 6 | no |
+
+Seed 3: the committed rule needs a changed coach with at least one scored child and finds none. The extension rule falls back to the changed coach with the most descendants: node 6, with 0 descendants (tied with node 12 and broken by the earlier generation).
 - Picks with changed coach code: generation 12 (part A rule) 5 of 6 seeds; extension 16 of 16 ({'source_s1:g6': 1, 'source_s2:g6': 5, 'source_s3:g6': 3, 'source_s4:g6': 6, 'source_s4:g20': 12, 'source_s2:g20': 9, 'source_s3:g20': 9, 'source_s1:g20': 1, 'source_s4:g30': 15, 'source_s2:g30': 9, 'source_s4:g40': 13, 'source_s3:g30': 9, 'source_s1:g30': 1, 'source_s2:g40': 5, 'source_s3:g40': 9, 'source_s1:g40': 1}).
 
 ## Diff audit of every picked coach (each changed hunk vs I_0; 2 independent judges + tiebreak)

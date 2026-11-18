@@ -122,6 +122,17 @@ def main():
              "between generations is run-to-run variation of one coach's 8-round run. Seed 0's identical coach scored "
              + ", ".join(pct(x) for x in [p_["heldout"] for p_ in ea.get("points", []) if p_.get("seed_index") == 0])
              + " (a spread of about 10 points), so the trend cannot be separated from that variation.")
+    cmp_p = os.path.join(EXP, "results", "pick_rule_comparison_g12.json")
+    if os.path.exists(cmp_p):
+        cmp = json.load(open(cmp_p))
+        L += ["", "**Pick rules compared at generation 12** (extension rule vs committed rule, same archive):", "",
+              "| seed | committed rule | extension rule | same coach? |", "|---|---|---|---|"]
+        for run, v in cmp.items():
+            L.append(f"| {v['seed_index']} ({run}) | {v['committed_rule_pick'] if v['committed_rule_pick'] is not None else 'none'} | "
+                     f"{v['extension_rule_pick'] if v['extension_rule_pick'] is not None else 'none'} | "
+                     f"{'yes' if v['committed_rule_pick'] == v['extension_rule_pick'] else 'no'} |")
+        L.append("\nSeed 3: the committed rule needs a changed coach with at least one scored child and finds none. The extension "
+                 "rule falls back to the changed coach with the most descendants: node 6, with 0 descendants (tied with node 12 and broken by the earlier generation).")
     pc = ea.get("picks_changed_code", {})
     L.append(f"- Picks with changed coach code: generation 12 (part A rule) {pc.get('gen12 (part A rule)')}; extension {pc.get('extension picks with changed coach code')} ({pc.get('extension picks')}).")
     au_p = os.path.join(EXP, "results", "diff_audit.json")

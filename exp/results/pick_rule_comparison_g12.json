@@ -1,0 +1,164 @@
+{
+ "source_s1": {
+  "seed_index": 0,
+  "committed_rule_pick": 1,
+  "extension_rule_pick": 1,
+  "extension_rule": "max mean child improvement among changed coaches with >=3 descendants",
+  "n_changed_coaches_at_g12": 7,
+  "candidates": [
+   {
+    "gen": 1,
+    "n_descendants": 7,
+    "n_children": 1,
+    "n_scored_children": 1,
+    "mean_child_improvement": 0.12
+   },
+   {
+    "gen": 2,
+    "n_descendants": 6,
+    "n_children": 5,
+    "n_scored_children": 4,
+    "mean_child_improvement": 2.7755575615628914e-17
+   },
+   {
+    "gen": 5,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   },
+   {
+    "gen": 6,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   },
+   {
+    "gen": 7,
+    "n_descendants": 1,
+    "n_children": 1,
+    "n_scored_children": 1,
+    "mean_child_improvement": 0.07999999999999996
+   },
+   {
+    "gen": 9,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   },
+   {
+    "gen": 12,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   }
+  ]
+ },
+ "source_s2": {
+  "seed_index": 1,
+  "committed_rule_pick": 5,
+  "extension_rule_pick": 5,
+  "extension_rule": "max mean child improvement among changed coaches with >=3 descendants",
+  "n_changed_coaches_at_g12": 4,
+  "candidates": [
+   {
+    "gen": 5,
+    "n_descendants": 3,
+    "n_children": 2,
+    "n_scored_children": 2,
+    "mean_child_improvement": -0.03999999999999998
+   },
+   {
+    "gen": 7,
+    "n_descendants": 1,
+    "n_children": 1,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   },
+   {
+    "gen": 8,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   },
+   {
+    "gen": 9,
+    "n_descendants": 1,
+    "n_children": 1,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   }
+  ]
+ },
+ "source_s3": {
+  "seed_index": 2,
+  "committed_rule_pick": 3,
+  "extension_rule_pick": 3,
+  "extension_rule": "max mean child improvement among changed coaches with >=3 descendants",
+  "n_changed_coaches_at_g12": 5,
+  "candidates": [
+   {
+    "gen": 3,
+    "n_descendants": 3,
+    "n_children": 1,
+    "n_scored_children": 1,
+    "mean_child_improvement": 0.0
+   },
+   {
+    "gen": 6,
+    "n_descendants": 2,
+    "n_children": 2,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   },
+   {
+    "gen": 9,
+    "n_descendants": 1,
+    "n_children": 1,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   },
+   {
+    "gen": 11,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   },
+   {
+    "gen": 12,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   }
+  ]
+ },
+ "source_s4": {
+  "seed_index": 3,
+  "committed_rule_pick": null,
+  "extension_rule_pick": 6,
+  "extension_rule": "no changed coach with >=3 descendants (and scored children): most descendants",
+  "n_changed_coaches_at_g12": 2,
+  "candidates": [
+   {
+    "gen": 6,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   },
+   {
+    "gen": 12,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null
+   }
+  ]
+ }
+}

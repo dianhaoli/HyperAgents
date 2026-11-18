@@ -198,3 +198,11 @@ The user allowed deviations from the prompt's design where clearly better; each 
     held-out grid found; private stores, admin socket and network blocked for the agent user).
 39. **VM restarts:** the VM restarted 6 times during the run. Every restart was resumed with `bash arcexp/resume.sh`. Only
     in-flight work was redone; cached rollouts were never re-run and no result was lost.
+40. **Pick-rule comparison at generation 12 (requested after the run; read-only, nothing re-run).** The extension
+    (DESIGN_v2) rule applied to each source archive as it stood at generation 12, against the committed rule
+    (`exp/results/pick_rule_comparison_g12.json`):
+    seed 0 (source_s1): both pick node 1 (same).
+    seed 1 (source_s2): both pick node 5 (same).
+    seed 2 (source_s3): both pick node 3 (same).
+    seed 3 (source_s4): committed rule picks none (no changed coach with a scored child); the extension rule's fallback
+    picks node 6 (0 descendants; tied with node 12 at 0 and broken by the earlier generation). Different.
