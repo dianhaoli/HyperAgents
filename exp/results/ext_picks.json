@@ -536,5 +536,196 @@
     "meta_agent.py"
    ]
   }
+ },
+ "source_s1:g20": {
+  "run": "source_s1",
+  "generation": 20,
+  "n_changed_coaches": 15,
+  "candidates": [
+   {
+    "gen": 1,
+    "score": 0.72,
+    "n_descendants": 13,
+    "n_children": 1,
+    "n_scored_children": 1,
+    "mean_child_improvement": 0.12,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 2,
+    "score": 0.84,
+    "n_descendants": 12,
+    "n_children": 5,
+    "n_scored_children": 4,
+    "mean_child_improvement": 2.7755575615628914e-17,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 5,
+    "score": 0.92,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 6,
+    "score": 0.72,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 7,
+    "score": 0.76,
+    "n_descendants": 1,
+    "n_children": 1,
+    "n_scored_children": 1,
+    "mean_child_improvement": 0.07999999999999996,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 9,
+    "score": 0.84,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 12,
+    "score": 0.96,
+    "n_descendants": 6,
+    "n_children": 3,
+    "n_scored_children": 3,
+    "mean_child_improvement": -0.07999999999999996,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 13,
+    "score": 0.92,
+    "n_descendants": 1,
+    "n_children": 1,
+    "n_scored_children": 1,
+    "mean_child_improvement": 0.039999999999999925,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 14,
+    "score": 0.88,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 15,
+    "score": 0.84,
+    "n_descendants": 2,
+    "n_children": 2,
+    "n_scored_children": 2,
+    "mean_child_improvement": 0.08000000000000002,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 16,
+    "score": 0.96,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 17,
+    "score": 0.84,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 18,
+    "score": null,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 19,
+    "score": 1.0,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   },
+   {
+    "gen": 20,
+    "score": null,
+    "n_descendants": 0,
+    "n_children": 0,
+    "n_scored_children": 0,
+    "mean_child_improvement": null,
+    "meta_files_changed_vs_I0": [
+     "meta_agent.py"
+    ]
+   }
+  ],
+  "pick": {
+   "gen": 1,
+   "score": 0.72,
+   "n_descendants": 13,
+   "n_children": 1,
+   "n_scored_children": 1,
+   "mean_child_improvement": 0.12,
+   "meta_files_changed_vs_I0": [
+    "meta_agent.py"
+   ]
+  },
+  "rule": "max mean child improvement among changed coaches with >=3 descendants",
+  "transplant_check": {
+   "ok": true,
+   "msg": "__ARC_SANDBOX_STARTED__\nIMPORT_OK\n",
+   "files_differing_from_I0": [
+    "meta_agent.py"
+   ]
+  }
  }
 }

@@ -36,8 +36,11 @@ def job_alive(name):
     if not os.path.exists(p):
         return False
     try:
-        os.kill(int(open(p).read().strip()), 0)
-        return True
+        pid = int(open(p).read().strip())
+        os.kill(pid, 0)
+        cmd = open(f"/proc/{pid}/cmdline", "rb").read().replace(b"\0", b" ").decode(errors="replace")
+        # pids are reused after a reboot: the process must really be this job
+        return ("arcexp" in cmd) and (name.replace("run_", "", 1) in cmd or name.replace("final_", "", 1) in cmd or name in cmd)
     except Exception:
         return False
 

@@ -1,0 +1,29 @@
+{
+  "phase": "ext_payoff",
+  "arm": "g20",
+  "seed": 0,
+  "source_run": "source_s1",
+  "coach_generation": 20,
+  "coach_node": 1,
+  "task_set": "payoff",
+  "max_generation": 8,
+  "template_dir": "exp/transplants_ext/source_s1_g20/template",
+  "freeze_paths": [
+    "agent",
+    "agent/base_agent.py",
+    "agent/llm.py",
+    "agent/llm_withtools.py",
+    "agent/tools/__init__.py",
+    "agent/tools/bash.py",
+    "agent/tools/edit.py",
+    "meta_agent.py",
+    "run_meta_agent.py",
+    "utils",
+    "utils/git_utils.py",
+    "utils/thread_logger.py"
+  ],
+  "rng_seed": 5000,
+  "workers": 12,
+  "name": "ext_source_s1_g20",
+  "root_commit": "b90d7030e2a6c2986af58355cf26f9333524cb9d"
+}

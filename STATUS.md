@@ -27,7 +27,7 @@ Hard cap $200 (gateway). One gateway (`arcexp/start_gateway.sh` is locked and id
 
 ## Resume after a VM restart (copy-paste)
 ```bash
-cd /home/user/HyperAgents && bash arcexp/setup_env.sh && bash arcexp/start_gateway.sh && rm -rf exp/stage/*
+cd /home/user/HyperAgents && bash arcexp/resume.sh
 python3 -m arcexp.orchestrate resume      # relaunches every unfinished run and phase job recorded in exp/logs/*.pid
 bash arcexp/monitor.sh
 ```

@@ -1,0 +1,18 @@
+{
+    "gen_output_dir": "/home/user/HyperAgents/exp/runs/source_s1/generate_source_s1/gen_20",
+    "current_genid": 20,
+    "parent_genid": 4,
+    "run_baseline": null,
+    "prev_patch_files": [
+        "/home/user/HyperAgents/exp/runs/source_s1/generate_source_s1/gen_4/agent_output/model_patch.diff"
+    ],
+    "curr_patch_files": [
+        "/home/user/HyperAgents/exp/runs/source_s1/generate_source_s1/gen_20/agent_output/model_patch.diff"
+    ],
+    "parent_agent_success": true,
+    "optimize_option": "only_agent",
+    "agent_archive_path": null,
+    "can_select_next_parent": true,
+    "run_eval": false,
+    "valid_parent": false
+}

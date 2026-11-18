@@ -2,3 +2,5 @@
 [eval] {'phase': 'rescore', 'arm': 'g20', 'seed': 3, 'iteration': 7} round 1: 3 test inputs to run (23 cached)
 ext_source_s4_g20 cand gen_7: loop score 0.740 rescore 0.580 combined 0.660
 [eval] {'phase': 'rescore', 'arm': 'g20', 'seed': 3, 'iteration': 'initial'} round 0: 26 test inputs to run (0 cached)
+ext_source_s4_g20 cand gen_7: loop score 0.740 rescore 0.580 combined 0.660
+[eval] {'phase': 'rescore', 'arm': 'g20', 'seed': 3, 'iteration': 'initial'} round 0: 16 test inputs to run (10 cached)

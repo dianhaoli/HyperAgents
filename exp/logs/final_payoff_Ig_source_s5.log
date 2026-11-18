@@ -27,3 +27,6 @@ OSError: [Errno 39] Directory not empty: '/home/user/HyperAgents/exp/runs/payoff
 payoff_Ig_source_s5 cand gen_4: loop score 0.740 rescore 0.520 combined 0.630
 payoff_Ig_source_s5 cand gen_3: loop score 0.700 rescore 0.700 combined 0.700
 [eval] {'phase': 'heldout', 'arm': 'Ig', 'seed': 5, 'iteration': 3} round 0: 115 test inputs to run (52 cached)
+payoff_Ig_source_s5 cand gen_4: loop score 0.740 rescore 0.520 combined 0.630
+payoff_Ig_source_s5 cand gen_3: loop score 0.700 rescore 0.700 combined 0.700
+[eval] {'phase': 'heldout', 'arm': 'Ig', 'seed': 5, 'iteration': 3} round 0: 71 test inputs to run (96 cached)
