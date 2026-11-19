@@ -27,7 +27,7 @@ Picture two AIs. The **player** solves visual logic puzzles. The **coach** studi
 Short answer: no. On a final exam of {{int:sets.heldout_tasks}} puzzles none of them had seen before, coached players scored about the same as a player with no coaching at all. What did help was much simpler: letting the model think longer before answering beat every kind of coaching.
 
 [[top.p3]]  <!-- p -->
-Average exam score: the share of the {{int:sets.heldout_tasks}} exam puzzles solved.
+Average exam score: the share of the {{int:sets.heldout_tasks}} exam puzzles solved. Generation-12 coach: the self-improved coach picked after 12 generations.
 
 [[top.p4]]  <!-- p -->
 Model: gpt-6-luna. Every player gets at most 2 model calls and 2 answers per puzzle. Total cost: {{usd:spend.total}}. November 2026.
@@ -54,7 +54,7 @@ Step 1: the coach improves itself over many generations. Step 2: we freeze it an
 **Figure 1**: how the experiment works.
 
 [[1-the-setup.p3]]  <!-- p -->
-We ran step 1 {{int:n_source_seeds}} separate times, for {{int:derived.sourceGens}} generations each. To test a coach, we froze it so it could no longer change (either the original coach or the self-improved one from each run[^2]). We then handed it a fresh, untouched player and gave it {{int:derived.rounds}} rounds of coaching on a different set of {{int:sets.payoff_practice_tasks}} practice puzzles. The finished player sat the exam exactly once: {{int:sets.heldout_tasks}} puzzles it had never seen.[^3]
+We ran step 1 {{int:n_source_seeds}} separate times, for {{int:derived.sourceGens}} generations each. To test a coach, we froze it so it could no longer change (either the original coach or the self-improved coach picked at generation 12 of each run, the **generation-12 coach**[^2]). We then handed it a fresh, untouched player and gave it {{int:derived.rounds}} rounds of coaching on a different set of {{int:sets.payoff_practice_tasks}} practice puzzles. The finished player sat the exam exactly once: {{int:sets.heldout_tasks}} puzzles it had never seen.[^3]
 
 [[1-the-setup.p4]]  <!-- p -->
 We also needed something to compare against. The uncoached player sat the same exam as it was, and once more with the model set to **think longer**: one notch higher on its "reasoning effort" setting, which lets the model reason more before it answers. It still got only two calls and two answers per puzzle. That setting was locked, so no coach could change it.[^4]
@@ -84,7 +84,7 @@ Pick a colour, click cells to paint, then press Check. Like the AI player, you g
 The result
 
 [[3-result.p1]]  <!-- p -->
-Players trained by the original coach scored {{pts:G.est}} points above the uncoached player, and players trained by a self-improved coach {{pts:Ig_gain_over_B0.est}} points. Both gaps are smaller than ordinary run-to-run noise, the amount scores bounce around when you simply run the same setup again. In other words, we can't tell either one apart from no effect.[^5] Thinking longer, by contrast, added about {{pp0:derived.xhighGain}} points.
+Players trained by the original coach scored {{pts:G.est}} points above the uncoached player, and players trained by a generation-12 coach {{pts:Ig_gain_over_B0.est}} points. Both gaps are smaller than ordinary run-to-run noise, the amount scores bounce around when you simply run the same setup again. In other words, we can't tell either one apart from no effect.[^5] Thinking longer, by contrast, added about {{pp0:derived.xhighGain}} points.
 
 [[3-result.title1]]  <!-- title -->
 Coached players scored the same as an uncoached one. Thinking longer scored much higher.
@@ -108,7 +108,7 @@ How well does a coach improve, and does it get better at improving?
 **First-order plasticity: how well a coach improves the player.** Freeze a coach, let it improve a fresh player for {{int:derived.rounds}} rounds, and compare that player's exam score with the uncoached player's. This is the *improvement@k* measure from the Hyperagents paper [[4]](#ref-hyper "cite"), with k = {{int:derived.rounds}} rounds. The original coach: {{pts:G.est}} points (95% interval {{ci:G}}).
 
 [[3b-plasticity.li2]]  <!-- li -->
-**Second-order plasticity: whether the coach gets better at improving.** Does that first-order gain grow as the coach rewrites itself? Compare players trained by later coaches with players trained by the original coach. Self-improved coach minus original: {{pts:Delta.est}} points (95% interval {{ci:Delta}}). Generation-40 coaches minus original: {{pts:extension.gen40_minus_gen0.est}} points (95% interval {{ci:extension.gen40_minus_gen0}}).
+**Second-order plasticity: whether the coach gets better at improving.** Does that first-order gain grow as the coach rewrites itself? Compare players trained by later coaches with players trained by the original coach. Generation-12 coach minus original: {{pts:Delta.est}} points (95% interval {{ci:Delta}}). Generation-40 coaches minus original: {{pts:extension.gen40_minus_gen0.est}} points (95% interval {{ci:extension.gen40_minus_gen0}}).
 
 [[3b-plasticity.p2]]  <!-- p -->
 Here both are indistinguishable from zero: coaching did not measurably improve the player, and rewriting itself did not make the coach a better coach. “Second-order plasticity” is our own name; the Hyperagents paper calls a coach rewriting itself *metacognitive self-modification*. That paper's positive result comes from moving evolved coaches to a new kind of task. Ours is a same-task test on ARC-AGI-2, so it does not directly test that claim.
@@ -162,7 +162,7 @@ Our estimates
 Did more generations help?
 
 [[4-generations.p1]]  <!-- p -->
-One reason it didn't: coaches rarely changed themselves. A coach's own code changed in only {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations. We then ran a follow-up that wasn't in the original pre-registered plan (its own plan was written down before it ran). In it, {{int:extension.per_generation.40.n}} runs kept going to generation {{int:derived.extMaxGen}}, and we also tested coaches picked at generations 20 and 40. Often the later pick was literally the same code: in run 1, the coaches picked at generations 12, 20 and 40 were all one version, made back at generation 1.
+One reason it didn't: coaches rarely changed themselves. A coach's own code changed in only {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations. We then ran a follow-up that wasn't in the original pre-registered plan (its own plan was written down before it ran). In it, {{int:extension.per_generation.40.n}} runs kept going to generation {{int:derived.extMaxGen}}, and we also tested coaches picked at generations 20 and 40. Like the generation-12 coach in the main result, these are self-improved coaches, picked by almost the same rule, just from a later point in each run (the follow-up rule also asked for at least 3 versions built on the coach). Often the later pick was literally the same code: in run 1, the coaches picked at generations 12, 20 and 40 were all one version, made back at generation 1.
 
 [[4-generations.p2]]  <!-- p -->
 That one coach scored {{pct:derived.sameCoach.g12}}, {{pct:derived.sameCoach.g20}} and {{pct:derived.sameCoach.g40}} in its three tests. Same code, different scores: that spread is pure noise, and it's bigger than any difference between generations.
@@ -276,7 +276,7 @@ Exam score of every finished player, also plotted against the tokens it used, pl
 Cost
 
 [[7-explore.p7]]  <!-- p -->
-The whole study cost {{usd:spend.total}} in model calls: {{usd:spend.by_role.task}} for players and {{usd:spend.by_role.meta}} for coaches. Per round, a coach used about {{tokens:derived.metaTokI0}} tokens (the chunks of text a model reads and writes) if it was the original coach, or {{tokens:derived.metaTokIg}} if it was self-improved.
+The whole study cost {{usd:spend.total}} in model calls: {{usd:spend.by_role.task}} for players and {{usd:spend.by_role.meta}} for coaches. Per round, a coach used about {{tokens:derived.metaTokI0}} tokens (the chunks of text a model reads and writes) if it was the original coach, or {{tokens:derived.metaTokIg}} for a generation-12 coach.
 
 [[7-explore.th1]]  <!-- th -->
 Phase
@@ -444,7 +444,7 @@ The design, fixed before any results
 **Final player of a run.** The two best players are re-scored on practice, the untouched starting player included; the better one sits the exam exactly once.
 
 [[7-explore.li19]]  <!-- li -->
-**Picking a self-improved coach.** Among coaches whose code differs from the original and that have at least one scored child, take the one whose children improved most on average; ties go to the earlier generation.
+**Picking the generation-12 coach.** Among coaches whose code differs from the original and that have at least one scored child, take the one whose children improved most on average; ties go to the earlier generation.
 
 [[7-explore.li20]]  <!-- li -->
 **Statistics.** 95% Welch t-intervals on per-run exam scores. The headline is the first matching row of a list written in advance.
@@ -462,10 +462,10 @@ What was run, in order
 **Step 1.** 6 self-improvement runs of 12 generations. The coach's own code changed in {{int:derived.selfEditGens}} of {{int:derived.totalGens}} generations (runs 1 to 6: 1, 4, 5, 1, 7, 3). Run 4 produced no qualifying coach, so 5 self-improved coaches were tested.
 
 [[7-explore.li24]]  <!-- li -->
-**Step 2.** Original coach, 6 test runs: {{pct:I0_runs.payoff_I0_1}}, {{pct:I0_runs.payoff_I0_2}}, {{pct:I0_runs.payoff_I0_3}}, {{pct:I0_runs.payoff_I0_4}}, {{pct:I0_runs.payoff_I0_5}}, {{pct:I0_runs.payoff_I0_6}} (average {{pct:I0_mean}}). Self-improved coaches from runs 1, 2, 3, 5, 6: {{pct:Ig_runs.payoff_Ig_source_s1}}, {{pct:Ig_runs.payoff_Ig_source_s2}}, {{pct:Ig_runs.payoff_Ig_source_s3}}, {{pct:Ig_runs.payoff_Ig_source_s5}}, {{pct:Ig_runs.payoff_Ig_source_s6}} (average {{pct:Ig_mean}}).
+**Step 2.** Original coach, 6 test runs: {{pct:I0_runs.payoff_I0_1}}, {{pct:I0_runs.payoff_I0_2}}, {{pct:I0_runs.payoff_I0_3}}, {{pct:I0_runs.payoff_I0_4}}, {{pct:I0_runs.payoff_I0_5}}, {{pct:I0_runs.payoff_I0_6}} (average {{pct:I0_mean}}). Generation-12 coaches from runs 1, 2, 3, 5, 6: {{pct:Ig_runs.payoff_Ig_source_s1}}, {{pct:Ig_runs.payoff_Ig_source_s2}}, {{pct:Ig_runs.payoff_Ig_source_s3}}, {{pct:Ig_runs.payoff_Ig_source_s5}}, {{pct:Ig_runs.payoff_Ig_source_s6}} (average {{pct:Ig_mean}}).
 
 [[7-explore.li25]]  <!-- li -->
-**Pre-registered analysis.** Original minus no coach {{pts:G.est}} {{ci:G}}; self-improved minus original {{pts:Delta.est}} {{ci:Delta}}. Headline: "{{raw:headline}}."
+**Pre-registered analysis.** Original minus no coach {{pts:G.est}} {{ci:G}}; generation-12 coach minus original {{pts:Delta.est}} {{ci:Delta}}. Headline: "{{raw:headline}}."
 
 [[7-explore.li26]]  <!-- li -->
 **Follow-up.** Runs 1 to 4 continued to 40 generations; coaches picked at generations 20 and 40 were tested under the same rules. Averages at generations 0, 12, 20, 40: {{pct:extension.per_generation.0.mean}}, {{pct:extension.per_generation.12.mean}}, {{pct:extension.per_generation.20.mean}}, {{pct:extension.per_generation.40.mean}}.
@@ -510,7 +510,7 @@ The 120 public ARC-AGI-2 evaluation tasks [[1]](#ref-arc "cite"), with {{int:set
 A gateway that no agent could edit fixed the model, its reasoning effort (*high*; *xhigh* for the think-longer run), the call cap and the budget.
 
 [[fn-5]]
-95% intervals: original coach minus no coach {{ci:G}} points; self-improved minus no coach {{ci:Ig_gain_over_B0}}; self-improved minus original {{pts:Delta.est}} {{ci:Delta}}. All include zero, which means "no difference" fits the data. Welch t-intervals [[2]](#ref-welch "cite"); the headline was pre-registered.
+95% intervals: original coach minus no coach {{ci:G}} points; generation-12 coach minus no coach {{ci:Ig_gain_over_B0}}; generation-12 coach minus original {{pts:Delta.est}} {{ci:Delta}}. All include zero, which means "no difference" fits the data. Welch t-intervals [[2]](#ref-welch "cite"); the headline was pre-registered.
 
 [[fn-6]]
 Same model, reasoning effort, call cap and practice puzzles as the study, with one difference: the demo asked for “detailed” reasoning summaries, while the study asked for “auto” (which returned none in a short test). We show the only round, out of several tried, that changed the player without breaking it, plus two puzzles picked to illustrate: one the edit fixed and one it didn't. Runs aren't deterministic, so each player was run on each puzzle several times.
@@ -522,9 +522,6 @@ Same model, reasoning effort, call cap and practice puzzles as the study, with o
 
 
 ### core.js
-
-[[js:core.js:23:2]]
-Self-improved coach
 
 [[js:core.js:23:3]]
 Think longer (no coach)
@@ -538,14 +535,8 @@ http://www.w3.org/2000/svg
 [[js:core.js:193:1]]
 Think longer, no coach
 
-[[js:core.js:194:1]]
-Self-improved coach
-
 [[js:core.js:195:2]]
 Self-improvement run
-
-[[js:core.js:209:2]]
-Self-improved coach
 
 [[js:core.js:210:2]]
 Think longer, no coach
@@ -563,7 +554,7 @@ Think longer, no coach
 Original coach, run 
 
 [[js:core.js:227:0]]
-Self-improved coach from run 
+Generation-12 coach from run 
 
 [[js:core.js:228:1]]
  coach from run 
@@ -667,9 +658,6 @@ See every run’s answer →
 [[js:fig-results.js:21:2]]
 assets/fig-results.css
 
-[[js:fig-results.js:34:2]]
-Self-improved coach
-
 [[js:fig-results.js:35:1]]
 Think longer (no coach)
 
@@ -680,10 +668,7 @@ No coach, run
 Original coach, run 
 
 [[js:fig-results.js:48:0]]
-Self-improved coach from 
-
-[[js:fig-results.js:142:2]]
-Self-improved coach
+Generation-12 coach from 
 
 [[js:fig-results.js:142:3]]
 Think longer, no coach
@@ -696,9 +681,6 @@ Exam score (share of 120 puzzles solved)
 
 [[js:fig-results.js:180:1]]
 Exam score: share of the 120 exam puzzles solved in two tries
-
-[[js:fig-results.js:266:2]]
-Self-improved coach
 
 [[js:fig-results.js:267:2]]
 Think longer, no coach
@@ -776,13 +758,13 @@ Differences in exam score, in points, with 95% Welch intervals. An interval that
 Original coach vs no coach
 
 [[js:fig-results.js:673:2]]
-Self-improved vs original coach
+Generation-12 vs original coach
 
 [[js:fig-results.js:674:0]]
 Ig_gain_over_B0
 
 [[js:fig-results.js:674:2]]
-Self-improved coach vs no coach
+Generation-12 coach vs no coach
 
 [[js:fig-results.js:690:3]]
 Crosses 0: no detectable difference.
@@ -832,9 +814,6 @@ tested 3 times. The spread is noise.
 [[js:fig-extension.js:202:0]]
 Ringed: one unchanged coach, tested 3 times. The spread is noise.
 
-[[js:fig-extension.js:221:2]]
-self-improved coach (main test)
-
 [[js:fig-extension.js:233:0]]
 Generation the coach was picked at
 
@@ -846,9 +825,6 @@ Picked at generation
 
 [[js:fig-watch.js:19:2]]
 assets/fig-watch.css
-
-[[js:fig-watch.js:26:1]]
-Self-improved coach
 
 [[js:fig-watch.js:26:2]]
 payoff_Ig_source_s1
@@ -1417,14 +1393,11 @@ Dashed squares: the
 [[js:fig-transcripts.js:78:0]]
 Self-improvement runs
 
-[[js:fig-transcripts.js:78:2]]
-Self-improved coach
-
 [[js:fig-transcripts.js:78:5]]
 Short test runs
 
 [[js:fig-transcripts.js:83:0]]
-Trial of the self-improved coach from run 
+Trial of the generation-12 coach from run 
 
 [[js:fig-transcripts.js:262:1]]
 Two model calls (refine or verify)
